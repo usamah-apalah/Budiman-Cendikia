@@ -6,5 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Pengumuman extends Model
 {
-    //
+    protected $table = 'pengumuman';
+    protected $fillable = ['unit', 'judul', 'konten', 'is_aktif'];
 }

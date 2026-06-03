@@ -7,43 +7,44 @@ use Illuminate\Http\Request;
 
 class GaleriController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $query = Galeri::query();
+        if ($request->has('unit')) {
+            $query->where('unit', $request->unit);
+        }
+        return response()->json($query->latest()->get());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'unit'      => 'required|in:sd,smp',
+            'judul'     => 'required|string|max:255',
+            'image'     => 'required|string',
+            'deskripsi' => 'nullable|string',
+        ]);
+
+        $galeri = Galeri::create($validated);
+        return response()->json($galeri, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Galeri $galeri)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Galeri $galeri)
     {
-        //
+        $validated = $request->validate([
+            'unit'      => 'sometimes|required|in:sd,smp',
+            'judul'     => 'sometimes|required|string|max:255',
+            'image'     => 'sometimes|required|string',
+            'deskripsi' => 'nullable|string',
+        ]);
+
+        $galeri->update($validated);
+        return response()->json($galeri);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Galeri $galeri)
     {
-        //
+        $galeri->delete();
+        return response()->json(['message' => 'Galeri berhasil dihapus']);
     }
 }

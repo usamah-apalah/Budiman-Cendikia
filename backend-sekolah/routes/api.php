@@ -21,10 +21,12 @@ Route::prefix('v1')->group(function () {
 
     // Auth
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register', [AuthController::class, 'register']);
 });
 
 // Protected routes (admin only)
 Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
+    Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::apiResource('berita', BeritaController::class)->except(['index', 'show']);
     Route::apiResource('guru', GuruController::class)->except(['index']);

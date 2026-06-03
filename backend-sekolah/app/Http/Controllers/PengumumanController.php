@@ -7,55 +7,41 @@ use Illuminate\Http\Request;
 
 class PengumumanController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(Pengumuman::latest()->get());
+        $query = Pengumuman::query();
+        if ($request->has('unit')) {
+            $query->where('unit', $request->unit);
+        }
+        return response()->json($query->latest()->get());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'judul' => 'required|string|max:255',
-            'isi'   => 'required|string',
-            'tanggal' => 'nullable|date',
+            'unit'    => 'required|in:sd,smp',
+            'judul'   => 'required|string|max:255',
+            'konten'  => 'required|string',
+            'is_aktif' => 'boolean',
         ]);
 
         $pengumuman = Pengumuman::create($validated);
         return response()->json($pengumuman, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Pengumuman $pengumuman)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Pengumuman $pengumuman)
     {
         $validated = $request->validate([
-            'judul' => 'sometimes|required|string|max:255',
-            'isi'   => 'sometimes|required|string',
-            'tanggal' => 'nullable|date',
+            'unit'    => 'sometimes|required|in:sd,smp',
+            'judul'   => 'sometimes|required|string|max:255',
+            'konten'  => 'sometimes|required|string',
+            'is_aktif' => 'boolean',
         ]);
 
         $pengumuman->update($validated);
         return response()->json($pengumuman);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Pengumuman $pengumuman)
     {
         $pengumuman->delete();

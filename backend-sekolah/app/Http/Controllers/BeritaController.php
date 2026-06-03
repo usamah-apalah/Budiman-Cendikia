@@ -9,11 +9,15 @@ use Illuminate\Support\Str;
 
 class BeritaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $berita = Berita::where('is_published', true)
-            ->latest()
-            ->paginate(10);
+        $query = Berita::where('is_published', true);
+
+        if ($request->has('unit')) {
+            $query->where('unit', $request->unit);
+        }
+
+        $berita = $query->latest()->paginate(10);
         return response()->json($berita);
     }
 
@@ -25,10 +29,10 @@ class BeritaController extends Controller
         return response()->json($berita);
     }
 
-    // Untuk admin panel
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'unit'         => 'required|in:sd,smp',
             'judul'        => 'required|string|max:255',
             'konten'       => 'required|string',
             'kategori'     => 'required|in:umum,prestasi,kegiatan',
@@ -37,6 +41,7 @@ class BeritaController extends Controller
         ]);
 
         $berita = Berita::create([
+            'unit'         => $validated['unit'],
             'judul'        => $validated['judul'],
             'slug'         => Str::slug($validated['judul']) . '-' . Str::random(5),
             'konten'       => $validated['konten'],
@@ -51,6 +56,7 @@ class BeritaController extends Controller
     public function update(Request $request, Berita $berita)
     {
         $validated = $request->validate([
+            'unit'         => 'sometimes|required|in:sd,smp',
             'judul'        => 'sometimes|required|string|max:255',
             'konten'       => 'sometimes|required|string',
             'kategori'     => 'sometimes|required|in:umum,prestasi,kegiatan',
