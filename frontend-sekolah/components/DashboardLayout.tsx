@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -12,93 +12,144 @@ interface DashboardLayoutProps {
   title: string;
 }
 
-export default function DashboardLayout({ children, unit, title }: DashboardLayoutProps) {
-  const router = useRouter();
+export default function DashboardLayout({
+  children,
+  unit,
+  title,
+}: DashboardLayoutProps) {
+  const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("admin_token");
     const savedUnit = localStorage.getItem("admin_unit");
 
-    if (!token || savedUnit !== unit) {
-      toast.error("Silakan login kembali.");
-      router.push(`/admin/login?unit=${unit}`);
+    if (token && savedUnit === unit) {
+      setIsAdmin(true);
     }
-  }, [router, unit]);
+  }, [unit]);
 
   const handleLogout = () => {
     localStorage.removeItem("admin_token");
     localStorage.removeItem("admin_unit");
-    router.push("/");
+    setIsAdmin(false);
+    window.location.href = "/";
   };
 
   const navItems = [
-    { name: "Dashboard", href: `/admin/${unit}`, icon: "🏠" },
-    { name: "Berita", href: `/admin/${unit}/berita`, icon: "📰" },
-    { name: "Guru", href: `/admin/${unit}/guru`, icon: "👨‍🏫" },
-    { name: "Galeri", href: `/admin/${unit}/galeri`, icon: "🖼️" },
-    { name: "Pengumuman", href: `/admin/${unit}/pengumuman`, icon: "📢" },
-    { name: "PPDB", href: `/admin/${unit}/ppdb`, icon: "📝" },
+    { name: "Dashboard", href: `/admin/${unit}` },
+    { name: "Berita", href: `/admin/${unit}/berita` },
+    { name: "Pengumuman", href: `/admin/${unit}/pengumuman` },
+    { name: "Agenda", href: `/admin/${unit}/agenda` },
+    { name: "Prestasi", href: `/admin/${unit}/prestasi` },
+    { name: "Guru", href: `/admin/${unit}/guru` },
+    { name: "Galeri", href: `/admin/${unit}/galeri` },
+    { name: "PPDB", href: `/admin/${unit}/ppdb` },
   ];
 
-  const themeColor = unit === "sd" ? "bg-blue-600" : "bg-indigo-700";
-  const themeHover = unit === "sd" ? "hover:bg-blue-700" : "hover:bg-indigo-800";
+  const themeSidebar = "bg-tosca-900";
+  const themeActive = "bg-tosca-700";
+  const themeHover = "hover:bg-tosca-700";
 
   return (
-    <div className="flex h-screen bg-gray-100 font-sans">
+    <div className="flex h-screen bg-gray-50 font-sans">
       {/* Sidebar */}
       <aside
         className={`${
           isSidebarOpen ? "w-64" : "w-20"
-        } transition-all duration-300 ${themeColor} text-white flex flex-col shadow-xl`}
+        } transition-all duration-300 ${themeSidebar} text-white flex flex-col shadow-2xl relative z-20`}
       >
-        <div className="p-6 flex items-center justify-between">
-          {isSidebarOpen && <span className="text-xl font-bold">Budiman {unit.toUpperCase()}</span>}
+        <div className="p-6 flex items-center justify-between border-b border-tosca-700/50">
+          {isSidebarOpen && (
+            <div className="flex flex-col">
+              <span className="text-xl font-bold tracking-tight">Budiman</span>
+              <span className="text-xs font-medium text-tosca-200 uppercase tracking-widest">
+                {unit} Administrator
+              </span>
+            </div>
+          )}
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="p-1 rounded-lg bg-white/10 hover:bg-white/20 transition"
+            className="p-2 rounded-xl bg-tosca-700 hover:bg-tosca-500 transition-colors shadow-inner text-[10px] font-bold"
           >
-            {isSidebarOpen ? "◀" : "▶"}
+            {isSidebarOpen ? 'CLOSE' : 'OPEN'}
           </button>
         </div>
 
-        <nav className="flex-1 mt-6 px-4 space-y-2">
+        <nav className="flex-1 mt-8 px-4 space-y-2">
           {navItems.map((item) => (
             <Link
               key={item.name}
               href={item.href}
-              className={`flex items-center p-3 rounded-xl transition ${themeHover} group`}
+              className={`flex items-center p-3 rounded-xl transition-all duration-200 group ${
+                pathname === item.href ? themeActive : themeHover
+              }`}
             >
-              <span className="text-2xl">{item.icon}</span>
-              {isSidebarOpen && <span className="ml-4 font-medium">{item.name}</span>}
+              {isSidebarOpen && (
+                <span className="font-medium">{item.name}</span>
+              )}
             </Link>
           ))}
         </nav>
 
-        <div className="p-4 border-t border-white/10">
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center p-3 rounded-xl bg-red-500 hover:bg-red-600 transition"
-          >
-            <span className="text-xl">🚪</span>
-            {isSidebarOpen && <span className="ml-4 font-medium">Logout</span>}
-          </button>
+        <div className="p-4 border-t border-tosca-700/50">
+          {isAdmin ? (
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center p-3 rounded-xl bg-red-500/80 hover:bg-red-600 transition-all shadow-lg hover:shadow-red-500/20 group"
+            >
+              {isSidebarOpen && (
+                <span className="ml-4 font-medium">Logout</span>
+              )}
+            </button>
+          ) : (
+            <Link
+              href={`/admin/login?unit=${unit}`}
+              className="w-full flex items-center p-3 rounded-xl bg-tosca-500 hover:bg-tosca-200 hover:text-tosca-900 transition-all shadow-lg shadow-tosca-500/20 group"
+            >
+              {isSidebarOpen && (
+                <span className="ml-4 font-medium">Login Admin</span>
+              )}
+            </Link>
+          )}
         </div>
       </aside>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="bg-white shadow-sm h-16 flex items-center justify-between px-8">
-          <h1 className="text-xl font-bold text-gray-800">{title}</h1>
-          <div className="flex items-center gap-4">
-            <span className="text-gray-500 font-medium">Administrator</span>
-            <div className={`w-10 h-10 rounded-full ${themeColor} flex items-center justify-center text-white font-bold`}>
-              A
+        <header className="bg-white border-b border-gray-200 h-18 flex items-center justify-between px-8 z-10">
+          <h1 className="text-lg font-semibold text-gray-700">
+            <span className="text-tosca-700 font-bold mr-2">|</span>
+            {title}
+          </h1>
+          <div className="flex items-center gap-6">
+            {!isAdmin && (
+              <Link
+                href={`/admin/login?unit=${unit}`}
+                className="hidden sm:block px-6 py-2 bg-tosca-50 text-tosca-700 font-bold rounded-xl border border-tosca-200 hover:bg-tosca-500 hover:text-white transition-all duration-300"
+              >
+                Login Admin
+              </Link>
+            )}
+            <div className="hidden md:flex flex-col items-end">
+              <span className="text-sm font-bold text-gray-800">
+                {isAdmin ? `Admin ${unit.toUpperCase()}` : "Tamu / Publik"}
+              </span>
+              <span
+                className={`text-[10px] uppercase font-black tracking-tighter ${isAdmin ? "text-green-500" : "text-gray-400"}`}
+              >
+                {isAdmin ? "Terautentikasi" : "Akses Publik"}
+              </span>
+            </div>
+            <div
+              className={`w-11 h-11 rounded-2xl ${isAdmin ? "bg-tosca-500" : "bg-gray-200"} flex items-center justify-center text-white font-bold shadow-lg transform hover:rotate-3 transition-transform cursor-pointer`}
+            >
             </div>
           </div>
         </header>
 
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-8">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#F8FAFC] p-8">
           {children}
         </main>
       </div>

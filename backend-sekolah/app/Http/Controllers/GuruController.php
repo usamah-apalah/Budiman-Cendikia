@@ -10,9 +10,10 @@ class GuruController extends Controller
     public function index(Request $request)
     {
         $query = Guru::query();
-        if ($request->has('unit')) {
-            $query->where('unit', $request->unit);
-        }
+        // Unit filter removed to synchronize data between units
+        // if ($request->has('unit')) {
+        //     $query->where('unit', $request->unit);
+        // }
         return response()->json($query->get());
     }
 

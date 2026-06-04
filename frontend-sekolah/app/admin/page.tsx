@@ -5,95 +5,124 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import api from "@/lib/api";
 
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  unit: "sd" | "smp" | null;
+}
+
 export default function AdminPage() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem("admin_token");
       if (!token) {
-        router.push("/admin/login");
+        setLoading(false);
         return;
       }
 
       try {
         const response = await api.get("/me");
         setUser(response.data);
-        
-        // If user is already logged in and has a unit, redirect to that unit's dashboard
-        if (response.data.unit) {
-          router.push(`/admin/${response.data.unit}`);
-        }
       } catch (error) {
         console.error("Auth check failed:", error);
         localStorage.removeItem("admin_token");
-        router.push("/admin/login");
       } finally {
         setLoading(false);
       }
     };
 
     checkAuth();
-  }, [router]);
+  }, []);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-tosca-500 border-gray-200"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6">
-      <div className="max-w-4xl w-full text-center">
-        <h1 className="text-4xl font-extrabold text-gray-900 mb-4">
-          Selamat Datang, {user?.name}
+    <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-6 relative overflow-hidden">
+      {/* Decorative elements */}
+      <div className="absolute top-0 left-0 w-96 h-96 bg-tosca-50 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl opacity-60"></div>
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-tosca-100 rounded-full translate-x-1/4 translate-y-1/4 blur-3xl opacity-40"></div>
+
+      <div className="max-w-4xl w-full text-center relative z-10">
+        <div className="inline-block px-4 py-1.5 bg-tosca-50 text-tosca-700 rounded-full text-xs font-black uppercase tracking-widest mb-6 border border-tosca-100">
+          Budiman Cendikia Portal
+        </div>
+        <h1 className="text-5xl font-black text-gray-900 mb-4 tracking-tight">
+          Selamat Datang{user ? `, ${user.name}` : ""}
         </h1>
-        <p className="text-xl text-gray-600 mb-12">
-          Pilih unit yang ingin Anda kelola hari ini.
+        <p className="text-lg text-gray-500 mb-12 font-medium max-w-2xl mx-auto">
+          Silakan pilih unit sekolah untuk melihat informasi terbaru, daftar guru, dan pengumuman.
         </p>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-2 gap-10">
           {/* SD Card */}
-          <Link href="/admin/sd" className="group">
-            <div className="bg-white p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all border-b-8 border-blue-600 transform hover:-translate-y-2">
-              <div className="w-20 h-20 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform">
-                <span className="text-4xl font-bold text-blue-600">SD</span>
+          <Link href="/admin/sd/dashboard" className="group">
+            <div className="bg-white p-10 rounded-[40px] shadow-xl hover:shadow-tosca-500/10 transition-all border-b-[12px] border-tosca-500 transform hover:-translate-y-3 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <span className="text-8xl font-black">SD</span>
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Unit SD</h2>
-              <p className="text-gray-500">
-                Kelola berita, guru, galeri, dan pengumuman untuk Sekolah Dasar.
+              <div className="w-24 h-24 bg-tosca-50 rounded-3xl flex items-center justify-center mb-8 mx-auto group-hover:scale-110 group-hover:bg-tosca-500 transition-all duration-500 shadow-inner">
+                <span className="text-4xl font-black text-tosca-700 group-hover:text-white">SD</span>
+              </div>
+              <h2 className="text-3xl font-black text-gray-900 mb-3 tracking-tight">Unit SD</h2>
+              <p className="text-gray-400 font-medium leading-relaxed">
+                Informasi berita, profil guru, galeri, dan pengumuman Sekolah Dasar.
               </p>
+              <div className="mt-8 flex items-center justify-center text-tosca-700 font-bold group-hover:translate-x-2 transition-transform">
+                Buka Dashboard
+              </div>
             </div>
           </Link>
 
           {/* SMP Card */}
-          <Link href="/admin/smp" className="group">
-            <div className="bg-white p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all border-b-8 border-indigo-700 transform hover:-translate-y-2">
-              <div className="w-20 h-20 bg-indigo-100 rounded-2xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform">
-                <span className="text-4xl font-bold text-indigo-700">SMP</span>
+          <Link href="/admin/smp/dashboard" className="group">
+            <div className="bg-white p-10 rounded-[40px] shadow-xl hover:shadow-tosca-700/10 transition-all border-b-[12px] border-tosca-700 transform hover:-translate-y-3 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <span className="text-8xl font-black">SMP</span>
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Unit SMP</h2>
-              <p className="text-gray-500">
-                Kelola berita, guru, galeri, dan pengumuman untuk Sekolah Menengah Pertama.
+              <div className="w-24 h-24 bg-tosca-100 rounded-3xl flex items-center justify-center mb-8 mx-auto group-hover:scale-110 group-hover:bg-tosca-700 transition-all duration-500 shadow-inner">
+                <span className="text-4xl font-black text-tosca-900 group-hover:text-white">SMP</span>
+              </div>
+              <h2 className="text-3xl font-black text-gray-900 mb-3 tracking-tight">Unit SMP</h2>
+              <p className="text-gray-400 font-medium leading-relaxed">
+                Informasi berita, profil guru, galeri, dan pengumuman Sekolah Menengah Pertama.
               </p>
+              <div className="mt-8 flex items-center justify-center text-tosca-900 font-bold group-hover:translate-x-2 transition-transform">
+                Buka Dashboard
+              </div>
             </div>
           </Link>
         </div>
 
-        <button
-          onClick={() => {
-            localStorage.removeItem("admin_token");
-            localStorage.removeItem("admin_unit");
-            router.push("/admin/login");
-          }}
-          className="mt-12 text-red-600 font-semibold hover:underline"
-        >
-          Logout dari sistem
-        </button>
+        {user ? (
+          <button
+            onClick={() => {
+              localStorage.removeItem("admin_token");
+              localStorage.removeItem("admin_unit");
+              setUser(null);
+            }}
+            className="mt-16 text-red-500 font-black text-sm uppercase tracking-widest hover:text-red-700 transition-colors"
+          >
+            Logout dari sistem
+          </button>
+        ) : (
+          <div className="mt-16 flex items-center justify-center gap-2 text-gray-400 font-medium">
+            Ingin mengelola konten? 
+            <Link href="/admin/login" className="text-tosca-700 font-black hover:underline ml-1">
+              Login Admin
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );

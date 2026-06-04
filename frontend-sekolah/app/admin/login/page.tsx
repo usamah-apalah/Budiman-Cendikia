@@ -5,13 +5,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import api from "@/lib/api";
 import { toast, ToastContainer } from "react-toastify";
 import Link from "next/link";
-import "react-toastify/dist/ReactToastify.css";
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const unit = searchParams.get("unit") || "sd";
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -22,101 +20,92 @@ function LoginForm() {
 
     try {
       const response = await api.post("/login", { email, password });
-      localStorage.setItem("admin_token", response.data.token);
-      localStorage.setItem("admin_unit", unit);
-      toast.success("Login berhasil!");
-      router.push(`/admin/${unit}`);
-    } catch (error: unknown) {
-      toast.error(
-        (error as { response?: { data?: { message?: string } } }).response?.data
-          ?.message || "Login gagal, silakan cek kembali.",
-      );
+      const { token, user } = response.data;
+
+      if (user.unit !== unit) {
+        toast.error(`Akun Anda terdaftar untuk unit ${user.unit.toUpperCase()}.`);
+        setIsLoading(false);
+        return;
+      }
+
+      localStorage.setItem("admin_token", token);
+      localStorage.setItem("admin_unit", user.unit);
+      toast.success("Login Berhasil!");
+      router.push(`/admin/${unit}/dashboard`);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Login Gagal. Cek kembali email & password.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-900">Admin Login</h2>
-        <p className="text-gray-500 mt-2 capitalize font-medium">
-          Unit: {unit.toUpperCase()}
+    <div className="w-full max-w-md p-8 bg-white rounded-3xl shadow-2xl border border-gray-100">
+      <div className="text-center mb-10">
+        <h2 className="text-3xl font-black text-gray-900 tracking-tight">Admin Login</h2>
+        <p className="text-tosca-700 mt-2 capitalize font-bold text-sm tracking-widest uppercase">
+          Unit {unit.toUpperCase()}
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">
             Email Address
           </label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition outline-none"
-            placeholder="admin@sekolah.com"
-          />
+          <div className="relative">
+             <input
+               type="email"
+               value={email}
+               onChange={(e) => setEmail(e.target.value)}
+               required
+               className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:ring-4 focus:ring-tosca-500/10 focus:border-tosca-500 transition-all outline-none bg-gray-50/50"
+               placeholder={unit === "sd" ? "admin_sd@budimancendikia.com" : "admin_smp@budimancendikia.com"}
+             />
+          </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">
             Password
           </label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition outline-none"
-            placeholder="••••••••"
-          />
+          <div className="relative">
+             <input
+               type="password"
+               value={password}
+               onChange={(e) => setPassword(e.target.value)}
+               required
+               className="w-full px-5 py-4 rounded-2xl border border-gray-200 focus:ring-4 focus:ring-tosca-500/10 focus:border-tosca-500 transition-all outline-none bg-gray-50/50"
+               placeholder="••••••••"
+             />
+          </div>
         </div>
 
         <button
           type="submit"
           disabled={isLoading}
-          className={`w-full py-3 px-4 rounded-lg text-white font-bold transition flex items-center justify-center ${
+          className={`w-full py-4 px-6 rounded-2xl text-white font-black tracking-wide transition-all duration-300 shadow-lg flex items-center justify-center gap-2 ${
             unit === "sd"
-              ? "bg-blue-600 hover:bg-blue-700"
-              : "bg-indigo-700 hover:bg-indigo-800"
-          } ${isLoading ? "opacity-70 cursor-not-allowed" : ""}`}
+              ? "bg-tosca-500 hover:bg-tosca-700 shadow-tosca-500/30"
+              : "bg-tosca-700 hover:bg-tosca-900 shadow-tosca-700/30"
+          } ${isLoading ? "opacity-70 cursor-not-allowed scale-95" : "hover:-translate-y-1"}`}
         >
           {isLoading ? (
-            <svg
-              className="animate-spin h-5 w-5 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-              />
-            </svg>
+            <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
           ) : (
-            "Login ke Dashboard"
+            <>Masuk ke Dashboard</>
           )}
         </button>
       </form>
 
-      <div className="mt-6 text-center">
-        <p className="text-gray-600">
+      <div className="mt-8 text-center">
+        <p className="text-gray-500 font-medium">
           Belum punya akun?{" "}
           <Link
             href={`/admin/register?unit=${unit}`}
-            className="text-blue-600 font-bold hover:underline"
+            className="text-tosca-700 font-black hover:underline ml-1"
           >
-            Daftar di sini
+            Daftar Sekarang
           </Link>
         </p>
       </div>
@@ -128,7 +117,11 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
+    <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] p-6 relative overflow-hidden">
+      {/* Decorative blobs */}
+      <div className="absolute top-0 left-0 w-64 h-64 bg-tosca-50 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl opacity-50"></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-tosca-200 rounded-full translate-x-1/3 translate-y-1/3 blur-3xl opacity-30"></div>
+      
       <Suspense fallback={<div>Loading...</div>}>
         <LoginForm />
       </Suspense>

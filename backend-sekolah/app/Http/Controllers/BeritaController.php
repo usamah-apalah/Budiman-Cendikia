@@ -11,11 +11,16 @@ class BeritaController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Berita::where('is_published', true);
+        $query = Berita::query();
 
-        if ($request->has('unit')) {
-            $query->where('unit', $request->unit);
+        if (!$request->has('show_all')) {
+            $query->where('is_published', true);
         }
+
+        // Unit filter removed to synchronize data between units
+        // if ($request->has('unit')) {
+        //     $query->where('unit', $request->unit);
+        // }
 
         $berita = $query->latest()->paginate(10);
         return response()->json($berita);
@@ -37,7 +42,7 @@ class BeritaController extends Controller
             'konten'       => 'required|string',
             'kategori'     => 'required|in:umum,prestasi,kegiatan',
             'thumbnail'    => 'nullable|string',
-            'is_published' => 'boolean',
+            'is_published' => 'sometimes|boolean',
         ]);
 
         $berita = Berita::create([
@@ -46,8 +51,8 @@ class BeritaController extends Controller
             'slug'         => Str::slug($validated['judul']) . '-' . Str::random(5),
             'konten'       => $validated['konten'],
             'kategori'     => $validated['kategori'],
-            'thumbnail'    => $validated['thumbnail'] ?? null,
-            'is_published' => $validated['is_published'] ?? false,
+            'thumbnail'    => !empty($validated['thumbnail']) ? $validated['thumbnail'] : null,
+            'is_published' => $request->boolean('is_published'),
         ]);
 
         return response()->json($berita, 201);
@@ -61,11 +66,19 @@ class BeritaController extends Controller
             'konten'       => 'sometimes|required|string',
             'kategori'     => 'sometimes|required|in:umum,prestasi,kegiatan',
             'thumbnail'    => 'nullable|string',
-            'is_published' => 'boolean',
+            'is_published' => 'sometimes|boolean',
         ]);
 
         if (isset($validated['judul'])) {
             $validated['slug'] = Str::slug($validated['judul']) . '-' . Str::random(5);
+        }
+
+        if (isset($validated['thumbnail']) && empty($validated['thumbnail'])) {
+            $validated['thumbnail'] = null;
+        }
+        
+        if ($request->has('is_published')) {
+            $validated['is_published'] = $request->boolean('is_published');
         }
 
         $berita->update($validated);

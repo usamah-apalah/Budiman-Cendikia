@@ -10,9 +10,10 @@ class PengumumanController extends Controller
     public function index(Request $request)
     {
         $query = Pengumuman::query();
-        if ($request->has('unit')) {
-            $query->where('unit', $request->unit);
-        }
+        // Unit filter removed to synchronize data between units
+        // if ($request->has('unit')) {
+        //     $query->where('unit', $request->unit);
+        // }
         return response()->json($query->latest()->get());
     }
 
@@ -21,11 +22,18 @@ class PengumumanController extends Controller
         $validated = $request->validate([
             'unit'    => 'required|in:sd,smp',
             'judul'   => 'required|string|max:255',
-            'konten'  => 'required|string',
+            'isi'     => 'required|string',
+            'image'   => 'nullable|string',
             'is_aktif' => 'boolean',
+            'tanggal_mulai' => 'nullable|date',
         ]);
 
-        $pengumuman = Pengumuman::create($validated);
+        $data = $validated;
+        if (!isset($data['tanggal_mulai'])) {
+            $data['tanggal_mulai'] = now()->toDateString();
+        }
+
+        $pengumuman = Pengumuman::create($data);
         return response()->json($pengumuman, 201);
     }
 
@@ -34,7 +42,8 @@ class PengumumanController extends Controller
         $validated = $request->validate([
             'unit'    => 'sometimes|required|in:sd,smp',
             'judul'   => 'sometimes|required|string|max:255',
-            'konten'  => 'sometimes|required|string',
+            'isi'     => 'sometimes|required|string',
+            'image'   => 'nullable|string',
             'is_aktif' => 'boolean',
         ]);
 

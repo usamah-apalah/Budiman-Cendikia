@@ -10,9 +10,10 @@ class GaleriController extends Controller
     public function index(Request $request)
     {
         $query = Galeri::query();
-        if ($request->has('unit')) {
-            $query->where('unit', $request->unit);
-        }
+        // Unit filter removed to synchronize data between units
+        // if ($request->has('unit')) {
+        //     $query->where('unit', $request->unit);
+        // }
         return response()->json($query->latest()->get());
     }
 
