@@ -46,12 +46,12 @@ export default function GuruMarquee({ unit }: { unit: "sd" | "smp" }) {
             key={`${item.id}-${index}`} 
             className="w-72 mx-4 bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col items-center text-center transition-all hover:shadow-xl hover:-translate-y-2 hover:border-tosca-200 cursor-pointer"
           >
-            <div className="w-24 h-24 rounded-full overflow-hidden bg-tosca-50 mb-4 border-4 border-white shadow-lg">
-              <img 
-                src={item.foto || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.nama)}&background=2FCFC9&color=fff&size=128`} 
-                alt={item.nama} 
-                className="w-full h-full object-cover"
-              />
+            <div className="w-24 h-24 rounded-full overflow-hidden bg-tosca-50 mb-4 border-4 border-white shadow-lg flex items-center justify-center">
+              {item.foto ? (
+                <img src={item.foto} alt={item.nama} className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-tosca-500 font-black text-2xl">{item.nama.charAt(0).toUpperCase()}</span>
+              )}
             </div>
             <h4 className="text-lg font-black text-gray-800 leading-tight mb-1">{item.nama}</h4>
             <p className="text-tosca-700 font-bold text-xs uppercase tracking-widest">{item.jabatan}</p>

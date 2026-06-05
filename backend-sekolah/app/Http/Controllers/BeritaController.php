@@ -38,6 +38,7 @@ class BeritaController extends Controller
     {
         $validated = $request->validate([
             'unit'         => 'required|in:sd,smp',
+            'tanggal'      => 'nullable|date',
             'judul'        => 'required|string|max:255',
             'konten'       => 'required|string',
             'kategori'     => 'required|in:umum,prestasi,kegiatan',
@@ -47,6 +48,7 @@ class BeritaController extends Controller
 
         $berita = Berita::create([
             'unit'         => $validated['unit'],
+            'tanggal'      => $validated['tanggal'] ?? now()->toDateString(),
             'judul'        => $validated['judul'],
             'slug'         => Str::slug($validated['judul']) . '-' . Str::random(5),
             'konten'       => $validated['konten'],
@@ -62,6 +64,7 @@ class BeritaController extends Controller
     {
         $validated = $request->validate([
             'unit'         => 'sometimes|required|in:sd,smp',
+            'tanggal'      => 'nullable|date',
             'judul'        => 'sometimes|required|string|max:255',
             'konten'       => 'sometimes|required|string',
             'kategori'     => 'sometimes|required|in:umum,prestasi,kegiatan',
@@ -86,9 +89,14 @@ class BeritaController extends Controller
         return response()->json($berita);
     }
 
-    public function destroy(Berita $berita)
+    public function destroy($id)
     {
-        $berita->delete();
-        return response()->json(['message' => 'Berita berhasil dihapus']);
+        $deleted = Berita::where('id', $id)->delete();
+        
+        if ($deleted) {
+            return response()->json(['message' => 'Berita berhasil dihapus', 'status' => 'success']);
+        }
+        
+        return response()->json(['message' => 'Gagal menghapus atau data tidak ditemukan', 'status' => 'failed'], 404);
     }
 }

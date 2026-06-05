@@ -43,9 +43,14 @@ class GaleriController extends Controller
         return response()->json($galeri);
     }
 
-    public function destroy(Galeri $galeri)
+    public function destroy($id)
     {
-        $galeri->delete();
-        return response()->json(['message' => 'Galeri berhasil dihapus']);
+        $deleted = Galeri::where('id', $id)->delete();
+        
+        if ($deleted) {
+            return response()->json(['message' => 'Galeri berhasil dihapus', 'status' => 'success']);
+        }
+        
+        return response()->json(['message' => 'Gagal menghapus atau data tidak ditemukan', 'status' => 'failed'], 404);
     }
 }

@@ -8,6 +8,7 @@ import AnimatedCounter from "@/components/AnimatedCounter";
 import PPDBBadge from "@/components/PPDBBadge";
 import Link from "next/link";
 import { useParams, notFound } from "next/navigation";
+import { ChevronDown } from "lucide-react";
 
 export default function UnitPublicHomePage() {
   const params = useParams();
@@ -19,6 +20,7 @@ export default function UnitPublicHomePage() {
 
   const unit = unitParam as "sd" | "smp";
   const [latestNews, setLatestNews] = useState<any[]>([]);
+  const [isSambutanExpanded, setIsSambutanExpanded] = useState(false);
 
   useEffect(() => {
     const fetchLatest = async () => {
@@ -57,7 +59,7 @@ export default function UnitPublicHomePage() {
     return (
       <PublicLayout unit="sd">
         {/* Hero Section */}
-        <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
+        <section className="relative pt-12 pb-20 md:pt-20 md:pb-32 overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-tosca-50/50 -z-10"></div>
           <div className="absolute top-0 right-0 w-1/3 h-full bg-tosca-500/10 -z-10 blur-3xl rounded-full translate-x-1/2"></div>
 
@@ -145,6 +147,77 @@ export default function UnitPublicHomePage() {
           </div>
         </section>
 
+        {/* Sambutan Kepala Sekolah */}
+        <section className="py-16 md:py-32 bg-white overflow-hidden">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="grid md:grid-cols-12 gap-10 md:gap-16 items-center">
+              <div className="md:col-span-5 scroll-animate opacity-0 translate-y-12 transition-all duration-700">
+                <div className="relative">
+                  <div className="absolute -inset-4 bg-tosca-100 rounded-[30px] md:rounded-[40px] -rotate-3 -z-10"></div>
+                  <div className="aspect-[3/4] bg-gray-200 rounded-[24px] md:rounded-[32px] overflow-hidden shadow-2xl relative">
+                    <img 
+                      src="/globe.svg" 
+                      alt="Kepala Sekolah SD" 
+                      className="w-full h-full object-cover opacity-20 p-12 md:p-20"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-tosca-900/20 to-transparent"></div>
+                  </div>
+                  <div className="mt-6 md:mt-8 text-center md:text-left">
+                    <h3 className="text-xl md:text-2xl font-black text-gray-900">Dr. H. Ahmad Fauzi, M.Pd</h3>
+                    <p className="text-tosca-600 font-bold uppercase tracking-widest text-[10px] md:text-xs mt-1 md:mt-2">Kepala Sekolah SD Budiman Cendikia</p>
+                  </div>
+                </div>
+              </div>
+              <div className="md:col-span-7 scroll-animate opacity-0 translate-y-12 transition-all duration-700 delay-200">
+                <span className="text-tosca-500 font-black uppercase tracking-[0.3em] text-[9px] md:text-[10px] mb-2 md:mb-4 block">Welcome Message</span>
+                <h2 className="text-3xl md:text-5xl font-black text-gray-900 leading-tight mb-4 md:mb-8">
+                  Sambutan <br className="hidden md:block" />
+                  <span className="text-tosca-500">Kepala Sekolah</span>
+                </h2>
+                <div className="relative space-y-6 text-gray-500 text-lg leading-relaxed font-medium">
+                  <p>
+                    Assalamu&apos;alaikum Warahmatullahi Wabarakatuh,
+                  </p>
+                  <p>
+                    Selamat datang di website resmi SD Budiman Cendikia. Kami bangga menjadi bagian dari perjalanan pendidikan putra-putri Anda. Di sini, kami tidak hanya fokus pada prestasi akademik, tetapi juga pembentukan karakter dan nilai-nilai keagamaan yang kuat.
+                  </p>
+                  <div className={`grid transition-all duration-1000 ease-in-out ${isSambutanExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
+                    <div className="overflow-hidden">
+                      <div className={`pt-6 space-y-6 transition-all duration-1000 delay-150 ${isSambutanExpanded ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"}`}>
+                        <p className="text-gray-500/80">
+                          Visi kami adalah mencetak generasi yang cerdas, kreatif, dan berakhlak mulia. Dengan dukungan tenaga pengajar yang kompeten dan fasilitas yang modern, kami berkomitmen memberikan lingkungan belajar yang terbaik.
+                        </p>
+                        <p className="text-gray-500/80">
+                          Semoga kehadiran website ini dapat mempermudah komunikasi dan akses informasi bagi seluruh civitas akademika dan masyarakat luas. Mari bersama-sama membimbing putra-putri kita menuju masa depan yang gemilang.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Gradient Fade Overlay */}
+                  <div 
+                    className={`absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white via-white/90 to-transparent pointer-events-none transition-all duration-700 ease-in-out ${
+                      isSambutanExpanded ? "opacity-0 translate-y-8" : "opacity-100 translate-y-0"
+                    }`}
+                  ></div>
+                </div>
+                <button 
+                  onClick={() => setIsSambutanExpanded(!isSambutanExpanded)}
+                  className="inline-flex items-center gap-2 mt-1 text-tosca-700 font-black uppercase tracking-widest text-[10px] md:text-xs transition-all group py-2 px-3 rounded-xl hover:bg-tosca-50"
+                >
+                  <span className="relative">
+                    {isSambutanExpanded ? "Sembunyikan" : "Baca Selengkapnya"}
+                  </span>
+                  <ChevronDown 
+                    size={16} 
+                    className={`transition-transform duration-500 ease-in-out ${isSambutanExpanded ? "rotate-180" : "rotate-0 group-hover:translate-y-0.5"}`} 
+                  />
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Tenaga Pengajar Marquee */}
         <section className="bg-[#F8FAFC] scroll-animate opacity-0 translate-y-12 transition-all duration-1000">
           <div className="max-w-7xl mx-auto px-6 pt-20 text-center">
@@ -159,34 +232,34 @@ export default function UnitPublicHomePage() {
         </section>
 
         {/* Featured News */}
-        <section className="py-32 bg-gray-50">
+        <section className="py-16 md:py-32 bg-gray-50">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="flex justify-between items-end mb-16 scroll-animate opacity-0 translate-y-12 transition-all duration-700">
-              <div>
-                <h2 className="text-4xl font-black text-gray-900 tracking-tight mb-4">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 md:mb-16 scroll-animate opacity-0 translate-y-12 transition-all duration-700">
+              <div className="mb-6 md:mb-0">
+                <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight mb-2 md:mb-4">
                   Berita & Kegiatan
                 </h2>
-                <p className="text-gray-400 font-medium max-w-md">
+                <p className="text-gray-400 text-sm md:text-base font-medium max-w-md">
                   Ikuti terus perkembangan terbaru dan keseruan aktivitas
                   belajar di SD Budiman Cendikia.
                 </p>
               </div>
               <Link
                 href="/sd/berita"
-                className="px-6 py-3 bg-white text-tosca-700 font-black rounded-xl border border-tosca-100 hover:bg-tosca-500 hover:text-white transition-all text-xs uppercase tracking-widest shadow-sm"
+                className="px-5 py-2.5 md:px-6 md:py-3 bg-white text-tosca-700 font-black rounded-xl border border-tosca-100 hover:bg-tosca-500 hover:text-white transition-all text-[10px] md:text-xs uppercase tracking-widest shadow-sm"
               >
                 Lihat Semua
               </Link>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
               {latestNews.map((item, i) => (
                 <div
                   key={item.id}
-                  className="bg-white rounded-[40px] overflow-hidden shadow-sm hover:shadow-xl transition-all group scroll-animate opacity-0 translate-y-12 duration-700"
+                  className="bg-white rounded-[24px] md:rounded-[40px] overflow-hidden shadow-sm hover:shadow-xl transition-all group scroll-animate opacity-0 translate-y-12 duration-700"
                   style={{ transitionDelay: `${i * 150}ms` }}
                 >
-                  <div className="h-64 bg-tosca-100 overflow-hidden relative">
+                  <div className="h-48 md:h-64 bg-tosca-100 overflow-hidden relative">
                     {item.thumbnail ? (
                       <img
                         src={item.thumbnail}
@@ -201,19 +274,19 @@ export default function UnitPublicHomePage() {
                       />
                     )}
                   </div>
-                  <div className="p-8">
-                    <span className="text-[10px] font-black text-tosca-500 uppercase tracking-widest mb-3 block capitalize">
+                  <div className="p-6 md:p-8">
+                    <span className="text-[9px] md:text-[10px] font-black text-tosca-500 uppercase tracking-widest mb-2 md:mb-3 block capitalize">
                       {item.kategori}
                     </span>
-                    <h3 className="text-xl font-black text-gray-900 mb-4 line-clamp-2">
+                    <h3 className="text-lg md:text-xl font-black text-gray-900 mb-3 md:mb-4 line-clamp-2">
                       {item.judul}
                     </h3>
-                    <p className="text-gray-400 text-sm font-medium mb-6 line-clamp-3">
+                    <p className="text-gray-400 text-xs md:text-sm font-medium mb-4 md:mb-6 line-clamp-2 md:line-clamp-3">
                       {item.konten}
                     </p>
                     <Link
                       href={`/sd/berita/${item.slug}`}
-                      className="inline-flex items-center gap-2 text-tosca-700 font-black text-xs uppercase tracking-widest hover:translate-x-2 transition-transform"
+                      className="inline-flex items-center gap-2 text-tosca-700 font-black text-[10px] md:text-xs uppercase tracking-widest hover:translate-x-2 transition-transform"
                     >
                       Baca Selengkapnya →
                     </Link>
@@ -236,7 +309,7 @@ export default function UnitPublicHomePage() {
     return (
       <PublicLayout unit="smp">
         {/* Hero Section */}
-        <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
+        <section className="relative pt-12 pb-20 md:pt-20 md:pb-32 overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-tosca-900/5 -z-10"></div>
           <div className="absolute bottom-0 left-0 w-1/2 h-full bg-tosca-700/5 -z-10 blur-3xl rounded-full -translate-x-1/4"></div>
 
@@ -320,34 +393,34 @@ export default function UnitPublicHomePage() {
         </section>
 
         {/* Featured News */}
-        <section className="py-32 bg-gray-50">
+        <section className="py-16 md:py-32 bg-gray-50">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="flex justify-between items-end mb-16 scroll-animate opacity-0 translate-y-12 transition-all duration-700">
-              <div>
-                <h2 className="text-4xl font-black text-gray-900 tracking-tight mb-4 uppercase">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 md:mb-16 scroll-animate opacity-0 translate-y-12 transition-all duration-700">
+              <div className="mb-6 md:mb-0">
+                <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight mb-2 md:mb-4 uppercase">
                   Kabar Terbaru
                 </h2>
-                <p className="text-gray-400 font-medium max-w-md">
+                <p className="text-gray-400 text-sm md:text-base font-medium max-w-md">
                   Berita terkini seputar kurikulum, prestasi, dan kegiatan
                   kesiswaan SMP Budiman Cendikia.
                 </p>
               </div>
               <Link
                 href="/smp/berita"
-                className="px-6 py-3 bg-white text-tosca-900 font-black rounded-xl border border-tosca-900/10 hover:bg-tosca-900 hover:text-white transition-all text-xs uppercase tracking-widest shadow-sm"
+                className="px-5 py-2.5 md:px-6 md:py-3 bg-white text-tosca-900 font-black rounded-xl border border-tosca-900/10 hover:bg-tosca-900 hover:text-white transition-all text-[10px] md:text-xs uppercase tracking-widest shadow-sm"
               >
                 Semua Berita
               </Link>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
               {latestNews.map((item, i) => (
                 <div
                   key={item.id}
-                  className="bg-white rounded-[40px] overflow-hidden shadow-sm hover:shadow-xl transition-all group border border-gray-100 scroll-animate opacity-0 translate-y-12 duration-700"
+                  className="bg-white rounded-[24px] md:rounded-[40px] overflow-hidden shadow-sm hover:shadow-xl transition-all group border border-gray-100 scroll-animate opacity-0 translate-y-12 duration-700"
                   style={{ transitionDelay: `${i * 150}ms` }}
                 >
-                  <div className="h-64 bg-tosca-900 overflow-hidden relative">
+                  <div className="h-48 md:h-64 bg-tosca-900 overflow-hidden relative">
                     {item.thumbnail ? (
                       <img
                         src={item.thumbnail}
@@ -355,24 +428,24 @@ export default function UnitPublicHomePage() {
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-6xl opacity-20">
+                      <div className="w-full h-full flex items-center justify-center text-5xl md:text-6xl opacity-20">
                         📰
                       </div>
                     )}
                   </div>
-                  <div className="p-8">
-                    <span className="text-[10px] font-black text-tosca-700 uppercase tracking-widest mb-3 block capitalize">
+                  <div className="p-6 md:p-8">
+                    <span className="text-[9px] md:text-[10px] font-black text-tosca-700 uppercase tracking-widest mb-2 md:mb-3 block capitalize">
                       {item.kategori}
                     </span>
-                    <h3 className="text-xl font-black text-gray-800 mb-4 line-clamp-2">
+                    <h3 className="text-lg md:text-xl font-black text-gray-800 mb-3 md:mb-4 line-clamp-2">
                       {item.judul}
                     </h3>
-                    <p className="text-gray-400 text-sm font-medium mb-6 line-clamp-3">
+                    <p className="text-gray-400 text-xs md:text-sm font-medium mb-4 md:mb-6 line-clamp-2 md:line-clamp-3">
                       {item.konten}
                     </p>
                     <Link
                       href={`/smp/berita/${item.slug}`}
-                      className="inline-flex items-center gap-2 text-tosca-900 font-black text-xs uppercase tracking-widest hover:translate-x-2 transition-transform"
+                      className="inline-flex items-center gap-2 text-tosca-900 font-black text-[10px] md:text-xs uppercase tracking-widest hover:translate-x-2 transition-transform"
                     >
                       Selengkapnya →
                     </Link>
@@ -389,7 +462,7 @@ export default function UnitPublicHomePage() {
         </section>
 
         {/* Features */}
-        <section className="py-32 bg-white">
+        <section className="py-16 md:py-32 bg-white">
           <div className="max-w-7xl mx-auto px-6">
             <div className="grid md:grid-cols-3 gap-12 text-center">
               {[
@@ -414,13 +487,13 @@ export default function UnitPublicHomePage() {
                   className="scroll-animate opacity-0 translate-y-12 transition-all duration-700"
                   style={{ transitionDelay: `${i * 200}ms` }}
                 >
-                  <div className="w-20 h-20 bg-tosca-50 rounded-3xl flex items-center justify-center text-4xl mb-8 mx-auto shadow-sm">
+                  <div className="w-16 h-16 md:w-20 md:h-20 bg-tosca-50 rounded-3xl flex items-center justify-center text-3xl md:text-4xl mb-6 md:mb-8 mx-auto shadow-sm">
                     {feat.icon}
                   </div>
-                  <h3 className="text-xl font-black text-gray-900 mb-4 uppercase tracking-tighter">
+                  <h3 className="text-lg md:text-xl font-black text-gray-900 mb-2 md:mb-4 uppercase tracking-tighter">
                     {feat.title}
                   </h3>
-                  <p className="text-gray-500 font-medium leading-relaxed">
+                  <p className="text-gray-500 text-sm md:text-base font-medium leading-relaxed">
                     {feat.desc}
                   </p>
                 </div>
@@ -431,16 +504,87 @@ export default function UnitPublicHomePage() {
 
         {/* Tim Pengajar Marquee */}
         <section className="bg-gray-50 scroll-animate opacity-0 translate-y-12 transition-all duration-1000">
-          <div className="max-w-7xl mx-auto px-6 pt-20 text-center">
-            <h2 className="text-4xl font-black text-gray-900 tracking-tight mb-4 uppercase">
+          <div className="max-w-7xl mx-auto px-6 pt-12 md:pt-20 text-center">
+            <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight mb-2 md:mb-4 uppercase">
               Tim Pengajar Kami
             </h2>
-            <p className="text-gray-400 font-medium max-w-xl mx-auto">
+            <p className="text-gray-400 text-sm md:text-base font-medium max-w-xl mx-auto">
               Dididik dan dibimbing oleh para ahli dan praktisi di bidangnya
               masing-masing.
             </p>
           </div>
           <GuruMarquee unit="smp" />
+        </section>
+
+        {/* Sambutan Kepala Sekolah */}
+        <section className="py-16 md:py-32 bg-white overflow-hidden">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="grid md:grid-cols-12 gap-10 md:gap-16 items-center">
+              <div className="md:col-span-5 scroll-animate opacity-0 translate-y-12 transition-all duration-700">
+                <div className="relative">
+                  <div className="absolute -inset-4 bg-tosca-100 rounded-[30px] md:rounded-[40px] -rotate-3 -z-10"></div>
+                  <div className="aspect-[3/4] bg-gray-200 rounded-[24px] md:rounded-[32px] overflow-hidden shadow-2xl relative">
+                    <img 
+                      src="/globe.svg" 
+                      alt="Kepala Sekolah SMP" 
+                      className="w-full h-full object-cover opacity-20 p-12 md:p-20"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-tosca-900/20 to-transparent"></div>
+                  </div>
+                  <div className="mt-6 md:mt-8 text-center md:text-left">
+                    <h3 className="text-xl md:text-2xl font-black text-gray-900">Drs. H. Mulyadi, M.Si</h3>
+                    <p className="text-tosca-600 font-bold uppercase tracking-widest text-[10px] md:text-xs mt-1 md:mt-2">Kepala Sekolah SMP Budiman Cendikia</p>
+                  </div>
+                </div>
+              </div>
+              <div className="md:col-span-7 scroll-animate opacity-0 translate-y-12 transition-all duration-700 delay-200">
+                <span className="text-tosca-500 font-black uppercase tracking-[0.3em] text-[9px] md:text-[10px] mb-2 md:mb-4 block">Welcome Message</span>
+                <h2 className="text-3xl md:text-5xl font-black text-gray-900 leading-tight mb-4 md:mb-8 uppercase">
+                  Sambutan <br className="hidden md:block" />
+                  <span className="text-tosca-700">Kepala Sekolah</span>
+                </h2>
+                <div className="relative space-y-6 text-gray-500 text-lg leading-relaxed font-medium">
+                  <p>
+                    Assalamu&apos;alaikum Warahmatullahi Wabarakatuh,
+                  </p>
+                  <p>
+                    Selamat datang di lingkungan belajar SMP Budiman Cendikia. Kami berkomitmen untuk mendampingi putra-putri Anda melewati masa remaja dengan bimbingan yang tepat, kurikulum yang relevan, dan pembiasaan nilai-nilai Islami.
+                  </p>
+                  <div className={`grid transition-all duration-1000 ease-in-out ${isSambutanExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
+                    <div className="overflow-hidden">
+                      <div className={`pt-6 space-y-6 transition-all duration-1000 delay-150 ${isSambutanExpanded ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"}`}>
+                        <p className="text-gray-500/80">
+                          Di SMP Budiman Cendikia, kami mendorong setiap siswa untuk mengeksplorasi potensi diri, menguasai teknologi, dan memiliki kemandirian yang kuat. Bersama-sama, kita wujudkan generasi emas yang siap menghadapi tantangan zaman.
+                        </p>
+                        <p className="text-gray-500/80">
+                          Website ini hadir sebagai jembatan informasi antara sekolah, orang tua, and masyarakat. Mari bersinergi menciptakan ekosistem pendidikan yang kondusif bagi tumbuh kembang generasi penerus bangsa.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Gradient Fade Overlay */}
+                  <div 
+                    className={`absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/90 to-transparent pointer-events-none transition-all duration-700 ease-in-out ${
+                      isSambutanExpanded ? "opacity-0 translate-y-8" : "opacity-100 translate-y-0"
+                    }`}
+                  ></div>
+                </div>
+                <button 
+                  onClick={() => setIsSambutanExpanded(!isSambutanExpanded)}
+                  className="inline-flex items-center gap-2 mt-1 text-tosca-900 font-black uppercase tracking-widest text-[10px] md:text-xs transition-all group py-2 px-3 rounded-xl hover:bg-tosca-50"
+                >
+                  <span className="relative">
+                    {isSambutanExpanded ? "Sembunyikan" : "Baca Selengkapnya"}
+                  </span>
+                  <ChevronDown 
+                    size={16} 
+                    className={`transition-transform duration-500 ease-in-out ${isSambutanExpanded ? "rotate-180" : "rotate-0 group-hover:translate-y-0.5"}`} 
+                  />
+                </button>
+              </div>
+            </div>
+          </div>
         </section>
       </PublicLayout>
     );

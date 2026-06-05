@@ -60,7 +60,7 @@ export default function PublicGuruPage() {
 
   return (
     <PublicLayout unit={unit}>
-      <div className="pt-32 pb-32 bg-[#F8FAFC] min-h-screen">
+      <div className="pt-16 pb-32 bg-[#F8FAFC] min-h-screen">
         {/* Header Section */}
         <div className="max-w-7xl mx-auto px-6 text-center mb-20 scroll-animate opacity-0 translate-y-12 transition-all duration-1000 ease-out">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-tosca-50 text-tosca-700 rounded-full text-xs font-black uppercase tracking-widest mb-6 border border-tosca-100">

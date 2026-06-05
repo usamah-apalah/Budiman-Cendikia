@@ -5,6 +5,7 @@ import AdminLayout from "@/components/AdminLayout";
 import GuruList from "@/components/GuruList";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { UserPlus } from "lucide-react";
 
 export default function GuruPage() {
   const params = useParams();
@@ -29,7 +30,7 @@ export default function GuruPage() {
         </div>
         {isAdmin && (
           <Link href={`/admin/${unit}/guru/tambah`} className={`bg-tosca-500 hover:bg-tosca-700 text-white px-8 py-3 rounded-2xl font-black transition-all shadow-lg shadow-tosca-500/20 flex items-center gap-3 hover:-translate-y-1`}>
-            <span>➕</span> Tambah Guru
+            <UserPlus size={18} /> Tambah Guru
           </Link>
         )}
       </div>

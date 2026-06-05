@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import api from "@/lib/api";
 import { toast } from "react-toastify";
+import ImageModal from "./ImageModal";
 
 interface Prestasi {
   id: number;
@@ -17,6 +18,9 @@ export default function PrestasiList({ unit }: { unit: "sd" | "smp" }) {
   const [prestasi, setPrestasi] = useState<Prestasi[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedTitle, setSelectedTitle] = useState("");
 
   useEffect(() => {
     const checkAdmin = () => {
@@ -47,16 +51,20 @@ export default function PrestasiList({ unit }: { unit: "sd" | "smp" }) {
     fetchPrestasi();
   }, [fetchPrestasi]);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = (e: React.MouseEvent, id: number) => {
+    e.stopPropagation();
     if (!isAdmin) return;
     if (!confirm("Hapus data prestasi ini?")) return;
-    try {
-      await api.delete(`/prestasi/${id}`);
-      toast.success("Prestasi berhasil dihapus.");
-      fetchPrestasi();
-    } catch {
-      toast.error("Gagal menghapus prestasi.");
-    }
+    const executeDelete = async () => {
+      try {
+        await api.delete(`/prestasi/${id}`);
+        toast.success("Prestasi berhasil dihapus.");
+        setPrestasi(prev => prev.filter(item => item.id !== id));
+      } catch {
+        toast.error("Gagal menghapus prestasi.");
+      }
+    };
+    executeDelete();
   };
 
   if (isLoading) return (
@@ -66,41 +74,59 @@ export default function PrestasiList({ unit }: { unit: "sd" | "smp" }) {
   );
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {prestasi.map((item) => (
-        <div key={item.id} className="bg-white rounded-[32px] overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all group flex flex-col">
-          <div className="relative h-48 overflow-hidden bg-tosca-50 flex items-center justify-center">
-            {item.image ? (
-              <img src={item.image} alt={item.judul} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-            ) : (
-              <span className="text-5xl text-tosca-200">Prestasi</span>
-            )}
-            <div className="absolute top-4 left-4">
-              <span className="px-3 py-1 bg-white/90 backdrop-blur text-tosca-700 text-[10px] font-black uppercase tracking-widest rounded-full shadow-sm flex items-center gap-1">
-                {item.kategori}
-              </span>
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+        {prestasi.map((item) => (
+          <div 
+            key={item.id} 
+            onClick={() => { if(item.image) { setSelectedImage(item.image); setSelectedTitle(item.judul); } }}
+            className={`bg-white rounded-[24px] md:rounded-[32px] overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all group flex flex-col ${item.image ? 'cursor-pointer' : ''}`}
+          >
+            <div className="relative h-40 md:h-48 overflow-hidden bg-tosca-50 flex items-center justify-center">
+              {item.image ? (
+                <img src={item.image} alt={item.judul} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+              ) : (
+                <div className="flex flex-col items-center gap-2">
+                   <div className="w-12 h-12 rounded-2xl bg-tosca-100 flex items-center justify-center text-tosca-500 font-black text-xl">
+                      {unit.toUpperCase()}
+                   </div>
+                   <span className="text-[10px] text-tosca-300 font-black uppercase tracking-widest">Prestasi</span>
+                </div>
+              )}
+              <div className="absolute top-3 left-3 md:top-4 md:left-4">
+                <span className="px-2 py-0.5 md:px-3 md:py-1 bg-white/90 backdrop-blur text-tosca-700 text-[9px] md:text-[10px] font-black uppercase tracking-widest rounded-full shadow-sm flex items-center gap-1">
+                  {item.kategori}
+                </span>
+              </div>
+            </div>
+            <div className="p-5 md:p-6 flex-1 flex flex-col">
+              <h3 className="text-base md:text-lg font-black text-gray-800 mb-1 md:mb-2 leading-tight group-hover:text-tosca-700 transition-colors">{item.judul}</h3>
+              <p className="text-gray-400 text-[10px] md:text-xs font-bold mb-3 md:mb-4 flex items-center gap-1">
+                {new Date(item.tanggal).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}
+              </p>
+              <p className="text-gray-500 text-xs md:text-sm line-clamp-2 md:line-clamp-3 mb-4 md:mb-6 flex-1">{item.konten}</p>
+              {isAdmin && (
+                <div className="flex justify-end gap-3 pt-4 border-t border-gray-50">
+                  <button onClick={(e) => { e.stopPropagation(); /* edit */ }} className="text-tosca-700 font-bold text-sm hover:underline flex items-center gap-1">Edit</button>
+                  <button onClick={(e) => handleDelete(e, item.id)} className="text-red-500 font-bold text-sm hover:underline flex items-center gap-1">Hapus</button>
+                </div>
+              )}
             </div>
           </div>
-          <div className="p-6 flex-1 flex flex-col">
-            <h3 className="text-lg font-black text-gray-800 mb-2 leading-tight group-hover:text-tosca-700 transition-colors">{item.judul}</h3>
-            <p className="text-gray-400 text-xs font-bold mb-4 flex items-center gap-1">
-              {new Date(item.tanggal).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}
-            </p>
-            <p className="text-gray-500 text-sm line-clamp-3 mb-6 flex-1">{item.konten}</p>
-            {isAdmin && (
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-50">
-                <button className="text-tosca-700 font-bold text-sm hover:underline flex items-center gap-1">Edit</button>
-                <button onClick={() => handleDelete(item.id)} className="text-red-500 font-bold text-sm hover:underline flex items-center gap-1">Hapus</button>
-              </div>
-            )}
+        ))}
+        {prestasi.length === 0 && (
+          <div className="col-span-full py-20 text-center bg-white rounded-[32px] border border-dashed border-gray-300">
+            <p className="text-gray-400 font-bold">Belum ada data prestasi tercatat.</p>
           </div>
-        </div>
-      ))}
-      {prestasi.length === 0 && (
-        <div className="col-span-full py-20 text-center bg-white rounded-[32px] border border-dashed border-gray-300">
-          <p className="text-gray-400 font-bold">Belum ada data prestasi tercatat.</p>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+
+      <ImageModal 
+        isOpen={!!selectedImage} 
+        onClose={() => setSelectedImage(null)} 
+        imageUrl={selectedImage || ""} 
+        title={selectedTitle}
+      />
+    </>
   );
 }

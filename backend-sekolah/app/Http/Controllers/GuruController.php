@@ -50,9 +50,14 @@ class GuruController extends Controller
         return response()->json($guru);
     }
 
-    public function destroy(Guru $guru)
+    public function destroy($id)
     {
-        $guru->delete();
-        return response()->json(['message' => 'Data guru berhasil dihapus']);
+        $deleted = Guru::where('id', $id)->delete();
+        
+        if ($deleted) {
+            return response()->json(['message' => 'Data guru berhasil dihapus', 'status' => 'success']);
+        }
+        
+        return response()->json(['message' => 'Gagal menghapus atau data tidak ditemukan', 'status' => 'failed'], 404);
     }
 }

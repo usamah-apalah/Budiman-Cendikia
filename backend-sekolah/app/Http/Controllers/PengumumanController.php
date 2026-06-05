@@ -51,9 +51,14 @@ class PengumumanController extends Controller
         return response()->json($pengumuman);
     }
 
-    public function destroy(Pengumuman $pengumuman)
+    public function destroy($id)
     {
-        $pengumuman->delete();
-        return response()->json(['message' => 'Pengumuman dihapus']);
+        $deleted = Pengumuman::where('id', $id)->delete();
+        
+        if ($deleted) {
+            return response()->json(['message' => 'Pengumuman berhasil dihapus', 'status' => 'success']);
+        }
+        
+        return response()->json(['message' => 'Gagal menghapus atau data tidak ditemukan', 'status' => 'failed'], 404);
     }
 }

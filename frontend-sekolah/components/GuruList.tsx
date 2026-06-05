@@ -46,16 +46,20 @@ export default function GuruList({ unit }: { unit: "sd" | "smp" }) {
     fetchGuru();
   }, [fetchGuru]);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = (e: React.MouseEvent, id: number) => {
+    e.stopPropagation();
     if (!isAdmin) return;
     if (!confirm("Hapus data guru ini?")) return;
-    try {
-      await api.delete(`/guru/${id}`);
-      toast.success("Data guru berhasil dihapus.");
-      fetchGuru();
-    } catch {
-      toast.error("Gagal menghapus data.");
-    }
+    const executeDelete = async () => {
+      try {
+        await api.delete(`/guru/${id}`);
+        toast.success("Data guru berhasil dihapus.");
+        setGuru(prev => prev.filter(item => item.id !== id));
+      } catch {
+        toast.error("Gagal menghapus data.");
+      }
+    };
+    executeDelete();
   };
 
   if (isLoading) return (
@@ -81,8 +85,12 @@ export default function GuruList({ unit }: { unit: "sd" | "smp" }) {
               <tr key={item.id} className="hover:bg-tosca-50/30 transition-colors group">
                 <td className="px-8 py-5">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl overflow-hidden bg-tosca-50 flex-shrink-0 shadow-sm border border-gray-100">
-                       <img src={item.foto || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.nama)}&background=2FCFC9&color=fff`} alt={item.nama} className="w-full h-full object-cover" />
+                    <div className="w-12 h-12 rounded-xl overflow-hidden bg-tosca-50 flex-shrink-0 shadow-sm border border-gray-100 flex items-center justify-center">
+                       {item.foto ? (
+                         <img src={item.foto} alt={item.nama} className="w-full h-full object-cover" />
+                       ) : (
+                         <span className="text-tosca-500 font-black text-xs">{item.nama.charAt(0).toUpperCase()}</span>
+                       )}
                     </div>
                     <p className="text-gray-800 font-bold group-hover:text-tosca-700 transition-colors">{item.nama}</p>
                   </div>
@@ -94,7 +102,7 @@ export default function GuruList({ unit }: { unit: "sd" | "smp" }) {
                     <button className="text-tosca-700 hover:text-tosca-900 font-bold text-sm inline-flex items-center gap-1">
                       Edit
                     </button>
-                    <button onClick={() => handleDelete(item.id)} className="text-red-500 hover:text-red-700 font-bold text-sm inline-flex items-center gap-1">
+                    <button onClick={(e) => handleDelete(e, item.id)} className="text-red-500 hover:text-red-700 font-bold text-sm inline-flex items-center gap-1">
                       Hapus
                     </button>
                   </td>

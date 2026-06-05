@@ -47,9 +47,14 @@ class AgendaController extends Controller
         return response()->json($agenda);
     }
 
-    public function destroy(Agenda $agenda)
+    public function destroy($id)
     {
-        $agenda->delete();
-        return response()->json(['message' => 'Agenda berhasil dihapus']);
+        $deleted = Agenda::where('id', $id)->delete();
+        
+        if ($deleted) {
+            return response()->json(['message' => 'Agenda berhasil dihapus', 'status' => 'success']);
+        }
+        
+        return response()->json(['message' => 'Gagal menghapus atau data tidak ditemukan', 'status' => 'failed'], 404);
     }
 }

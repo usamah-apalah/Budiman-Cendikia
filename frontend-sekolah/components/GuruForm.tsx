@@ -4,6 +4,7 @@ import { useState } from "react";
 import api from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { UserCircle, Save, Undo2, X, UploadCloud, UserPlus } from "lucide-react";
 
 export default function GuruForm({ unit, initialData }: { unit: "sd" | "smp", initialData?: any }) {
   const router = useRouter();
@@ -58,6 +59,8 @@ export default function GuruForm({ unit, initialData }: { unit: "sd" | "smp", in
     }
   };
 
+  const themeBtn = unit === "sd" ? "bg-tosca-500 hover:bg-tosca-700 shadow-tosca-500/30" : "bg-tosca-700 hover:bg-tosca-900 shadow-tosca-700/30";
+
   return (
     <form onSubmit={handleSubmit} className="bg-white p-10 rounded-[40px] shadow-sm border border-gray-100 space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
@@ -68,12 +71,17 @@ export default function GuruForm({ unit, initialData }: { unit: "sd" | "smp", in
               {preview ? (
                 <img src={preview} alt="Preview" className="w-full h-full object-cover" />
               ) : (
-                <span className="text-4xl">👨‍🏫</span>
+                <div className="text-center p-4 flex flex-col items-center gap-2">
+                   <UserCircle size={48} className="text-gray-300 group-hover:text-tosca-500 transition-colors" />
+                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Upload Foto</p>
+                </div>
               )}
               <input type="file" onChange={handleImageChange} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
             </div>
             {preview && (
-              <button type="button" onClick={() => {setFoto(null); setPreview(null)}} className="absolute -top-2 -right-2 bg-red-500 text-white p-2 rounded-full shadow-lg">✕</button>
+              <button type="button" onClick={() => {setFoto(null); setPreview(null)}} className="absolute -top-2 -right-2 bg-red-500 text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform">
+                <X size={16} />
+              </button>
             )}
           </div>
         </div>
@@ -81,7 +89,7 @@ export default function GuruForm({ unit, initialData }: { unit: "sd" | "smp", in
         <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="md:col-span-2">
             <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Nama Lengkap</label>
-            <input type="text" value={formData.nama} onChange={e => setFormData({...formData, nama: e.target.value})} required className="w-full px-5 py-3 rounded-2xl border border-gray-200 focus:ring-4 focus:ring-tosca-500/10 focus:border-tosca-500 outline-none" placeholder="Contoh: Budi Santoso, S.Pd" />
+            <input type="text" value={formData.nama} onChange={e => setFormData({...formData, nama: e.target.value})} required className="w-full px-5 py-3 rounded-2xl border border-gray-200 focus:ring-4 focus:ring-tosca-500/10 focus:border-tosca-500 outline-none font-bold" placeholder="Contoh: Budi Santoso, S.Pd" />
           </div>
           <div>
             <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">NIP / NUPTK</label>
@@ -103,11 +111,14 @@ export default function GuruForm({ unit, initialData }: { unit: "sd" | "smp", in
       </div>
 
       <div className="flex justify-end gap-4 pt-8 border-t border-gray-100">
-        <button type="button" onClick={() => router.back()} className="px-8 py-3 rounded-xl font-bold text-gray-400">Batal</button>
-        <button type="submit" disabled={isLoading} className={`px-12 py-3 rounded-2xl text-white font-black text-xs uppercase tracking-widest bg-tosca-500 hover:bg-tosca-700 transition-all ${isLoading ? 'opacity-70' : ''}`}>
-          {isLoading ? 'Menyimpan...' : 'Simpan Data Guru'}
+        <button type="button" onClick={() => router.back()} className="px-8 py-3 rounded-xl font-bold text-gray-400 hover:bg-gray-100 transition-all flex items-center justify-center">
+          Batal
+        </button>
+        <button type="submit" disabled={isLoading} className={`px-12 py-3 rounded-2xl text-white font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center shadow-lg ${themeBtn} ${isLoading ? 'opacity-70 cursor-not-allowed scale-95' : 'hover:-translate-y-1'}`}>
+          {isLoading ? 'Menyimpan...' : initialData ? 'Perbarui Data' : 'Tambah Guru'}
         </button>
       </div>
     </form>
   );
 }
+

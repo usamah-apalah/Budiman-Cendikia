@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import api from "@/lib/api";
 import { toast } from "react-toastify";
+import { Megaphone, Calendar } from "lucide-react";
 
 interface Pengumuman {
   id: number;
@@ -47,16 +48,20 @@ export default function PengumumanList({ unit }: { unit: "sd" | "smp" }) {
     fetchPengumuman();
   }, [fetchPengumuman]);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = (e: React.MouseEvent, id: number) => {
+    e.stopPropagation();
     if (!isAdmin) return;
     if (!confirm("Hapus pengumuman ini?")) return;
-    try {
-      await api.delete(`/pengumuman/${id}`);
-      toast.success("Pengumuman berhasil dihapus.");
-      fetchPengumuman();
-    } catch {
-      toast.error("Gagal menghapus pengumuman.");
-    }
+    const executeDelete = async () => {
+      try {
+        await api.delete(`/pengumuman/${id}`);
+        toast.success("Pengumuman berhasil dihapus.");
+        setPengumuman(prev => prev.filter(item => item.id !== id));
+      } catch {
+        toast.error("Gagal menghapus pengumuman.");
+      }
+    };
+    executeDelete();
   };
 
   if (isLoading) return (
@@ -80,10 +85,12 @@ export default function PengumumanList({ unit }: { unit: "sd" | "smp" }) {
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="px-3 py-1 bg-tosca-50 text-tosca-700 text-[10px] font-black uppercase tracking-widest rounded-full flex items-center gap-1">
-                      PENGUMUMAN
+                    <span className="px-3 py-1 bg-tosca-50 text-tosca-700 text-[9px] md:text-[10px] font-black uppercase tracking-widest rounded-full flex items-center gap-2">
+                      <Megaphone size={12} />
+                      INFO RESMI
                     </span>
-                    <span className="text-gray-400 text-xs font-bold flex items-center gap-1">
+                    <span className="text-gray-400 text-[10px] md:text-xs font-bold flex items-center gap-2">
+                      <Calendar size={12} />
                       {new Date(item.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </span>
                   </div>
@@ -92,7 +99,7 @@ export default function PengumumanList({ unit }: { unit: "sd" | "smp" }) {
                 {isAdmin && (
                   <div className="flex gap-2">
                     <button className="text-tosca-700 hover:bg-tosca-50 p-2 rounded-xl transition text-sm font-bold">Edit</button>
-                    <button onClick={() => handleDelete(item.id)} className="text-red-500 hover:bg-red-50 p-2 rounded-xl transition text-sm font-bold">Hapus</button>
+                    <button onClick={(e) => handleDelete(e, item.id)} className="text-red-500 hover:bg-red-50 p-2 rounded-xl transition text-sm font-bold">Hapus</button>
                   </div>
                 )}
               </div>

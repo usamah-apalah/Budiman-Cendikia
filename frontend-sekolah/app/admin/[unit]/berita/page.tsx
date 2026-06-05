@@ -6,6 +6,8 @@ import BeritaList from "@/components/BeritaList";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 
+import { Plus } from "lucide-react";
+
 export default function BeritaAdminPage() {
   const params = useParams();
   const unit = params.unit as "sd" | "smp";
@@ -28,7 +30,7 @@ export default function BeritaAdminPage() {
         </div>
         {isAdmin && (
           <Link href={`/admin/${unit}/berita/tambah`} className="bg-tosca-500 hover:bg-tosca-700 text-white px-8 py-3 rounded-2xl font-black transition-all shadow-lg shadow-tosca-500/20 flex items-center gap-3 hover:-translate-y-1">
-            <span>✍️</span> Tambah Berita
+            <Plus size={18} /> Tambah Berita
           </Link>
         )}
       </div>

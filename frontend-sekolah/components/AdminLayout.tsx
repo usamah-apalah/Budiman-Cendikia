@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -71,9 +72,9 @@ export default function AdminLayout({
           )}
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="p-2 rounded-xl bg-gray-800 hover:bg-tosca-500 transition-colors"
+            className="p-2 rounded-xl bg-gray-800 hover:bg-tosca-500 transition-colors flex items-center justify-center"
           >
-            {isSidebarOpen ? "◀" : "▶"}
+            {isSidebarOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
           </button>
         </div>
 

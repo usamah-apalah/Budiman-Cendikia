@@ -47,9 +47,14 @@ class PrestasiController extends Controller
         return response()->json($prestasi);
     }
 
-    public function destroy(Prestasi $prestasi)
+    public function destroy($id)
     {
-        $prestasi->delete();
-        return response()->json(['message' => 'Prestasi berhasil dihapus']);
+        $deleted = Prestasi::where('id', $id)->delete();
+        
+        if ($deleted) {
+            return response()->json(['message' => 'Prestasi berhasil dihapus', 'status' => 'success']);
+        }
+        
+        return response()->json(['message' => 'Gagal menghapus atau data tidak ditemukan', 'status' => 'failed'], 404);
     }
 }
