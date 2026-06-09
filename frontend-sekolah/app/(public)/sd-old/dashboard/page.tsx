@@ -3,8 +3,30 @@
 import PublicLayout from "@/components/PublicLayout";
 import StatCard from "@/components/StatCard";
 import Link from "next/link";
+import { SITE_STATS } from "@/lib/constants";
+import { useState, useEffect } from "react";
+import api from "@/lib/api";
 
 export default function SDPublicDashboard() {
+  const [stats, setStats] = useState(SITE_STATS.sd);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await api.get("/stats?unit=sd");
+        if (res.data.status === "success") {
+          setStats({
+            ...SITE_STATS.sd,
+            ...res.data.data,
+          });
+        }
+      } catch (e) {
+        console.error("Failed to fetch stats:", e);
+      }
+    };
+    fetchStats();
+  }, []);
+
   return (
     <PublicLayout unit="sd">
       <div className="pt-32 pb-20 bg-gray-50 min-h-screen">
@@ -21,26 +43,22 @@ export default function SDPublicDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             <StatCard
               title="Total Berita"
-              value={12}
-              icon="📰"
+              value={stats.berita}
               color="bg-tosca-50 text-tosca-700"
             />
             <StatCard
               title="Total Guru"
-              value={24}
-              icon="👨‍🏫"
+              value={stats.guru}
               color="bg-tosca-200/30 text-tosca-900"
             />
             <StatCard
               title="Agenda"
-              value={3}
-              icon="📅"
+              value={stats.agenda}
               color="bg-yellow-50 text-yellow-600"
             />
             <StatCard
               title="Pendaftar PPDB"
-              value={48}
-              icon="📝"
+              value={stats.ppdb}
               color="bg-tosca-700/10 text-tosca-900"
             />
           </div>

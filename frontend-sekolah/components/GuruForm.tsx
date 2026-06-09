@@ -6,7 +6,19 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { UserCircle, Save, Undo2, X, UploadCloud, UserPlus } from "lucide-react";
 
-export default function GuruForm({ unit, initialData }: { unit: "sd" | "smp", initialData?: any }) {
+interface GuruData {
+  id?: number;
+  nama: string;
+  nip?: string;
+  jabatan: string;
+  mata_pelajaran?: string;
+  email?: string;
+  gmail?: string;
+  whatsapp?: string;
+  foto?: string;
+}
+
+export default function GuruForm({ unit, initialData }: { unit: "sd" | "smp", initialData?: GuruData }) {
   const router = useRouter();
   const [formData, setFormData] = useState({
     nama: initialData?.nama || "",
@@ -14,6 +26,8 @@ export default function GuruForm({ unit, initialData }: { unit: "sd" | "smp", in
     jabatan: initialData?.jabatan || "",
     mata_pelajaran: initialData?.mata_pelajaran || "",
     email: initialData?.email || "",
+    gmail: initialData?.gmail || "",
+    whatsapp: initialData?.whatsapp || "",
   });
   const [foto, setFoto] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(initialData?.foto || null);
@@ -52,8 +66,9 @@ export default function GuruForm({ unit, initialData }: { unit: "sd" | "smp", in
         toast.success("Guru berhasil ditambahkan!");
       }
       router.push(`/admin/${unit}/guru`);
-    } catch {
-      toast.error("Gagal menyimpan data guru.");
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? (error as any).response?.data?.message || error.message : "Gagal menyimpan data guru.";
+      toast.error(msg);
     } finally {
       setIsLoading(false);
     }
@@ -65,9 +80,9 @@ export default function GuruForm({ unit, initialData }: { unit: "sd" | "smp", in
     <form onSubmit={handleSubmit} className="bg-white p-10 rounded-[40px] shadow-sm border border-gray-100 space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
         <div className="md:col-span-1">
-          <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3 text-center">Foto Profil</label>
-          <div className="relative group mx-auto w-48 h-48">
-            <div className="w-full h-full rounded-[40px] border-2 border-dashed border-gray-200 bg-gray-50 overflow-hidden flex items-center justify-center group-hover:border-tosca-500 transition-all">
+          <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3 text-center">Foto Profil (3:4)</label>
+          <div className="relative group mx-auto w-48 h-64">
+            <div className="w-full h-full rounded-[32px] border-2 border-dashed border-gray-200 bg-gray-50 overflow-hidden flex items-center justify-center group-hover:border-tosca-500 transition-all">
               {preview ? (
                 <img src={preview} alt="Preview" className="w-full h-full object-cover" />
               ) : (
@@ -104,8 +119,16 @@ export default function GuruForm({ unit, initialData }: { unit: "sd" | "smp", in
             <input type="text" value={formData.mata_pelajaran} onChange={e => setFormData({...formData, mata_pelajaran: e.target.value})} className="w-full px-5 py-3 rounded-2xl border border-gray-200 focus:ring-4 focus:ring-tosca-500/10 focus:border-tosca-500 outline-none" placeholder="Contoh: Matematika" />
           </div>
           <div>
-            <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Email</label>
+            <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Email (Cadangan)</label>
             <input type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full px-5 py-3 rounded-2xl border border-gray-200 focus:ring-4 focus:ring-tosca-500/10 focus:border-tosca-500 outline-none" placeholder="guru@sekolah.com" />
+          </div>
+          <div>
+            <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Gmail Aktif</label>
+            <input type="email" value={formData.gmail} onChange={e => setFormData({...formData, gmail: e.target.value})} className="w-full px-5 py-3 rounded-2xl border border-gray-200 focus:ring-4 focus:ring-tosca-500/10 focus:border-tosca-500 outline-none font-bold" placeholder="nama.guru@gmail.com" />
+          </div>
+          <div>
+            <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">WhatsApp (62...)</label>
+            <input type="text" value={formData.whatsapp} onChange={e => setFormData({...formData, whatsapp: e.target.value})} className="w-full px-5 py-3 rounded-2xl border border-gray-200 focus:ring-4 focus:ring-tosca-500/10 focus:border-tosca-500 outline-none font-bold" placeholder="628123456789" />
           </div>
         </div>
       </div>

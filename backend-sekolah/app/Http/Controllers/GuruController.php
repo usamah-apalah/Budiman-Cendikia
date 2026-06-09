@@ -10,10 +10,9 @@ class GuruController extends Controller
     public function index(Request $request)
     {
         $query = Guru::query();
-        // Unit filter removed to synchronize data between units
-        // if ($request->has('unit')) {
-        //     $query->where('unit', $request->unit);
-        // }
+        if ($request->has('unit')) {
+            $query->where('unit', $request->unit);
+        }
         return response()->json($query->get());
     }
 
@@ -27,6 +26,8 @@ class GuruController extends Controller
             'mata_pelajaran' => 'nullable|string',
             'foto'           => 'nullable|string',
             'email'          => 'nullable|email',
+            'gmail'          => 'nullable|string',
+            'whatsapp'       => 'nullable|string',
         ]);
 
         $guru = Guru::create($validated);
@@ -43,6 +44,8 @@ class GuruController extends Controller
             'mata_pelajaran' => 'nullable|string',
             'foto'           => 'nullable|string',
             'email'          => 'nullable|email',
+            'gmail'          => 'nullable|string',
+            'whatsapp'       => 'nullable|string',
             'is_aktif'       => 'boolean',
         ]);
 

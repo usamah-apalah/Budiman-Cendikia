@@ -10,10 +10,9 @@ class AgendaController extends Controller
     public function index(Request $request)
     {
         $query = Agenda::query();
-        // Unit filter removed to synchronize data between units
-        // if ($request->has('unit')) {
-        //     $query->where('unit', $request->unit);
-        // }
+        if ($request->has('unit')) {
+            $query->where('unit', $request->unit);
+        }
         return response()->json($query->latest()->get());
     }
 

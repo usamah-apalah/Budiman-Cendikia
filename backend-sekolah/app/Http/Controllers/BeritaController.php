@@ -17,10 +17,9 @@ class BeritaController extends Controller
             $query->where('is_published', true);
         }
 
-        // Unit filter removed to synchronize data between units
-        // if ($request->has('unit')) {
-        //     $query->where('unit', $request->unit);
-        // }
+        if ($request->has('unit')) {
+            $query->where('unit', $request->unit);
+        }
 
         $berita = $query->latest()->paginate(10);
         return response()->json($berita);

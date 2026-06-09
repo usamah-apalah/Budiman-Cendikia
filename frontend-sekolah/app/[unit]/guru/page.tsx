@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Quote } from "lucide-react";
+import { Quote, Mail, Phone } from "lucide-react";
 import PublicLayout from "@/components/PublicLayout";
 import { useParams } from "next/navigation";
 import api from "@/lib/api";
@@ -12,6 +12,8 @@ interface Guru {
   jabatan: string;
   mata_pelajaran: string | null;
   foto: string | null;
+  gmail: string | null;
+  whatsapp: string | null;
 }
 
 export default function PublicGuruPage() {
@@ -85,14 +87,14 @@ export default function PublicGuruPage() {
               {/* Profil Staf Inti (Horizontal Card) */}
               {kepalaSekolah && (
                 <div className="bg-white rounded-[40px] shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden flex flex-col md:flex-row group hover:shadow-2xl transition-all duration-500 scroll-animate opacity-0 translate-y-12">
-                  <div className="w-full md:w-1/3 bg-tosca-50 flex-shrink-0 overflow-hidden">
+                  <div className="w-full md:w-[400px] bg-tosca-50 flex-shrink-0 overflow-hidden aspect-[3/4]">
                     <img
                       src={
                         kepalaSekolah.foto ||
                         `https://ui-avatars.com/api/?name=${encodeURIComponent(kepalaSekolah.nama)}&background=2FCFC9&color=fff&size=512`
                       }
                       alt={kepalaSekolah.nama}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 aspect-square md:aspect-auto"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     />
                   </div>
                   <div className="p-10 md:p-14 flex flex-col justify-center flex-1 relative overflow-hidden">
@@ -133,42 +135,70 @@ export default function PublicGuruPage() {
 
               {/* Grid Daftar Guru */}
               {daftarGuru.length > 0 && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 md:gap-10">
                   {daftarGuru.map((item, index) => (
                     <div
                       key={item.id}
-                      className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-2 hover:border-tosca-200 transition-all duration-500 group flex flex-col items-center text-center scroll-animate opacity-0 translate-y-12"
+                      className="bg-white rounded-[40px] overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-2 hover:border-tosca-200 transition-all duration-500 group flex flex-col scroll-animate opacity-0 translate-y-12"
                       style={{ transitionDelay: `${(index % 4) * 100}ms` }}
                     >
-                      <div className="w-32 h-32 rounded-full overflow-hidden bg-tosca-50 mb-6 border-4 border-white shadow-lg relative">
+                      <div className="aspect-[3/4] overflow-hidden bg-tosca-50 relative">
                         <img
                           src={
                             item.foto ||
-                            `https://ui-avatars.com/api/?name=${encodeURIComponent(item.nama)}&background=2FCFC9&color=fff&size=256`
+                            `https://ui-avatars.com/api/?name=${encodeURIComponent(item.nama)}&background=2FCFC9&color=fff&size=512`
                           }
                           alt={item.nama}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         />
+                        
+                        {/* Overlay Contacts */}
+                        <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/80 via-black/40 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-500 flex justify-center gap-4">
+                          {item.gmail && (
+                            <a 
+                              href={`mailto:${item.gmail}`}
+                              className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white hover:bg-white hover:text-tosca-600 transition-all"
+                              title="Kirim Email"
+                            >
+                              <Mail size={20} />
+                            </a>
+                          )}
+                          {item.whatsapp && (
+                            <a 
+                              href={`https://wa.me/${item.whatsapp}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white hover:bg-[#25D366] hover:text-white transition-all"
+                              title="Hubungi WhatsApp"
+                            >
+                              <Phone size={20} />
+                            </a>
+                          )}
+                        </div>
                       </div>
 
-                      <div className="flex-1 flex flex-col justify-between w-full">
-                        <div>
-                          <h4 className="text-lg font-black text-gray-800 leading-tight mb-2 group-hover:text-tosca-700 transition-colors">
-                            {item.nama}
-                          </h4>
-                          <span className="inline-block px-3 py-1 bg-tosca-50 text-tosca-700 rounded-full text-[10px] font-black uppercase tracking-widest mb-4">
-                            {item.jabatan}
-                          </span>
-                        </div>
+                      <div className="p-8 flex flex-col flex-1">
+                        <span className="text-[10px] font-black text-tosca-500 uppercase tracking-[0.2em] mb-3 block">
+                          {item.jabatan}
+                        </span>
+                        <h4 className="text-xl font-black text-gray-900 leading-tight mb-4 group-hover:text-tosca-600 transition-colors">
+                          {item.nama}
+                        </h4>
 
                         {item.mata_pelajaran && (
-                          <div className="pt-4 border-t border-gray-50 mt-auto w-full">
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
-                              Pengampu
-                            </p>
-                            <p className="text-gray-700 text-sm font-bold">
-                              {item.mata_pelajaran}
-                            </p>
+                          <div className="pt-5 border-t border-gray-100 mt-auto flex items-center justify-between">
+                            <div>
+                              <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">
+                                Pengampu
+                              </p>
+                              <p className="text-gray-700 text-sm font-black tracking-tight">
+                                {item.mata_pelajaran}
+                              </p>
+                            </div>
+                            <div className="flex gap-2">
+                               {item.gmail && <Mail size={14} className="text-gray-300" />}
+                               {item.whatsapp && <Phone size={14} className="text-gray-300" />}
+                            </div>
                           </div>
                         )}
                       </div>

@@ -10,10 +10,14 @@ class PrestasiController extends Controller
     public function index(Request $request)
     {
         $query = Prestasi::query();
-        // Unit filter removed to synchronize data between units
-        // if ($request->has('unit')) {
-        //     $query->where('unit', $request->unit);
-        // }
+        if ($request->has('unit')) {
+            $query->where('unit', $request->unit);
+        }
+
+        if ($request->has('limit')) {
+            return response()->json($query->latest()->limit($request->limit)->get());
+        }
+
         return response()->json($query->latest()->get());
     }
 
@@ -26,6 +30,7 @@ class PrestasiController extends Controller
             'tanggal'  => 'required|date',
             'image'    => 'nullable|string',
             'kategori' => 'required|in:siswa,guru,sekolah',
+            'tingkat'  => 'required|in:Lokal,Nasional,Internasional',
         ]);
 
         $prestasi = Prestasi::create($validated);
@@ -41,6 +46,7 @@ class PrestasiController extends Controller
             'tanggal'  => 'sometimes|required|date',
             'image'    => 'nullable|string',
             'kategori' => 'sometimes|required|in:siswa,guru,sekolah',
+            'tingkat'  => 'sometimes|required|in:Lokal,Nasional,Internasional',
         ]);
 
         $prestasi->update($validated);

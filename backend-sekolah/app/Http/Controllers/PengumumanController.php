@@ -10,21 +10,31 @@ class PengumumanController extends Controller
     public function index(Request $request)
     {
         $query = Pengumuman::query();
-        // Unit filter removed to synchronize data between units
-        // if ($request->has('unit')) {
-        //     $query->where('unit', $request->unit);
-        // }
+
+        if ($request->has('unit')) {
+            $query->where('unit', $request->unit);
+        }
+
+        if ($request->has('target_page')) {
+            $query->whereJsonContains('target_pages', $request->target_page);
+        }
+
+        if (!$request->has('show_all')) {
+            $query->where('is_aktif', true);
+        }
+
         return response()->json($query->latest()->get());
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'unit'    => 'required|in:sd,smp',
-            'judul'   => 'required|string|max:255',
-            'isi'     => 'required|string',
-            'image'   => 'nullable|string',
-            'is_aktif' => 'boolean',
+            'unit'         => 'required|in:sd,smp',
+            'judul'        => 'required|string|max:255',
+            'isi'          => 'required|string',
+            'image'        => 'nullable|string',
+            'target_pages' => 'nullable|array',
+            'is_aktif'     => 'boolean',
             'tanggal_mulai' => 'nullable|date',
         ]);
 
@@ -37,28 +47,33 @@ class PengumumanController extends Controller
         return response()->json($pengumuman, 201);
     }
 
+    public function show(Pengumuman $pengumuman)
+    {
+        return response()->json($pengumuman);
+    }
+
     public function update(Request $request, Pengumuman $pengumuman)
     {
         $validated = $request->validate([
-            'unit'    => 'sometimes|required|in:sd,smp',
-            'judul'   => 'sometimes|required|string|max:255',
-            'isi'     => 'sometimes|required|string',
-            'image'   => 'nullable|string',
-            'is_aktif' => 'boolean',
+            'unit'         => 'sometimes|required|in:sd,smp',
+            'judul'        => 'sometimes|required|string|max:255',
+            'isi'          => 'sometimes|required|string',
+            'image'        => 'nullable|string',
+            'target_pages' => 'nullable|array',
+            'is_aktif'     => 'boolean',
         ]);
 
         $pengumuman->update($validated);
         return response()->json($pengumuman);
     }
 
-    public function destroy($id)
+    public function destroy(int $id)
     {
-        $deleted = Pengumuman::where('id', $id)->delete();
-        
-        if ($deleted) {
-            return response()->json(['message' => 'Pengumuman berhasil dihapus', 'status' => 'success']);
-        }
-        
-        return response()->json(['message' => 'Gagal menghapus atau data tidak ditemukan', 'status' => 'failed'], 404);
+        $pengumuman = Pengumuman::findOrFail($id);
+        $pengumuman->delete();
+
+        return response()->json([
+            'message' => 'Pengumuman berhasil dihapus.'
+        ]);
     }
 }

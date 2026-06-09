@@ -44,20 +44,21 @@ export default function GuruMarquee({ unit }: { unit: "sd" | "smp" }) {
         {duplicatedGuru.map((item, index) => (
           <div 
             key={`${item.id}-${index}`} 
-            className="w-72 mx-4 bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col items-center text-center transition-all hover:shadow-xl hover:-translate-y-2 hover:border-tosca-200 cursor-pointer"
+            className="w-64 mx-4 bg-white rounded-[32px] overflow-hidden shadow-sm border border-gray-100 flex flex-col transition-all hover:shadow-2xl hover:-translate-y-2 hover:border-tosca-200 cursor-pointer group"
           >
-            <div className="w-24 h-24 rounded-full overflow-hidden bg-tosca-50 mb-4 border-4 border-white shadow-lg flex items-center justify-center">
+            <div className="aspect-[3/4] w-full bg-tosca-50 overflow-hidden relative">
               {item.foto ? (
-                <img src={item.foto} alt={item.nama} className="w-full h-full object-cover" />
+                <img src={item.foto} alt={item.nama} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
               ) : (
-                <span className="text-tosca-500 font-black text-2xl">{item.nama.charAt(0).toUpperCase()}</span>
+                <div className="w-full h-full flex items-center justify-center">
+                  <span className="text-tosca-500 font-black text-4xl">{item.nama.charAt(0).toUpperCase()}</span>
+                </div>
               )}
             </div>
-            <h4 className="text-lg font-black text-gray-800 leading-tight mb-1">{item.nama}</h4>
-            <p className="text-tosca-700 font-bold text-xs uppercase tracking-widest">{item.jabatan}</p>
-            {item.mata_pelajaran && (
-               <p className="mt-2 text-gray-400 text-sm font-medium">{item.mata_pelajaran}</p>
-            )}
+            <div className="p-6 text-center">
+              <h4 className="text-lg font-black text-gray-800 leading-tight mb-1 group-hover:text-tosca-600 transition-colors">{item.nama}</h4>
+              <p className="text-tosca-700 font-bold text-[10px] uppercase tracking-[0.2em]">{item.jabatan}</p>
+            </div>
           </div>
         ))}
       </div>

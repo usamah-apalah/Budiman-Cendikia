@@ -80,42 +80,47 @@ export default function GaleriList({ unit }: { unit: "sd" | "smp" }) {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-        {galeri.map((item) => (
-          <div 
-            key={item.id} 
-            onClick={() => { setSelectedImage(item.image); setSelectedTitle(item.judul); }}
-            className="bg-white rounded-[24px] md:rounded-[32px] overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all group cursor-pointer"
-          >
-            <div className="relative h-48 md:h-56 overflow-hidden">
-              <img 
-                src={item.image || "/globe.svg"} 
-                alt={item.judul}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              {isMounted && isAdmin && (
-                <div className="absolute top-3 right-3 md:top-4 md:right-4 flex gap-2 opacity-100 transition-opacity z-10">
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); /* edit logic */ }} 
-                    className="bg-white/90 backdrop-blur px-3 py-1 rounded-xl text-tosca-700 shadow-lg hover:bg-white transition-colors text-[10px] md:text-xs font-bold"
-                  >
-                    Edit
-                  </button>
-                  <button 
-                    onClick={(e) => handleDelete(e, item.id)} 
-                    className="bg-red-500/90 backdrop-blur px-3 py-1 rounded-xl text-white shadow-lg hover:bg-red-600 transition-colors text-[10px] md:text-xs font-bold"
-                  >
-                    Hapus
-                  </button>
-                </div>
-              )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12 px-2">
+        {galeri.map((item, i) => {
+          const rotations = ["-rotate-1", "rotate-1", "-rotate-2", "rotate-2", "-rotate-3", "rotate-3"];
+          const rotation = rotations[i % rotations.length];
+
+          return (
+            <div 
+              key={item.id} 
+              onClick={() => { setSelectedImage(item.image); setSelectedTitle(item.judul); }}
+              className={`bg-white p-4 rounded-[32px] shadow-sm border border-gray-100 transition-all duration-500 cursor-pointer group hover:shadow-2xl hover:z-10 hover:scale-105 hover:rotate-0 ${rotation}`}
+            >
+              <div className="relative aspect-[4/3] rounded-[24px] overflow-hidden mb-5">
+                <img 
+                  src={item.image || "/globe.svg"} 
+                  alt={item.judul}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                {isMounted && isAdmin && (
+                  <div className="absolute top-3 right-3 flex gap-2 opacity-100 z-10">
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); }} 
+                      className="bg-white/90 backdrop-blur px-3 py-1.5 rounded-xl text-tosca-700 shadow-lg hover:bg-white transition-colors text-[10px] font-black uppercase tracking-widest"
+                    >
+                      Edit
+                    </button>
+                    <button 
+                      onClick={(e) => handleDelete(e, item.id)} 
+                      className="bg-red-500 text-white px-3 py-1.5 rounded-xl shadow-lg hover:bg-red-600 transition-colors text-[10px] font-black uppercase tracking-widest"
+                    >
+                      Hapus
+                    </button>
+                  </div>
+                )}
+              </div>
+              <div className="px-2 pb-2">
+                <h3 className="text-lg font-black text-gray-800 mb-1 group-hover:text-tosca-600 transition-colors leading-tight">{item.judul}</h3>
+                <p className="text-gray-400 text-xs font-bold line-clamp-1 uppercase tracking-widest">{item.deskripsi || 'Dokumentasi Sekolah'}</p>
+              </div>
             </div>
-            <div className="p-5 md:p-6">
-              <h3 className="text-base md:text-lg font-black text-gray-800 mb-1 group-hover:text-tosca-700 transition-colors">{item.judul}</h3>
-              <p className="text-gray-400 text-xs md:text-sm line-clamp-2 font-medium">{item.deskripsi || 'Tidak ada deskripsi.'}</p>
-            </div>
-          </div>
-        ))}
+          );
+        })}
         {galeri.length === 0 && (
           <div className="col-span-full py-20 text-center bg-white rounded-[40px] border border-dashed border-gray-200">
             <p className="text-gray-400 font-bold">Galeri masih kosong.</p>

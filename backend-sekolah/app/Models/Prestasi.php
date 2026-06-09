@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class Prestasi extends Model
 {
     use HasFactory;
-    protected $fillable = ['unit', 'judul', 'konten', 'tanggal', 'image', 'kategori'];
+    protected $fillable = ['unit', 'judul', 'konten', 'tanggal', 'image', 'kategori', 'tingkat'];
 }
