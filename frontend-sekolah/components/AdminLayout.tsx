@@ -43,6 +43,7 @@ export default function AdminLayout({
 
   const navItems = [
     { name: "Admin Home", href: `/admin/${unit}/dashboard` },
+    { name: "Artikel", href: `/admin/${unit}/artikel` },
     { name: "Berita", href: `/admin/${unit}/berita` },
     { name: "Pengumuman", href: `/admin/${unit}/pengumuman` },
     { name: "Agenda", href: `/admin/${unit}/agenda` },

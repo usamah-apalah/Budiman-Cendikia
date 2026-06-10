@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
+import Link from "next/link";
 
 interface Guru {
   id: number;
@@ -42,8 +43,9 @@ export default function GuruMarquee({ unit }: { unit: "sd" | "smp" }) {
 
       <div className="flex w-max animate-marquee">
         {duplicatedGuru.map((item, index) => (
-          <div 
+          <Link 
             key={`${item.id}-${index}`} 
+            href={`/${unit}/guru/${item.id}`}
             className="w-64 mx-4 bg-white rounded-[32px] overflow-hidden shadow-sm border border-gray-100 flex flex-col transition-all hover:shadow-2xl hover:-translate-y-2 hover:border-tosca-200 cursor-pointer group"
           >
             <div className="aspect-[3/4] w-full bg-tosca-50 overflow-hidden relative">
@@ -59,7 +61,7 @@ export default function GuruMarquee({ unit }: { unit: "sd" | "smp" }) {
               <h4 className="text-lg font-black text-gray-800 leading-tight mb-1 group-hover:text-tosca-600 transition-colors">{item.nama}</h4>
               <p className="text-tosca-700 font-bold text-[10px] uppercase tracking-[0.2em]">{item.jabatan}</p>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

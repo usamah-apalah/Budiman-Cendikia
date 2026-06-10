@@ -13,7 +13,6 @@ interface PublicLayoutProps {
 export default function PublicLayout({ children, unit }: PublicLayoutProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -42,7 +41,6 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
         { name: "Berita & Kegiatan", href: `/${unit}/berita` },
         { name: "Agenda Sekolah", href: `/${unit}/agenda` },
         { name: "Prestasi Siswa", href: `/${unit}/prestasi` },
-        { name: "Ekstrakurikuler", href: `/${unit}/ekstrakurikuler` },
       ]
     },
     { 
@@ -51,16 +49,6 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
       dropdown: [
         { name: "Galeri Foto", href: `/${unit}/galeri` },
         { name: "Dokumentasi Video", href: `/${unit}/video` },
-      ]
-    },
-    { 
-      name: "Kontak", 
-      href: "#",
-      dropdown: [
-        { name: "Instagram", href: "#" },
-        { name: "TikTok", href: "#" },
-        { name: "Facebook", href: "#" },
-        { name: "WhatsApp", href: "#" },
       ]
     },
   ];
@@ -76,7 +64,7 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
           isScrolled ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-6 py-2.5 flex justify-between items-center text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em]">
+        <div className="max-w-7xl mx-auto px-6 py-2.5 flex justify-between items-center text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] grid-cols-2">
           <div className="flex gap-10">
             <div className="flex items-center gap-2.5">
               <Phone size={14} className="text-tosca-300" />
@@ -100,50 +88,61 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
 
       {/* Floating Capsule Navbar */}
       <div className={`fixed left-0 right-0 z-50 transition-all duration-700 flex justify-center px-4 md:px-8 ${
-        isScrolled ? "top-4 md:top-6" : "top-12 md:top-14"
+        isScrolled ? "top-4 md:top-5" : "top-12 md:top-14"
       }`}>
-        <nav className={`w-full max-w-[1100px] transition-all duration-700 flex items-center justify-between px-3 md:px-4 py-3 rounded-full border shadow-[0_25px_50px_-12px_rgba(0,0,0,0.12)] ${
-          isScrolled 
-            ? "bg-white/90 backdrop-blur-xl border-white/50" 
-            : "bg-white/70 backdrop-blur-md border-white/40"
-        }`}>
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 md:gap-4 pl-4 md:pl-6 group shrink-0">
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-tosca-500 rounded-full flex items-center justify-center text-white font-black text-xl shadow-lg shadow-tosca-500/20 group-hover:rotate-12 transition-transform">
-              B
-            </div>
-            <div className="flex flex-col">
-              <span className={`font-black text-lg md:text-xl tracking-tighter leading-none ${brandColor}`}>BUDIMAN</span>
-              <span className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.3em] text-gray-400">CENDIKIA {unit}</span>
-            </div>
-          </Link>
-
-          {/* Desktop Menu */}
-          <div className="hidden lg:flex items-center justify-center gap-1 xl:gap-2 flex-1 mx-4">
+        <nav 
+          className="w-full transition-all duration-700 flex items-center justify-between px-3 md:px-4 rounded-full"
+          style={{
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            background: "rgba(200, 247, 245, 0.65)",
+            border: "1.5px solid rgba(11, 107, 105, 0.22)",
+            boxShadow: "inset 0 1px 2px rgba(255,255,255,0.4), 0 12px 30px rgba(11, 107, 105, 0.12)",
+            overflow: "visible",
+            boxSizing: "border-box",
+            maxWidth: "min(95%, 1100px)", // Dikembalikan ke max width yang pas
+            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "15px 30px" // Dikurangi kembali ke tinggi yang ramping dan elegan
+          }}
+        >
+          {/* Logo container (flex-1 to help center the menu) */}
+          <div className="flex-1 flex justify-start items-center">
+            <Link href="/" className="flex items-center gap-3 pl-2 md:pl-4 group shrink-0">
+              <div className="w-10 h-10 md:w-11 md:h-11 bg-tosca-500 rounded-full flex items-center justify-center text-white font-black text-xl shadow-lg shadow-tosca-500/20 group-hover:rotate-12 transition-transform">
+                B
+              </div>
+              <div className="flex flex-col">
+                <span className={`font-black text-base md:text-lg tracking-tighter leading-none ${brandColor}`}>BUDIMAN</span>
+                <span className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.3em] text-gray-400">CENDIKIA {unit}</span>
+              </div>
+            </Link>
+          </div>
+ 
+          {/* Desktop Menu (Centered, gap 20px - 30px) */}
+          <div className="hidden lg:flex items-center justify-center gap-[20px] xl:gap-[30px] flex-initial mx-2">
             {navLinks.map((link) => (
               <div 
                 key={link.name} 
                 className="relative group"
-                onMouseEnter={() => link.dropdown && setActiveDropdown(link.name)}
-                onMouseLeave={() => setActiveDropdown(null)}
               >
                 <Link 
                   href={link.href}
-                  className={`flex items-center gap-2.5 px-5 py-2.5 text-[11px] xl:text-[12px] font-black uppercase tracking-[0.1em] transition-all rounded-full ${
+                  className={`flex items-center gap-1.5 px-[15px] py-[8px] text-[13px] xl:text-[14px] font-black uppercase tracking-wider transition-all rounded-full whitespace-nowrap ${
                     pathname === link.href || (link.dropdown && link.dropdown.some(s => pathname === s.href))
                       ? accentBg
-                      : "text-gray-500 hover:text-tosca-600 hover:bg-tosca-50/50"
+                      : "text-gray-700 hover:text-tosca-600 hover:bg-tosca-50/50"
                   }`}
                 >
                   <span>{link.name}</span>
-                  {link.dropdown && <ChevronDown size={12} className={`transition-transform duration-300 opacity-50 ${activeDropdown === link.name ? 'rotate-180' : ''}`} />}
+                  {link.dropdown && <ChevronDown size={12} className="transition-transform duration-300 opacity-50 group-hover:rotate-180" />}
                 </Link>
 
                 {/* Dropdown */}
                 {link.dropdown && (
-                  <div className={`absolute top-full left-1/2 -translate-x-1/2 pt-3 transition-all duration-300 ${
-                    activeDropdown === link.name ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 translate-y-2 pointer-events-none"
-                  }`}>
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 transition-all duration-300 z-[60] opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto">
                     <div className="bg-white/95 backdrop-blur-xl border border-gray-100 shadow-2xl rounded-[24px] p-2 min-w-[220px] flex flex-col gap-1">
                       {link.dropdown.map((sub) => (
                         <Link 
@@ -162,23 +161,51 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
               </div>
             ))}
           </div>
-
-          {/* Action Buttons */}
-          <div className="flex items-center gap-2 md:gap-3 pr-2 flex-none">
+ 
+          {/* Action Buttons (flex-1 to help center the menu, aligned right) */}
+          <div className="flex-1 flex justify-end items-center gap-[15px] pr-2 md:pr-4">
+            {/* Tombol 'KONTAK' (Hover Effect 3D) */}
+            <a
+              href="https://wa.me/628123456789"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] rounded-full transition-all duration-300 flex items-center justify-center whitespace-nowrap"
+              style={{
+                backgroundColor: "#2FCFC9",
+                color: "#0B6B69",
+                transition: "all 0.3s ease",
+                padding: "8px 20px",
+                whiteSpace: "nowrap"
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#0FA8A4";
+                e.currentTarget.style.transform = "translateY(-1.5px) scale(1.02)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#2FCFC9";
+                e.currentTarget.style.transform = "translateY(0) scale(1)";
+              }}
+            >
+              KONTAK
+            </a>
+ 
             <Link 
               href={`/admin/login?unit=${unit}`}
-              className="px-6 md:px-8 py-2.5 md:py-3 bg-[#0B6B69] text-white text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] rounded-full hover:bg-tosca-900 transition-all shadow-lg shadow-tosca-900/10 flex items-center gap-2.5"
+              className="bg-[#0B6B69] text-white text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] rounded-full hover:bg-tosca-900 transition-all shadow-lg shadow-tosca-900/10 flex items-center gap-2 whitespace-nowrap"
+              style={{
+                padding: "8px 20px"
+              }}
             >
-              <LogIn size={14} className="hidden sm:block" />
-              Login
+              <LogIn size={13} className="hidden sm:block" />
+              LOGIN
             </Link>
-
+ 
             {/* Mobile Toggle */}
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
-              className="lg:hidden w-10 h-10 flex items-center justify-center bg-gray-50 text-tosca-900 rounded-full hover:bg-tosca-100 transition-colors"
+              className="lg:hidden w-9 h-9 flex items-center justify-center bg-gray-50 text-tosca-900 rounded-full hover:bg-tosca-100 transition-colors"
             >
-              {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              {isMobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
           </div>
         </nav>

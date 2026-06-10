@@ -8,7 +8,8 @@ import AnimatedCounter from "@/components/AnimatedCounter";
 import PPDBBadge from "@/components/PPDBBadge";
 import Link from "next/link";
 import { useParams, notFound } from "next/navigation";
-import { ChevronDown, Monitor, Calendar, Megaphone, Newspaper, MapPin, ChevronRight } from "lucide-react";
+import { ChevronDown, Monitor, Calendar, Megaphone, Newspaper, MapPin, ChevronRight, Facebook } from "lucide-react";
+import ProgramFasilitasUnggulan from "@/components/ProgramFasilitasUnggulan";
 import { SITE_STATS } from "@/lib/constants";
 
 interface NewsItem {
@@ -74,6 +75,7 @@ export default function UnitPublicHomePage() {
   const unit = isValidUnit ? (unitParam as "sd" | "smp") : "sd";
   const [stats, setStats] = useState(SITE_STATS[unit]);
   const [latestNews, setLatestNews] = useState<NewsItem[]>([]);
+  const [latestArtikel, setLatestArtikel] = useState<NewsItem[]>([]);
   const [latestPrestasi, setLatestPrestasi] = useState<PrestasiItem[]>([]);
   const [programFasilitas, setProgramFasilitas] = useState<ProgramItem[]>([]);
   const [latestAgenda, setLatestAgenda] = useState<AgendaItem[]>([]);
@@ -99,14 +101,16 @@ export default function UnitPublicHomePage() {
 
     const fetchLatest = async () => {
       try {
-        const [newsRes, prestasiRes, programRes, agendaRes, pengumumanRes] = await Promise.all([
+        const [newsRes, artikelRes, prestasiRes, programRes, agendaRes, pengumumanRes] = await Promise.all([
           api.get(`/berita?unit=${unit}`),
+          api.get(`/artikel?unit=${unit}`),
           api.get(`/prestasi?unit=${unit}&limit=3`),
           api.get(`/program-fasilitas?unit=${unit}`),
           api.get(`/agenda?unit=${unit}`),
           api.get(`/pengumuman?unit=${unit}`)
         ]);
         setLatestNews(newsRes.data.data.slice(0, 3));
+        setLatestArtikel(artikelRes.data.data.slice(0, 3));
         setLatestPrestasi(prestasiRes.data);
         setProgramFasilitas(programRes.data);
         setLatestAgenda(agendaRes.data.slice(0, 3));
@@ -432,17 +436,17 @@ export default function UnitPublicHomePage() {
                     <Newspaper size={18} className="text-tosca-500" />
                     Artikel
                   </h3>
-                  <Link href={`/${unit}/berita`} className="text-xs font-bold text-tosca-500 hover:text-tosca-700 flex items-center gap-1 transition-colors uppercase tracking-wider">
+                  <Link href={`/${unit}/artikel`} className="text-xs font-bold text-tosca-500 hover:text-tosca-700 flex items-center gap-1 transition-colors uppercase tracking-wider">
                     Lihat Semua <ChevronRight size={14} />
                   </Link>
                 </div>
                 
-                {latestNews.length > 0 ? (
+                {latestArtikel.length > 0 ? (
                   <div className="flex-1 flex flex-col justify-start overflow-y-auto space-y-4 pr-1">
-                    {latestNews.slice(0, 3).map((item) => (
+                    {latestArtikel.slice(0, 3).map((item) => (
                       <Link 
                         key={item.id} 
-                        href={`/${unit}/berita/${item.slug}`}
+                        href={`/${unit}/artikel/${item.slug}`}
                         className="flex gap-4 items-center group p-2 rounded-2xl hover:bg-gray-50/50 transition-all duration-200"
                       >
                         {/* Thumbnail */}
@@ -529,51 +533,50 @@ export default function UnitPublicHomePage() {
         )}
 
         {/* Features / Program & Fasilitas */}
-        <section className={`py-20 ${latestPrestasi.length > 0 ? 'bg-white' : 'bg-gray-50'}`}>
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="text-center mb-16 scroll-animate opacity-0 translate-y-12 transition-all duration-700">
-               <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight uppercase">
-                 Program & <span className="text-tosca-500">Fasilitas Unggulan</span>
-               </h2>
-            </div>
-            <div className="grid md:grid-cols-3 gap-8 md:gap-12 text-center">
-              {programFasilitas.length > 0 ? (
-                programFasilitas.map((feat, i) => {
-                  const CardContent = (
-                    <div
-                      className="h-full p-10 rounded-[48px] border border-gray-100 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 hover:border-tosca-200 cursor-pointer group bg-white shadow-sm shadow-gray-100"
-                    >
-                      <div className="w-20 h-20 md:w-24 md:h-24 bg-tosca-50 rounded-[32px] flex items-center justify-center mb-10 mx-auto shadow-sm overflow-hidden transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 group-hover:bg-tosca-500 group-hover:text-white">
-                        {feat.ikon ? (
-                          <img src={feat.ikon} alt={feat.nama} className="w-full h-full object-cover p-4" />
-                        ) : (
-                          <Monitor size={44} className="text-tosca-500 group-hover:text-white" />
-                        )}
-                      </div>
-                      <h3 className="text-xl md:text-2xl font-black text-gray-900 mb-4 tracking-tighter group-hover:text-tosca-600 transition-colors uppercase">
-                        {feat.nama}
-                      </h3>
-                      <p className="text-gray-400 text-sm md:text-base font-medium leading-relaxed line-clamp-3">
-                        {feat.deskripsi}
-                      </p>
-                    </div>
-                  );
+        <ProgramFasilitasUnggulan unit={unit} programFasilitas={programFasilitas} />
 
-                  return (
-                    <div
-                      key={feat.id}
-                      className="scroll-animate opacity-0 translate-y-12 transition-all duration-700 h-full"
-                      style={{ transitionDelay: `${i * 200}ms` }}
-                    >
-                      <Link href={`/${unit}/program/${feat.slug}`}>{CardContent}</Link>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="col-span-full py-12 text-center text-gray-400 font-bold italic">
-                  Belum ada Program & Fasilitas yang ditambahkan.
+        {/* Facebook Section */}
+        <section className="py-20 bg-tosca-50/30">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="bg-white rounded-[40px] p-8 md:p-12 shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-10 scroll-animate opacity-0 translate-y-12 transition-all duration-700">
+              <div className="flex-1 text-center md:text-left">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-full mb-6">
+                  <Facebook size={16} fill="currentColor" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">Update Terbaru</span>
                 </div>
-              )}
+                <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight mb-4 uppercase">
+                  Ikuti Kami di <span className="text-blue-600">Facebook</span>
+                </h2>
+                <p className="text-gray-500 font-medium text-lg leading-relaxed max-w-xl">
+                  Jangan lewatkan informasi kegiatan terbaru, pengumuman penting, dan momen kebersamaan di sekolah kami. Ikuti halaman resmi kami untuk berita terkini.
+                </p>
+                <div className="mt-8 flex flex-wrap justify-center md:justify-start gap-4">
+                  <a 
+                    href="https://facebook.com/sekolahbudimancendikia" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="px-10 py-4 bg-blue-600 text-white font-black rounded-2xl shadow-xl shadow-blue-600/20 hover:bg-blue-700 hover:-translate-y-1 transition-all flex items-center gap-3 uppercase tracking-widest text-xs"
+                  >
+                    <Facebook size={18} fill="currentColor" />
+                    Ikuti Halaman Kami
+                  </a>
+                </div>
+              </div>
+              <div className="w-full md:w-1/3 aspect-square max-w-[300px] relative">
+                <div className="absolute inset-0 bg-blue-100 rounded-[48px] rotate-6"></div>
+                <div className="absolute inset-0 bg-white rounded-[48px] shadow-xl flex items-center justify-center p-10 border border-blue-50">
+                  <Facebook size={120} className="text-blue-600 opacity-20" />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+                    <div className="w-24 h-24 rounded-3xl bg-blue-600 flex items-center justify-center text-white shadow-lg">
+                      <Facebook size={48} fill="currentColor" />
+                    </div>
+                    <div className="text-center">
+                      <p className="font-black text-gray-900 leading-none mb-1">Budiman Cendikia</p>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Official Page</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -875,17 +878,17 @@ export default function UnitPublicHomePage() {
                     <Newspaper size={18} className="text-tosca-700" />
                     Artikel
                   </h3>
-                  <Link href={`/${unit}/berita`} className="text-xs font-bold text-tosca-700 hover:text-tosca-900 flex items-center gap-1 transition-colors uppercase tracking-wider">
+                  <Link href={`/${unit}/artikel`} className="text-xs font-bold text-tosca-700 hover:text-tosca-900 flex items-center gap-1 transition-colors uppercase tracking-wider">
                     Lihat Semua <ChevronRight size={14} />
                   </Link>
                 </div>
                 
-                {latestNews.length > 0 ? (
+                {latestArtikel.length > 0 ? (
                   <div className="flex-1 flex flex-col justify-start overflow-y-auto space-y-4 pr-1">
-                    {latestNews.slice(0, 3).map((item) => (
+                    {latestArtikel.slice(0, 3).map((item) => (
                       <Link 
                         key={item.id} 
-                        href={`/${unit}/berita/${item.slug}`}
+                        href={`/${unit}/artikel/${item.slug}`}
                         className="flex gap-4 items-center group p-2 rounded-2xl hover:bg-gray-50/50 transition-all duration-200"
                       >
                         {/* Thumbnail */}
@@ -972,51 +975,50 @@ export default function UnitPublicHomePage() {
         )}
 
         {/* Features / Program & Fasilitas */}
-        <section className={`py-20 ${latestPrestasi.length > 0 ? 'bg-white' : 'bg-gray-50'}`}>
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="text-center mb-16 scroll-animate opacity-0 translate-y-12 transition-all duration-700">
-               <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight uppercase">
-                 Program & <span className="text-tosca-700">Fasilitas Unggulan</span>
-               </h2>
-            </div>
-            <div className="grid md:grid-cols-3 gap-8 md:gap-12 text-center">
-              {programFasilitas.length > 0 ? (
-                programFasilitas.map((feat, i) => {
-                  const CardContent = (
-                    <div
-                      className="h-full p-10 rounded-[48px] border border-gray-100 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 hover:border-tosca-900/10 cursor-pointer group bg-white shadow-sm shadow-gray-100"
-                    >
-                      <div className="w-20 h-20 md:w-24 md:h-24 bg-tosca-50 rounded-[32px] flex items-center justify-center mb-10 mx-auto shadow-sm overflow-hidden transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 group-hover:bg-tosca-900 group-hover:text-white">
-                        {feat.ikon ? (
-                          <img src={feat.ikon} alt={feat.nama} className="w-full h-full object-cover p-4" />
-                        ) : (
-                          <Monitor size={44} className="text-tosca-700 group-hover:text-white" />
-                        )}
-                      </div>
-                      <h3 className="text-xl md:text-2xl font-black text-gray-900 mb-4 tracking-tighter group-hover:text-tosca-700 transition-colors uppercase">
-                        {feat.nama}
-                      </h3>
-                      <p className="text-gray-400 text-sm md:text-base font-medium leading-relaxed line-clamp-3">
-                        {feat.deskripsi}
-                      </p>
-                    </div>
-                  );
+        <ProgramFasilitasUnggulan unit={unit} programFasilitas={programFasilitas} />
 
-                  return (
-                    <div
-                      key={feat.id}
-                      className="scroll-animate opacity-0 translate-y-12 transition-all duration-700 h-full"
-                      style={{ transitionDelay: `${i * 200}ms` }}
-                    >
-                      <Link href={`/${unit}/program/${feat.slug}`}>{CardContent}</Link>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="col-span-full py-12 text-center text-gray-400 font-bold italic">
-                  Belum ada Program & Fasilitas yang ditambahkan.
+        {/* Facebook Section */}
+        <section className="py-20 bg-tosca-50/30">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="bg-white rounded-[40px] p-8 md:p-12 shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-10 scroll-animate opacity-0 translate-y-12 transition-all duration-700">
+              <div className="flex-1 text-center md:text-left">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-full mb-6">
+                  <Facebook size={16} fill="currentColor" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">Update Terbaru</span>
                 </div>
-              )}
+                <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight mb-4 uppercase">
+                  Ikuti Kami di <span className="text-blue-600">Facebook</span>
+                </h2>
+                <p className="text-gray-500 font-medium text-lg leading-relaxed max-w-xl">
+                  Jangan lewatkan informasi kegiatan terbaru, pengumuman penting, dan momen kebersamaan di sekolah kami. Ikuti halaman resmi kami untuk berita terkini.
+                </p>
+                <div className="mt-8 flex flex-wrap justify-center md:justify-start gap-4">
+                  <a 
+                    href="https://facebook.com/sekolahbudimancendikia" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="px-10 py-4 bg-blue-600 text-white font-black rounded-2xl shadow-xl shadow-blue-600/20 hover:bg-blue-700 hover:-translate-y-1 transition-all flex items-center gap-3 uppercase tracking-widest text-xs"
+                  >
+                    <Facebook size={18} fill="currentColor" />
+                    Ikuti Halaman Kami
+                  </a>
+                </div>
+              </div>
+              <div className="w-full md:w-1/3 aspect-square max-w-[300px] relative">
+                <div className="absolute inset-0 bg-blue-100 rounded-[48px] rotate-6"></div>
+                <div className="absolute inset-0 bg-white rounded-[48px] shadow-xl flex items-center justify-center p-10 border border-blue-50">
+                  <Facebook size={120} className="text-blue-600 opacity-20" />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+                    <div className="w-24 h-24 rounded-3xl bg-blue-600 flex items-center justify-center text-white shadow-lg">
+                      <Facebook size={48} fill="currentColor" />
+                    </div>
+                    <div className="text-center">
+                      <p className="font-black text-gray-900 leading-none mb-1">Budiman Cendikia</p>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Official Page</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -1318,17 +1320,17 @@ export default function UnitPublicHomePage() {
                     <Newspaper size={18} className="text-tosca-700" />
                     Artikel
                   </h3>
-                  <Link href={`/${unit}/berita`} className="text-xs font-bold text-tosca-700 hover:text-tosca-900 flex items-center gap-1 transition-colors uppercase tracking-wider">
+                  <Link href={`/${unit}/artikel`} className="text-xs font-bold text-tosca-700 hover:text-tosca-900 flex items-center gap-1 transition-colors uppercase tracking-wider">
                     Lihat Semua <ChevronRight size={14} />
                   </Link>
                 </div>
                 
-                {latestNews.length > 0 ? (
+                {latestArtikel.length > 0 ? (
                   <div className="flex-1 flex flex-col justify-start overflow-y-auto space-y-4 pr-1">
-                    {latestNews.slice(0, 3).map((item) => (
+                    {latestArtikel.slice(0, 3).map((item) => (
                       <Link 
                         key={item.id} 
-                        href={`/${unit}/berita/${item.slug}`}
+                        href={`/${unit}/artikel/${item.slug}`}
                         className="flex gap-4 items-center group p-2 rounded-2xl hover:bg-gray-50/50 transition-all duration-200"
                       >
                         {/* Thumbnail */}
@@ -1415,51 +1417,50 @@ export default function UnitPublicHomePage() {
         )}
 
         {/* Features / Program & Fasilitas */}
-        <section className={`py-20 ${latestPrestasi.length > 0 ? 'bg-white' : 'bg-gray-50'}`}>
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="text-center mb-16 scroll-animate opacity-0 translate-y-12 transition-all duration-700">
-               <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight uppercase">
-                 Program & <span className="text-tosca-700">Fasilitas Unggulan</span>
-               </h2>
-            </div>
-            <div className="grid md:grid-cols-3 gap-8 md:gap-12 text-center">
-              {programFasilitas.length > 0 ? (
-                programFasilitas.map((feat, i) => {
-                  const CardContent = (
-                    <div
-                      className="h-full p-10 rounded-[48px] border border-gray-100 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 hover:border-tosca-900/10 cursor-pointer group bg-white shadow-sm shadow-gray-100"
-                    >
-                      <div className="w-20 h-20 md:w-24 md:h-24 bg-tosca-50 rounded-[32px] flex items-center justify-center mb-10 mx-auto shadow-sm overflow-hidden transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 group-hover:bg-tosca-900 group-hover:text-white">
-                        {feat.ikon ? (
-                          <img src={feat.ikon} alt={feat.nama} className="w-full h-full object-cover p-4" />
-                        ) : (
-                          <Monitor size={44} className="text-tosca-700 group-hover:text-white" />
-                        )}
-                      </div>
-                      <h3 className="text-xl md:text-2xl font-black text-gray-900 mb-4 tracking-tighter group-hover:text-tosca-700 transition-colors uppercase">
-                        {feat.nama}
-                      </h3>
-                      <p className="text-gray-400 text-sm md:text-base font-medium leading-relaxed line-clamp-3">
-                        {feat.deskripsi}
-                      </p>
-                    </div>
-                  );
+        <ProgramFasilitasUnggulan unit={unit} programFasilitas={programFasilitas} />
 
-                  return (
-                    <div
-                      key={feat.id}
-                      className="scroll-animate opacity-0 translate-y-12 transition-all duration-700 h-full"
-                      style={{ transitionDelay: `${i * 200}ms` }}
-                    >
-                      <Link href={`/${unit}/program/${feat.slug}`}>{CardContent}</Link>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="col-span-full py-12 text-center text-gray-400 font-bold italic">
-                  Belum ada Program & Fasilitas yang ditambahkan.
+        {/* Facebook Section */}
+        <section className="py-20 bg-tosca-50/30">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="bg-white rounded-[40px] p-8 md:p-12 shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-10 scroll-animate opacity-0 translate-y-12 transition-all duration-700">
+              <div className="flex-1 text-center md:text-left">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-full mb-6">
+                  <Facebook size={16} fill="currentColor" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">Update Terbaru</span>
                 </div>
-              )}
+                <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight mb-4 uppercase">
+                  Ikuti Kami di <span className="text-blue-600">Facebook</span>
+                </h2>
+                <p className="text-gray-500 font-medium text-lg leading-relaxed max-w-xl">
+                  Jangan lewatkan informasi kegiatan terbaru, pengumuman penting, dan momen kebersamaan di sekolah kami. Ikuti halaman resmi kami untuk berita terkini.
+                </p>
+                <div className="mt-8 flex flex-wrap justify-center md:justify-start gap-4">
+                  <a 
+                    href="https://facebook.com/sekolahbudimancendikia" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="px-10 py-4 bg-blue-600 text-white font-black rounded-2xl shadow-xl shadow-blue-600/20 hover:bg-blue-700 hover:-translate-y-1 transition-all flex items-center gap-3 uppercase tracking-widest text-xs"
+                  >
+                    <Facebook size={18} fill="currentColor" />
+                    Ikuti Halaman Kami
+                  </a>
+                </div>
+              </div>
+              <div className="w-full md:w-1/3 aspect-square max-w-[300px] relative">
+                <div className="absolute inset-0 bg-blue-100 rounded-[48px] rotate-6"></div>
+                <div className="absolute inset-0 bg-white rounded-[48px] shadow-xl flex items-center justify-center p-10 border border-blue-50">
+                  <Facebook size={120} className="text-blue-600 opacity-20" />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+                    <div className="w-24 h-24 rounded-3xl bg-blue-600 flex items-center justify-center text-white shadow-lg">
+                      <Facebook size={48} fill="currentColor" />
+                    </div>
+                    <div className="text-center">
+                      <p className="font-black text-gray-900 leading-none mb-1">Budiman Cendikia</p>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Official Page</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -1761,17 +1762,17 @@ export default function UnitPublicHomePage() {
                     <Newspaper size={18} className="text-tosca-700" />
                     Artikel
                   </h3>
-                  <Link href={`/${unit}/berita`} className="text-xs font-bold text-tosca-700 hover:text-tosca-900 flex items-center gap-1 transition-colors uppercase tracking-wider">
+                  <Link href={`/${unit}/artikel`} className="text-xs font-bold text-tosca-700 hover:text-tosca-900 flex items-center gap-1 transition-colors uppercase tracking-wider">
                     Lihat Semua <ChevronRight size={14} />
                   </Link>
                 </div>
                 
-                {latestNews.length > 0 ? (
+                {latestArtikel.length > 0 ? (
                   <div className="flex-1 flex flex-col justify-start overflow-y-auto space-y-4 pr-1">
-                    {latestNews.slice(0, 3).map((item) => (
+                    {latestArtikel.slice(0, 3).map((item) => (
                       <Link 
                         key={item.id} 
-                        href={`/${unit}/berita/${item.slug}`}
+                        href={`/${unit}/artikel/${item.slug}`}
                         className="flex gap-4 items-center group p-2 rounded-2xl hover:bg-gray-50/50 transition-all duration-200"
                       >
                         {/* Thumbnail */}
@@ -1858,51 +1859,50 @@ export default function UnitPublicHomePage() {
         )}
 
         {/* Features / Program & Fasilitas */}
-        <section className={`py-20 ${latestPrestasi.length > 0 ? 'bg-white' : 'bg-gray-50'}`}>
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="text-center mb-16 scroll-animate opacity-0 translate-y-12 transition-all duration-700">
-               <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight uppercase">
-                 Program & <span className="text-tosca-700">Fasilitas Unggulan</span>
-               </h2>
-            </div>
-            <div className="grid md:grid-cols-3 gap-8 md:gap-12 text-center">
-              {programFasilitas.length > 0 ? (
-                programFasilitas.map((feat, i) => {
-                  const CardContent = (
-                    <div
-                      className="h-full p-10 rounded-[48px] border border-gray-100 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 hover:border-tosca-900/10 cursor-pointer group bg-white shadow-sm shadow-gray-100"
-                    >
-                      <div className="w-20 h-20 md:w-24 md:h-24 bg-tosca-50 rounded-[32px] flex items-center justify-center mb-10 mx-auto shadow-sm overflow-hidden transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 group-hover:bg-tosca-900 group-hover:text-white">
-                        {feat.ikon ? (
-                          <img src={feat.ikon} alt={feat.nama} className="w-full h-full object-cover p-4" />
-                        ) : (
-                          <Monitor size={44} className="text-tosca-700 group-hover:text-white" />
-                        )}
-                      </div>
-                      <h3 className="text-xl md:text-2xl font-black text-gray-900 mb-4 tracking-tighter group-hover:text-tosca-700 transition-colors uppercase">
-                        {feat.nama}
-                      </h3>
-                      <p className="text-gray-400 text-sm md:text-base font-medium leading-relaxed line-clamp-3">
-                        {feat.deskripsi}
-                      </p>
-                    </div>
-                  );
+        <ProgramFasilitasUnggulan unit={unit} programFasilitas={programFasilitas} />
 
-                  return (
-                    <div
-                      key={feat.id}
-                      className="scroll-animate opacity-0 translate-y-12 transition-all duration-700 h-full"
-                      style={{ transitionDelay: `${i * 200}ms` }}
-                    >
-                      <Link href={`/${unit}/program/${feat.slug}`}>{CardContent}</Link>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="col-span-full py-12 text-center text-gray-400 font-bold italic">
-                  Belum ada Program & Fasilitas yang ditambahkan.
+        {/* Facebook Section */}
+        <section className="py-20 bg-tosca-50/30">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="bg-white rounded-[40px] p-8 md:p-12 shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-10 scroll-animate opacity-0 translate-y-12 transition-all duration-700">
+              <div className="flex-1 text-center md:text-left">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-full mb-6">
+                  <Facebook size={16} fill="currentColor" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">Update Terbaru</span>
                 </div>
-              )}
+                <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight mb-4 uppercase">
+                  Ikuti Kami di <span className="text-blue-600">Facebook</span>
+                </h2>
+                <p className="text-gray-500 font-medium text-lg leading-relaxed max-w-xl">
+                  Jangan lewatkan informasi kegiatan terbaru, pengumuman penting, dan momen kebersamaan di sekolah kami. Ikuti halaman resmi kami untuk berita terkini.
+                </p>
+                <div className="mt-8 flex flex-wrap justify-center md:justify-start gap-4">
+                  <a 
+                    href="https://facebook.com/sekolahbudimancendikia" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="px-10 py-4 bg-blue-600 text-white font-black rounded-2xl shadow-xl shadow-blue-600/20 hover:bg-blue-700 hover:-translate-y-1 transition-all flex items-center gap-3 uppercase tracking-widest text-xs"
+                  >
+                    <Facebook size={18} fill="currentColor" />
+                    Ikuti Halaman Kami
+                  </a>
+                </div>
+              </div>
+              <div className="w-full md:w-1/3 aspect-square max-w-[300px] relative">
+                <div className="absolute inset-0 bg-blue-100 rounded-[48px] rotate-6"></div>
+                <div className="absolute inset-0 bg-white rounded-[48px] shadow-xl flex items-center justify-center p-10 border border-blue-50">
+                  <Facebook size={120} className="text-blue-600 opacity-20" />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+                    <div className="w-24 h-24 rounded-3xl bg-blue-600 flex items-center justify-center text-white shadow-lg">
+                      <Facebook size={48} fill="currentColor" />
+                    </div>
+                    <div className="text-center">
+                      <p className="font-black text-gray-900 leading-none mb-1">Budiman Cendikia</p>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Official Page</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>

@@ -79,7 +79,32 @@ export default function PrestasiList({ unit }: { unit: "sd" | "smp" }) {
         {prestasi.map((item) => (
           <div 
             key={item.id} 
-            onClick={() => { if(item.image) { setSelectedImage(item.image); setSelectedTitle(item.judul); } }}
+            onClick={(e) => {
+              try {
+                if (!item.image) return;
+                const card = e.currentTarget;
+                if (card) {
+                  const img = card.querySelector("img");
+                  if (img) {
+                    const src = img.getAttribute("src");
+                    if (src) {
+                      setSelectedImage(src);
+                      setSelectedTitle(item.judul || "");
+                      return;
+                    }
+                  }
+                }
+                // Fallback jika elemen tidak ditemukan
+                setSelectedImage(item.image);
+                setSelectedTitle(item.judul || "");
+              } catch (err) {
+                console.error("Gagal membuka gambar prestasi:", err);
+                if (item.image) {
+                  setSelectedImage(item.image);
+                  setSelectedTitle(item.judul || "");
+                }
+              }
+            }}
             className={`bg-white rounded-[24px] md:rounded-[32px] overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all group flex flex-col ${item.image ? 'cursor-pointer' : ''}`}
           >
             <div className="relative h-40 md:h-48 overflow-hidden bg-tosca-50 flex items-center justify-center">

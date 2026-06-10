@@ -48,123 +48,152 @@ export default function FasilitasPage() {
   }, [fetchItems]);
 
   return (
-    <PublicLayout unit={unit}>
-      <div className="pt-6 pb-24 bg-white min-h-screen">
-        <div className="max-w-7xl mx-auto px-6">
-          
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-tosca-500 mb-8">
-            <Link href={`/${unit}`} className="hover:text-tosca-700 transition-colors">
-              Beranda
-            </Link>
-            <ChevronRight size={12} className="text-tosca-200" />
-            <Link href="#" className="hover:text-tosca-700 transition-colors">
-              Profil Sekolah
-            </Link>
-            <ChevronRight size={12} className="text-tosca-200" />
-            <span className="text-tosca-700">Fasilitas Sekolah</span>
-          </nav>
+    <>
+      <PublicLayout unit={unit}>
+        <div className="pt-6 pb-24 bg-white min-h-screen">
+          <div className="max-w-7xl mx-auto px-6">
+            
+            {/* Breadcrumb */}
+            <nav className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-tosca-500 mb-8">
+              <Link href={`/${unit}`} className="hover:text-tosca-700 transition-colors">
+                Beranda
+              </Link>
+              <ChevronRight size={12} className="text-tosca-200" />
+              <Link href="#" className="hover:text-tosca-700 transition-colors">
+                Profil Sekolah
+              </Link>
+              <ChevronRight size={12} className="text-tosca-200" />
+              <span className="text-tosca-700">Fasilitas Sekolah</span>
+            </nav>
 
-          {/* Heading */}
-          <div className="mb-12">
-            <h1 className="text-4xl md:text-5xl font-black text-tosca-900 tracking-tight mb-2 uppercase">
-              Fasilitas Sekolah
-            </h1>
-            <div className="h-1.5 w-24 bg-tosca-500 rounded-full mt-4"></div>
-          </div>
-
-          {/* Main Content */}
-          {isLoading ? (
-            <div className="flex justify-center py-20">
-              <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-tosca-500"></div>
+            {/* Heading */}
+            <div className="mb-12">
+              <h1 className="text-4xl md:text-5xl font-black text-tosca-900 tracking-tight mb-2 uppercase">
+                Fasilitas Sekolah
+              </h1>
+              <div className="h-1.5 w-24 bg-tosca-500 rounded-full mt-4"></div>
             </div>
-          ) : (
-            <>
-              {items.length > 0 ? (
-                <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-                  {items.map((item) => (
-                    <div 
-                      key={item.id} 
-                      onClick={() => {
-                        if (item.ikon) {
-                          setActiveImage(item.ikon);
-                          setActiveTitle(item.nama);
-                          setIsLightboxOpen(true);
-                        }
-                      }}
-                      className="break-inside-avoid bg-white rounded-2xl overflow-hidden border border-tosca-200 shadow-[0_4px_20px_rgba(11,107,105,0.03)] hover:shadow-[0_10px_20px_rgba(11,107,105,0.12)] hover:-translate-y-2 transition-all duration-300 ease-in-out cursor-pointer group mb-6 relative"
-                    >
-                      {/* Image block */}
-                      <div className="relative overflow-hidden w-full h-auto">
-                        <img 
-                          src={item.ikon || "/globe.svg"} 
-                          alt={item.nama}
-                          className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                        
-                        {/* Hover Overlay with palette colors */}
-                        <div className="absolute inset-0 bg-tosca-900/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 select-none">
-                          <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-md p-2 rounded-full text-white">
-                            <Maximize2 size={16} strokeWidth={1.5} />
-                          </div>
-                          <h3 className="text-white text-lg font-black uppercase tracking-tight mb-2">
-                            {item.nama}
-                          </h3>
-                          {item.deskripsi && (
-                            <p className="text-tosca-50 text-xs font-medium leading-relaxed line-clamp-3">
-                              {item.deskripsi}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="py-20 text-center bg-white rounded-2xl border border-dashed border-tosca-200 p-8 shadow-sm">
-                  <ImageIcon size={48} strokeWidth={1.5} className="text-tosca-200 mx-auto mb-4" />
-                  <h3 className="text-lg font-black text-tosca-900 mb-1">Fasilitas Belum Tersedia</h3>
-                  <p className="text-tosca-700 font-bold text-sm">Dokumentasi fasilitas sekolah belum ditambahkan saat ini.</p>
-                </div>
-              )}
-            </>
-          )}
 
-          {/* Fullscreen Lightbox */}
-          {isLightboxOpen && activeImage && (
-            <div 
-              className="fixed inset-0 bg-tosca-900/95 backdrop-blur-sm z-[999] flex flex-col items-center justify-center p-4 animate-fade-in cursor-zoom-out"
-              onClick={() => setIsLightboxOpen(false)}
-            >
-              {/* Close Button */}
-              <button 
-                onClick={() => setIsLightboxOpen(false)}
-                className="absolute top-6 right-6 text-white hover:text-tosca-200 transition-colors bg-tosca-700/50 p-3 rounded-full hover:bg-tosca-700 focus:outline-none"
-              >
-                <X size={24} strokeWidth={1.5} />
-              </button>
-
-              {/* Lightbox Content Container */}
-              <div 
-                className="max-w-4xl max-h-[85vh] relative flex flex-col items-center justify-center rounded-2xl overflow-hidden border border-tosca-200/20 bg-tosca-900 shadow-2xl animate-zoom-in"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <img 
-                  src={activeImage} 
-                  alt={activeTitle} 
-                  className="max-w-full max-h-[75vh] object-contain rounded-t-2xl"
-                />
-                
-                {/* Caption using white and dark tosca bg */}
-                <div className="w-full bg-tosca-900/90 p-5 border-t border-tosca-700/50 text-center">
-                  <h3 className="text-white text-lg font-black uppercase tracking-tight">{activeTitle}</h3>
-                </div>
+            {/* Main Content */}
+            {isLoading ? (
+              <div className="flex justify-center py-20">
+                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-tosca-500"></div>
               </div>
-            </div>
-          )}
+            ) : (
+              <>
+                {items.length > 0 ? (
+                  <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+                    {items.map((item) => (
+                      <Link
+                        key={item.id}
+                        href={`/${unit}/program/${item.slug}`}
+                        className="block break-inside-avoid bg-white/40 backdrop-blur-md rounded-2xl overflow-hidden border border-white/20 shadow-[0_8px_32px_0_rgba(11,107,105,0.08)] hover:shadow-[0_15px_35px_rgba(11,107,105,0.15)] hover:-translate-y-2 transition-all duration-300 ease-in-out cursor-pointer group mb-6 relative"
+                      >
+                        {/* Image block */}
+                        <div className="relative overflow-hidden w-full h-auto">
+                          <img 
+                            src={item.ikon || "/globe.svg"} 
+                            alt={item.nama}
+                            className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                          
+                          {/* Lightbox Trigger Button (Shows on hover) */}
+                          <div 
+                            className="absolute top-4 right-4 bg-[#0B6B69]/70 hover:bg-[#0B6B69] backdrop-blur-md p-2.5 rounded-full text-white transition-all duration-300 opacity-0 group-hover:opacity-100 z-20 border border-white/10 shadow-lg"
+                            onClick={(e) => {
+                              try {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (item.ikon) {
+                                  setActiveImage(item.ikon);
+                                  setActiveTitle(item.nama);
+                                  setIsLightboxOpen(true);
+                                }
+                              } catch (err) {
+                                console.error("Gagal membuka lightbox:", err);
+                              }
+                            }}
+                          >
+                            <Maximize2 size={15} strokeWidth={2.5} />
+                          </div>
 
+                          {/* Hover Overlay with glassmorphism (Slides up on hover) */}
+                          <div className="absolute bottom-0 left-0 right-0 bg-[#0B6B69]/75 backdrop-blur-md border-t border-white/15 p-5 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out flex flex-col justify-end select-none z-10">
+                            <h3 className="text-white text-base md:text-lg font-black uppercase tracking-tight mb-1.5">
+                              {item.nama}
+                            </h3>
+                            {item.deskripsi && (
+                              <p className="text-tosca-50 text-xs font-bold leading-relaxed line-clamp-3">
+                                {item.deskripsi}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="py-20 text-center bg-white rounded-2xl border border-dashed border-tosca-200 p-8 shadow-sm">
+                    <ImageIcon size={48} strokeWidth={1.5} className="text-tosca-200 mx-auto mb-4" />
+                    <h3 className="text-lg font-black text-tosca-900 mb-1">Fasilitas Belum Tersedia</h3>
+                    <p className="text-tosca-700 font-bold text-sm">Dokumentasi fasilitas sekolah belum ditambahkan saat ini.</p>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </div>
-      </div>
-    </PublicLayout>
+      </PublicLayout>
+
+      {/* Fullscreen Lightbox (Ditempatkan di luar PublicLayout untuk menghindari bug fixed-position akibat CSS transform parent) */}
+      {isLightboxOpen && activeImage && (
+        <div 
+          className="fixed inset-0 bg-black/85 z-[999] flex flex-col items-center justify-center p-4 animate-fade-in cursor-zoom-out"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+          onClick={() => setIsLightboxOpen(false)}
+        >
+          {/* Lightbox Content Container */}
+          <div 
+            className="max-w-4xl max-h-[90vh] relative flex flex-col items-center justify-center rounded-2xl overflow-hidden border border-tosca-200/20 bg-tosca-900 shadow-2xl animate-zoom-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button (Dipindahkan ke pojok kanan atas container modal yang terpusat) */}
+            <button 
+              onClick={() => setIsLightboxOpen(false)}
+              className="absolute top-4 right-4 text-white hover:text-tosca-200 transition-colors bg-black/50 p-2.5 rounded-full hover:bg-black/75 focus:outline-none z-30 border border-white/10"
+            >
+              <X size={20} strokeWidth={2.5} />
+            </button>
+
+            <img 
+              src={activeImage} 
+              alt={activeTitle} 
+              className="max-w-full max-h-[70vh] object-contain rounded-t-2xl"
+              style={{
+                maxWidth: "90vw",
+                maxHeight: "70vh",
+                objectFit: "contain",
+                display: "block",
+                margin: "auto"
+              }}
+            />
+            
+            {/* Caption using white and dark tosca bg */}
+            <div className="w-full bg-tosca-900/90 p-5 border-t border-tosca-700/50 text-center z-10">
+              <h3 className="text-white text-lg font-black uppercase tracking-tight">{activeTitle}</h3>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

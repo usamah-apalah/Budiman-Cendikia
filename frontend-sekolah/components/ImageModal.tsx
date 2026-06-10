@@ -1,7 +1,8 @@
 "use client";
 
-import { X, Download, Maximize2 } from "lucide-react";
+import { X, Download, Share2, Link2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 interface ImageModalProps {
   isOpen: boolean;
@@ -19,49 +20,106 @@ export default function ImageModal({ isOpen, onClose, imageUrl, title }: ImageMo
 
   if (!isMounted || !isOpen) return null;
 
+  const handleShareWA = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const text = `Lihat prestasi ini: ${title || ""} - ${imageUrl}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+  };
+
+  const handleCopyLink = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(imageUrl).then(() => {
+      toast.success("Link berhasil disalin!");
+    }).catch(() => {
+      toast.error("Gagal menyalin link.");
+    });
+  };
+
+  const handleClose = (e: React.MouseEvent) => {
+    try {
+      if (e) {
+        e.stopPropagation();
+      }
+      if (onClose) {
+        onClose();
+      }
+    } catch (err) {
+      console.error("Gagal menutup modal pratinjau gambar:", err);
+    }
+  };
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 animate-fade-in">
+    <div className="modal animate-fade-in">
       <div 
         className="absolute inset-0 bg-black/80 backdrop-blur-sm cursor-pointer" 
-        onClick={onClose}
+        onClick={handleClose}
       ></div>
       
-      <div className="relative w-full max-w-5xl max-h-full flex flex-col items-center">
-        <div className="absolute -top-12 left-0 right-0 flex justify-between items-center text-white px-2">
-          <h4 className="font-bold text-sm md:text-base truncate max-w-[70%]">{title || "Preview Gambar"}</h4>
-          <div className="flex gap-4">
-             <a 
+      <div className="modal-content animate-zoom-in" onClick={(e) => e.stopPropagation()}>
+        <button 
+          onClick={handleClose}
+          className="close p-2 bg-black/40 hover:bg-black/75 text-white rounded-full transition-colors border border-white/10"
+          title="Tutup"
+          aria-label="Tutup"
+        >
+          <X size={22} />
+        </button>
+
+        <img 
+          src={imageUrl || ""} 
+          alt={title || "Full preview"} 
+          className="select-none shadow-2xl rounded-2xl max-h-[80vh] object-contain mx-auto"
+          onError={(e) => {
+            try {
+              const target = e.currentTarget;
+              if (target) {
+                target.style.display = "none";
+              }
+            } catch (err) {
+              console.error("Gagal menangani error load gambar modal:", err);
+            }
+          }}
+        />
+
+        {imageUrl && (
+          <div className="absolute bottom-4 left-4 z-10 flex flex-wrap gap-2">
+            <a 
               href={imageUrl} 
               download 
               target="_blank" 
               rel="noopener noreferrer"
-              className="p-2 hover:bg-white/10 rounded-full transition-colors"
+              className="p-2 bg-black/50 hover:bg-black/80 text-white rounded-full transition-colors border border-white/10"
               title="Download Gambar"
-             >
-               <Download size={20} />
-             </a>
-             <button 
-              onClick={onClose}
-              className="p-2 hover:bg-white/10 rounded-full transition-colors"
-              title="Tutup"
-             >
-               <X size={24} />
-             </button>
-          </div>
-        </div>
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Download size={16} />
+            </a>
+            
+            <button 
+              onClick={handleShareWA}
+              className="p-2 bg-green-600/70 hover:bg-green-600 text-white rounded-full transition-colors border border-white/10"
+              title="Bagikan ke WhatsApp"
+            >
+              <Share2 size={16} />
+            </button>
 
-        <div className="relative group w-full flex justify-center overflow-hidden rounded-2xl shadow-2xl bg-gray-900/50">
-          <img 
-            src={imageUrl} 
-            alt={title || "Full preview"} 
-            className="max-w-full max-h-[80vh] object-contain select-none"
-          />
-        </div>
-        
-        <p className="mt-4 text-gray-400 text-xs font-medium uppercase tracking-widest flex items-center gap-2">
-          <Maximize2 size={12} /> Klik area luar untuk menutup
-        </p>
+            <button 
+              onClick={handleCopyLink}
+              className="p-2 bg-blue-600/70 hover:bg-blue-600 text-white rounded-full transition-colors border border-white/10"
+              title="Salin Link Gambar"
+            >
+              <Link2 size={16} />
+            </button>
+
+            {title && (
+              <span className="px-3 py-1.5 bg-black/50 text-white text-xs font-bold rounded-xl border border-white/10 flex items-center max-w-[250px] truncate">
+                {title}
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
 }
+

@@ -81,24 +81,26 @@ export default function ProgramDetailPage() {
               <ChevronLeft size={16} /> Kembali ke Beranda
             </Link>
 
-            <div className="flex flex-col md:flex-row gap-12 items-start">
-              <div className="w-24 h-24 md:w-32 md:h-32 bg-white rounded-[40px] shadow-2xl shadow-tosca-500/10 flex items-center justify-center flex-shrink-0 p-6">
-                {item.ikon ? (
-                  <img src={item.ikon} alt={item.nama} className="w-full h-full object-contain" />
-                ) : (
-                  <div className="text-4xl">⭐</div>
-                )}
-              </div>
-              
-              <div className="flex-1">
-                <span className="px-4 py-1.5 bg-tosca-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg shadow-tosca-500/20 mb-6 inline-block">
+            <div className="flex flex-col gap-10">
+              <div>
+                <span className="px-4 py-1.5 bg-tosca-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg shadow-tosca-500/20 mb-5 inline-block">
                   Program Unggulan
                 </span>
-                <h1 className="text-4xl md:text-6xl font-black text-gray-900 leading-tight mb-8">
+                <h1 className="text-4xl md:text-6xl font-black text-gray-900 leading-tight mb-4">
                   {item.nama}
                 </h1>
-                <div className="w-20 h-2 bg-tosca-500 rounded-full"></div>
+                <div className="h-2 w-20 bg-tosca-500 rounded-full"></div>
               </div>
+
+              {item.ikon && (
+                <div className="w-full rounded-[32px] md:rounded-[40px] overflow-hidden shadow-2xl shadow-tosca-500/10 border border-gray-100/50">
+                  <img 
+                    src={item.ikon} 
+                    alt={item.nama} 
+                    className="w-full h-auto max-h-[550px] object-cover object-center" 
+                  />
+                </div>
+              )}
             </div>
           </div>
         </section>

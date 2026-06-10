@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Quote, Mail, Phone } from "lucide-react";
 import PublicLayout from "@/components/PublicLayout";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import api from "@/lib/api";
 
 interface Guru {
@@ -88,14 +89,16 @@ export default function PublicGuruPage() {
               {kepalaSekolah && (
                 <div className="bg-white rounded-[40px] shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden flex flex-col md:flex-row group hover:shadow-2xl transition-all duration-500 scroll-animate opacity-0 translate-y-12">
                   <div className="w-full md:w-[400px] bg-tosca-50 flex-shrink-0 overflow-hidden aspect-[3/4]">
-                    <img
-                      src={
-                        kepalaSekolah.foto ||
-                        `https://ui-avatars.com/api/?name=${encodeURIComponent(kepalaSekolah.nama)}&background=2FCFC9&color=fff&size=512`
-                      }
-                      alt={kepalaSekolah.nama}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
+                    <Link href={`/${unit}/guru/${kepalaSekolah.id}`} className="block w-full h-full">
+                      <img
+                        src={
+                          kepalaSekolah.foto ||
+                          `https://ui-avatars.com/api/?name=${encodeURIComponent(kepalaSekolah.nama)}&background=2FCFC9&color=fff&size=512`
+                        }
+                        alt={kepalaSekolah.nama}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      />
+                    </Link>
                   </div>
                   <div className="p-10 md:p-14 flex flex-col justify-center flex-1 relative overflow-hidden">
                     <div className="absolute top-0 right-0 p-8 opacity-5 text-tosca-900 pointer-events-none transform -rotate-12">
@@ -106,7 +109,9 @@ export default function PublicGuruPage() {
                       {kepalaSekolah.jabatan}
                     </span>
                     <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-6">
-                      {kepalaSekolah.nama}
+                      <Link href={`/${unit}/guru/${kepalaSekolah.id}`} className="hover:text-tosca-600 hover:underline transition-colors">
+                        {kepalaSekolah.nama}
+                      </Link>
                     </h2>
 
                     <div className="relative">
@@ -143,20 +148,23 @@ export default function PublicGuruPage() {
                       style={{ transitionDelay: `${(index % 4) * 100}ms` }}
                     >
                       <div className="aspect-[3/4] overflow-hidden bg-tosca-50 relative">
-                        <img
-                          src={
-                            item.foto ||
-                            `https://ui-avatars.com/api/?name=${encodeURIComponent(item.nama)}&background=2FCFC9&color=fff&size=512`
-                          }
-                          alt={item.nama}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                        />
+                        <Link href={`/${unit}/guru/${item.id}`} className="block w-full h-full">
+                          <img
+                            src={
+                              item.foto ||
+                              `https://ui-avatars.com/api/?name=${encodeURIComponent(item.nama)}&background=2FCFC9&color=fff&size=512`
+                            }
+                            alt={item.nama}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          />
+                        </Link>
                         
                         {/* Overlay Contacts */}
-                        <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/80 via-black/40 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-500 flex justify-center gap-4">
+                        <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/80 via-black/40 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-500 flex justify-center gap-4 z-20">
                           {item.gmail && (
                             <a 
                               href={`mailto:${item.gmail}`}
+                              onClick={(e) => e.stopPropagation()}
                               className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white hover:bg-white hover:text-tosca-600 transition-all"
                               title="Kirim Email"
                             >
@@ -168,6 +176,7 @@ export default function PublicGuruPage() {
                               href={`https://wa.me/${item.whatsapp}`}
                               target="_blank"
                               rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
                               className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white hover:bg-[#25D366] hover:text-white transition-all"
                               title="Hubungi WhatsApp"
                             >
@@ -182,7 +191,9 @@ export default function PublicGuruPage() {
                           {item.jabatan}
                         </span>
                         <h4 className="text-xl font-black text-gray-900 leading-tight mb-4 group-hover:text-tosca-600 transition-colors">
-                          {item.nama}
+                          <Link href={`/${unit}/guru/${item.id}`} className="hover:underline">
+                            {item.nama}
+                          </Link>
                         </h4>
 
                         {item.mata_pelajaran && (

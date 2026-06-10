@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { usePathname } from "next/navigation";
 import ImageModal from "./ImageModal";
 
-interface Berita {
+interface Artikel {
   id: number;
   judul: string;
   tanggal: string | null;
@@ -15,11 +15,11 @@ interface Berita {
   is_published: boolean;
 }
 
-export default function BeritaList({ unit }: { unit: "sd" | "smp" }) {
+export default function ArtikelList({ unit }: { unit: "sd" | "smp" }) {
   const pathname = usePathname();
   const isDashboard = pathname.includes('/admin');
   
-  const [berita, setBerita] = useState<Berita[]>([]);
+  const [artikel, setArtikel] = useState<Artikel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
@@ -31,7 +31,6 @@ export default function BeritaList({ unit }: { unit: "sd" | "smp" }) {
     setIsMounted(true);
     const token = localStorage.getItem("admin_token");
     const savedUnit = localStorage.getItem("admin_unit");
-    // Hanya set isAdmin true jika di panel admin, token ada, DAN unit cocok
     if (isDashboard && token && savedUnit === unit) {
       setIsAdmin(true);
     } else {
@@ -39,37 +38,36 @@ export default function BeritaList({ unit }: { unit: "sd" | "smp" }) {
     }
   }, [unit, isDashboard]);
 
-  const fetchBerita = useCallback(async () => {
+  const fetchArtikel = useCallback(async () => {
     try {
       const token = localStorage.getItem("admin_token");
       const savedUnit = localStorage.getItem("admin_unit");
       const isActuallyAdmin = isDashboard && token && savedUnit === unit;
       
-      const response = await api.get(`/berita?unit=${unit}${isActuallyAdmin ? '&show_all=1' : ''}`);
-      setBerita(response.data.data);
+      const response = await api.get(`/artikel?unit=${unit}${isActuallyAdmin ? '&show_all=1' : ''}`);
+      setArtikel(response.data.data);
     } catch {
-      toast.error("Gagal mengambil data berita.");
+      toast.error("Gagal mengambil data artikel.");
     } finally {
       setIsLoading(false);
     }
   }, [unit, isDashboard]);
 
   useEffect(() => {
-    fetchBerita();
-  }, [fetchBerita]);
+    fetchArtikel();
+  }, [fetchArtikel]);
 
   const handleDelete = (e: React.MouseEvent, id: number) => {
     e.stopPropagation();
     if (!isAdmin) return;
-    if (!confirm("Apakah Anda yakin ingin menghapus berita ini?")) return;
+    if (!confirm("Apakah Anda yakin ingin menghapus artikel ini?")) return;
     const executeDelete = async () => {
       try {
-        await api.delete(`/berita/${id}`);
-        toast.success("Berita berhasil dihapus.");
-        // Perbarui state secara real-time dengan memfilter item yang dihapus
-        setBerita(prevBerita => prevBerita.filter(item => item.id !== id));
+        await api.delete(`/artikel/${id}`);
+        toast.success("Artikel berhasil dihapus.");
+        setArtikel(prevArtikel => prevArtikel.filter(item => item.id !== id));
       } catch {
-        toast.error("Gagal menghapus berita.");
+        toast.error("Gagal menghapus artikel.");
       }
     };
     executeDelete();
@@ -84,34 +82,14 @@ export default function BeritaList({ unit }: { unit: "sd" | "smp" }) {
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-        {berita.map((item) => (
+        {artikel.map((item) => (
           <div key={item.id} className="bg-white rounded-[24px] md:rounded-[32px] overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all group flex flex-col">
             <div 
               className={`relative h-48 md:h-52 overflow-hidden bg-tosca-50 flex items-center justify-center ${item.thumbnail ? 'cursor-pointer' : ''}`}
-              onClick={(e) => {
-                try {
-                  if (!item.thumbnail) return;
-                  const container = e.currentTarget;
-                  if (container) {
-                    const img = container.querySelector("img");
-                    if (img) {
-                      const src = img.getAttribute("src");
-                      if (src) {
-                        setSelectedImage(src);
-                        setSelectedTitle(item.judul || "");
-                        return;
-                      }
-                    }
-                  }
-                  // Fallback jika elemen tidak ditemukan
+              onClick={() => {
+                if (item.thumbnail) {
                   setSelectedImage(item.thumbnail);
                   setSelectedTitle(item.judul || "");
-                } catch (err) {
-                  console.error("Gagal membuka gambar berita:", err);
-                  if (item.thumbnail) {
-                    setSelectedImage(item.thumbnail);
-                    setSelectedTitle(item.judul || "");
-                  }
                 }
               }}
             >
@@ -122,7 +100,7 @@ export default function BeritaList({ unit }: { unit: "sd" | "smp" }) {
                    <div className="w-12 h-12 rounded-2xl bg-tosca-100 flex items-center justify-center text-tosca-500 font-black text-xl">
                       {unit.toUpperCase()}
                    </div>
-                   <span className="text-[10px] text-tosca-300 font-black uppercase tracking-widest">Berita</span>
+                   <span className="text-[10px] text-tosca-300 font-black uppercase tracking-widest">Artikel</span>
                 </div>
               )}
               <div className="absolute top-4 left-4">
@@ -155,9 +133,6 @@ export default function BeritaList({ unit }: { unit: "sd" | "smp" }) {
               
               {isMounted && isAdmin && (
                 <div className="mt-auto pt-6 border-t border-gray-50 flex justify-end gap-3">
-                  <button onClick={(e) => { e.stopPropagation(); /* edit */ }} className="text-tosca-700 hover:text-tosca-900 font-bold text-sm">
-                    Edit
-                  </button>
                   <button onClick={(e) => handleDelete(e, item.id)} className="text-red-500 hover:text-red-700 font-bold text-sm">
                     Hapus
                   </button>
@@ -167,9 +142,9 @@ export default function BeritaList({ unit }: { unit: "sd" | "smp" }) {
           </div>
         ))}
         
-        {berita.length === 0 && (
+        {artikel.length === 0 && (
           <div className="col-span-full py-20 text-center bg-white rounded-[40px] border border-dashed border-gray-200">
-            <p className="text-gray-400 font-bold">Belum ada berita yang diterbitkan.</p>
+            <p className="text-gray-400 font-bold">Belum ada artikel yang diterbitkan.</p>
           </div>
         )}
       </div>

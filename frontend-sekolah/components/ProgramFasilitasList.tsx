@@ -64,7 +64,32 @@ export default function ProgramFasilitasList({ unit, onEdit }: { unit: "sd" | "s
           <div key={item.id} className="bg-white p-8 rounded-[32px] shadow-sm border border-gray-100 hover:shadow-xl transition-all group flex flex-col">
             <div 
               className={`w-20 h-20 bg-tosca-50 rounded-3xl flex items-center justify-center mb-8 mx-auto shadow-sm overflow-hidden ${item.ikon ? 'cursor-pointer' : ''}`}
-              onClick={() => { if(item.ikon) { setSelectedImage(item.ikon); setSelectedTitle(item.nama); } }}
+              onClick={(e) => {
+                try {
+                  if (!item.ikon) return;
+                  const container = e.currentTarget;
+                  if (container) {
+                    const img = container.querySelector("img");
+                    if (img) {
+                      const src = img.getAttribute("src");
+                      if (src) {
+                        setSelectedImage(src);
+                        setSelectedTitle(item.nama || "");
+                        return;
+                      }
+                    }
+                  }
+                  // Fallback jika elemen tidak ditemukan
+                  setSelectedImage(item.ikon);
+                  setSelectedTitle(item.nama || "");
+                } catch (err) {
+                  console.error("Gagal membuka gambar program/fasilitas:", err);
+                  if (item.ikon) {
+                    setSelectedImage(item.ikon);
+                    setSelectedTitle(item.nama || "");
+                  }
+                }
+              }}
             >
               {item.ikon ? (
                 <img src={item.ikon} alt={item.nama} className="w-full h-full object-cover" />

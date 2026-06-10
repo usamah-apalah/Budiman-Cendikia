@@ -9,11 +9,60 @@ class GuruController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Guru::query();
-        if ($request->has('unit')) {
-            $query->where('unit', $request->unit);
+        try {
+            // Validasi parameter query unit atau unit_sekolah secara aman
+            $validated = $request->validate([
+                'unit' => 'nullable|string|in:sd,smp,SD,SMP',
+                'unit_sekolah' => 'nullable|string|in:sd,smp,SD,SMP',
+            ]);
+
+            // Dapatkan value unit dari salah satu parameter yang tersedia
+            $unitVal = $validated['unit'] ?? $validated['unit_sekolah'] ?? null;
+
+            if (empty($unitVal)) {
+                return response()->json([
+                    'error' => 'Validasi gagal. Parameter unit (sd/smp) wajib diisi.',
+                ], 422);
+            }
+
+            // Normalisasi unit ke lowercase agar sesuai dengan database enum ('sd', 'smp')
+            $unit = strtolower($unitVal);
+
+            // Mengambil guru yang terdaftar pada unit yang bersangkutan dan berstatus aktif
+            $guruList = Guru::where('unit', $unit)
+                            ->where('is_aktif', true)
+                            ->get();
+
+            // Mengembalikan format array langsung agar tidak merusak frontend yang ada
+            return response()->json($guruList);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'error' => 'Validasi gagal. Parameter unit atau unit_sekolah (sd/smp) wajib diisi.',
+                'messages' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error("GuruController@index error: " . $e->getMessage());
+            return response()->json(['error' => 'Terjadi kesalahan pada server'], 500);
         }
-        return response()->json($query->get());
+    }
+
+    public function show($id)
+    {
+        try {
+            // Cari data guru berdasarkan id dan pastikan statusnya aktif
+            $guru = Guru::where('id', $id)->where('is_aktif', true)->first();
+
+            if (!$guru) {
+                return response()->json([
+                    'error' => 'Data guru tidak ditemukan atau tidak aktif.'
+                ], 404);
+            }
+
+            return response()->json($guru);
+        } catch (\Exception $e) {
+            \Log::error("GuruController@show error: " . $e->getMessage());
+            return response()->json(['error' => 'Terjadi kesalahan pada server'], 500);
+        }
     }
 
     public function store(Request $request)

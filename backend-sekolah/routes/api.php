@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BeritaController;
+use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\GuruController;
 use App\Http\Controllers\GaleriController;
 use App\Http\Controllers\PengumumanController;
@@ -20,7 +21,10 @@ Route::prefix('v1')->group(function () {
     Route::post('/upload', [UploadController::class, 'upload']);
     Route::get('/berita', [BeritaController::class, 'index']);
     Route::get('/berita/{slug}', [BeritaController::class, 'show']);
+    Route::get('/artikel', [ArtikelController::class, 'index']);
+    Route::get('/artikel/{slug}', [ArtikelController::class, 'show']);
     Route::get('/guru', [GuruController::class, 'index']);
+    Route::get('/guru/{id}', [GuruController::class, 'show']);
     Route::get('/galeri', [GaleriController::class, 'index']);
     Route::get('/pengumuman', [PengumumanController::class, 'index']);
     Route::get('/pengumuman/{pengumuman}', [PengumumanController::class, 'show']);
@@ -42,6 +46,7 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::apiResource('berita', BeritaController::class)->parameters(['berita' => 'berita'])->except(['index', 'show']);
+    Route::apiResource('artikel', ArtikelController::class)->except(['index', 'show']);
     Route::apiResource('guru', GuruController::class)->except(['index']);
     Route::apiResource('galeri', GaleriController::class)->except(['index']);
     Route::apiResource('pengumuman', PengumumanController::class)->except(['index', 'show']);

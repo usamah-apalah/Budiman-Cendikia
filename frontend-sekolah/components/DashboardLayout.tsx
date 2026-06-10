@@ -39,6 +39,7 @@ export default function DashboardLayout({
 
   const navItems = [
     { name: "Dashboard", href: `/admin/${unit}/dashboard` },
+    { name: "Artikel", href: `/admin/${unit}/artikel` },
     { name: "Berita", href: `/admin/${unit}/berita` },
     { name: "Pengumuman", href: `/admin/${unit}/pengumuman` },
     { name: "Agenda", href: `/admin/${unit}/agenda` },

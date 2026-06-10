@@ -88,7 +88,29 @@ export default function GaleriList({ unit }: { unit: "sd" | "smp" }) {
           return (
             <div 
               key={item.id} 
-              onClick={() => { setSelectedImage(item.image); setSelectedTitle(item.judul); }}
+              onClick={(e) => {
+                try {
+                  const card = e.currentTarget;
+                  if (card) {
+                    const img = card.querySelector("img");
+                    if (img) {
+                      const src = img.getAttribute("src");
+                      if (src) {
+                        setSelectedImage(src);
+                        setSelectedTitle(item.judul || "");
+                        return;
+                      }
+                    }
+                  }
+                  // Fallback jika elemen tidak ditemukan
+                  setSelectedImage(item.image || "");
+                  setSelectedTitle(item.judul || "");
+                } catch (err) {
+                  console.error("Gagal membuka gambar galeri:", err);
+                  setSelectedImage(item.image || "");
+                  setSelectedTitle(item.judul || "");
+                }
+              }}
               className={`bg-white p-4 rounded-[32px] shadow-sm border border-gray-100 transition-all duration-500 cursor-pointer group hover:shadow-2xl hover:z-10 hover:scale-105 hover:rotate-0 ${rotation}`}
             >
               <div className="relative aspect-[4/3] rounded-[24px] overflow-hidden mb-5">

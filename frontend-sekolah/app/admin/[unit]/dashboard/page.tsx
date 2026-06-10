@@ -68,7 +68,10 @@ export default function AdminDashboardHome() {
                   </div>
                </div>
                <div className="grid grid-cols-2 gap-4">
-                  <Link href={`/admin/${unit}/berita/tambah`} className="p-6 bg-tosca-50 rounded-[32px] border border-tosca-100 hover:bg-tosca-500 hover:text-white transition-all group">
+                  <Link href={`/admin/${unit}/artikel/tambah`} className="p-6 bg-tosca-50 rounded-[32px] border border-tosca-100 hover:bg-tosca-500 hover:text-white transition-all group">
+                     <p className="font-black text-sm uppercase tracking-widest">Tambah Artikel</p>
+                  </Link>
+                  <Link href={`/admin/${unit}/berita/tambah`} className="p-6 bg-gray-50 rounded-[32px] border border-gray-100 hover:bg-tosca-500 hover:text-white transition-all group">
                      <p className="font-black text-sm uppercase tracking-widest">Tambah Berita</p>
                   </Link>
                   <Link href={`/admin/${unit}/guru/tambah`} className="p-6 bg-gray-50 rounded-[32px] border border-gray-100 hover:bg-tosca-900 hover:text-white transition-all group">
