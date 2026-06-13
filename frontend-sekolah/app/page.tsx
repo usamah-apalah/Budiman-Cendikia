@@ -1,9 +1,21 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Instagram, Youtube, Facebook } from "lucide-react";
+import ShareableImageModal from "@/components/ShareableImageModal";
+
+interface Prestasi {
+  title: string;
+  category: string;
+  date: string;
+  description: string;
+  image: string;
+}
 
 export default function Home() {
+  const [selectedPrestasi, setSelectedPrestasi] = useState<Prestasi | null>(null);
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-6 relative overflow-hidden">
       {/* Decorative blobs */}
@@ -84,6 +96,14 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      <ShareableImageModal
+        isOpen={!!selectedPrestasi}
+        onClose={() => setSelectedPrestasi(null)}
+        imageUrl={selectedPrestasi?.image || ""}
+        title={selectedPrestasi?.title || ""}
+        description={selectedPrestasi?.description || ""}
+      />
     </div>
   );
 }

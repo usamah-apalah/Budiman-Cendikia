@@ -12,6 +12,7 @@ export default function PrestasiForm({ unit }: { unit: "sd" | "smp" }) {
   const [konten, setKonten] = useState("");
   const [tanggal, setTanggal] = useState("");
   const [kategori, setKategori] = useState("siswa");
+  const [tingkat, setTingkat] = useState("Lokal");
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -26,6 +27,32 @@ export default function PrestasiForm({ unit }: { unit: "sd" | "smp" }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!judul.trim()) {
+      toast.error("Judul prestasi wajib diisi.");
+      return;
+    }
+    if (!tanggal) {
+      toast.error("Tanggal perolehan wajib diisi.");
+      return;
+    }
+    if (!kategori) {
+      toast.error("Kategori wajib diisi.");
+      return;
+    }
+    if (!tingkat) {
+      toast.error("Tingkat prestasi wajib diisi.");
+      return;
+    }
+    if (!konten.trim()) {
+      toast.error("Keterangan/detail prestasi wajib diisi.");
+      return;
+    }
+    if (!image) {
+      toast.error("Foto dokumentasi wajib diunggah.");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -46,11 +73,13 @@ export default function PrestasiForm({ unit }: { unit: "sd" | "smp" }) {
         konten,
         tanggal,
         kategori,
+        tingkat,
         image: imageUrl,
       });
       toast.success("Prestasi berhasil dicatat!");
       router.push(`/admin/${unit}/prestasi`);
-    } catch {
+    } catch (err: any) {
+      console.error(err);
       toast.error("Gagal menyimpan data prestasi.");
     } finally {
       setIsLoading(false);
@@ -71,17 +100,27 @@ export default function PrestasiForm({ unit }: { unit: "sd" | "smp" }) {
                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Tanggal Perolehan</label>
                <input type="date" value={tanggal} onChange={e => setTanggal(e.target.value)} required className="w-full px-5 py-3 rounded-2xl border border-gray-200 focus:ring-4 focus:ring-tosca-500/10 focus:border-tosca-500 outline-none" />
             </div>
-            <div>
-               <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Kategori</label>
-               <select value={kategori} onChange={e => setKategori(e.target.value)} className="w-full px-5 py-3 rounded-2xl border border-gray-200 focus:ring-4 focus:ring-tosca-500/10 focus:border-tosca-500 outline-none appearance-none cursor-pointer">
-                  <option value="siswa">Siswa</option>
-                  <option value="guru">Guru</option>
-                  <option value="sekolah">Sekolah</option>
-               </select>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                 <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Kategori</label>
+                 <select value={kategori} onChange={e => setKategori(e.target.value)} className="w-full px-5 py-3 rounded-2xl border border-gray-200 focus:ring-4 focus:ring-tosca-500/10 focus:border-tosca-500 outline-none appearance-none cursor-pointer">
+                    <option value="siswa">Siswa</option>
+                    <option value="guru">Guru</option>
+                    <option value="sekolah">Sekolah</option>
+                 </select>
+              </div>
+              <div>
+                 <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Tingkat</label>
+                 <select value={tingkat} onChange={e => setTingkat(e.target.value)} className="w-full px-5 py-3 rounded-2xl border border-gray-200 focus:ring-4 focus:ring-tosca-500/10 focus:border-tosca-500 outline-none appearance-none cursor-pointer">
+                    <option value="Lokal">Lokal</option>
+                    <option value="Nasional">Nasional</option>
+                    <option value="Internasional">Internasional</option>
+                 </select>
+              </div>
             </div>
             <div>
                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Keterangan / Detail</label>
-               <textarea value={konten} onChange={e => setKonten(e.target.value)} rows={5} className="w-full px-5 py-3 rounded-2xl border border-gray-200 focus:ring-4 focus:ring-tosca-500/10 focus:border-tosca-500 outline-none" placeholder="Jelaskan detail prestasi yang diraih..."></textarea>
+               <textarea value={konten} onChange={e => setKonten(e.target.value)} rows={5} required className="w-full px-5 py-3 rounded-2xl border border-gray-200 focus:ring-4 focus:ring-tosca-500/10 focus:border-tosca-500 outline-none" placeholder="Jelaskan detail prestasi yang diraih..."></textarea>
             </div>
          </div>
 

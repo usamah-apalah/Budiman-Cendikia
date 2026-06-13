@@ -6,7 +6,8 @@ import { useParams } from "next/navigation";
 import api from "@/lib/api";
 import { toast } from "react-toastify";
 import PublicLayout from "@/components/PublicLayout";
-import { ChevronRight, X, Maximize2, Image as ImageIcon } from "lucide-react";
+import { ChevronRight, Maximize2, Image as ImageIcon } from "lucide-react";
+import ShareableImageModal from "@/components/ShareableImageModal";
 
 interface ProgramFasilitas {
   id: number;
@@ -29,6 +30,7 @@ export default function FasilitasPage() {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [activeImage, setActiveImage] = useState<string | null>(null);
   const [activeTitle, setActiveTitle] = useState("");
+  const [activeDescription, setActiveDescription] = useState("");
 
   const fetchItems = useCallback(async () => {
     try {
@@ -107,6 +109,7 @@ export default function FasilitasPage() {
                                 if (item.ikon) {
                                   setActiveImage(item.ikon);
                                   setActiveTitle(item.nama);
+                                  setActiveDescription(item.deskripsi || "");
                                   setIsLightboxOpen(true);
                                 }
                               } catch (err) {
@@ -145,55 +148,14 @@ export default function FasilitasPage() {
         </div>
       </PublicLayout>
 
-      {/* Fullscreen Lightbox (Ditempatkan di luar PublicLayout untuk menghindari bug fixed-position akibat CSS transform parent) */}
-      {isLightboxOpen && activeImage && (
-        <div 
-          className="fixed inset-0 bg-black/85 z-[999] flex flex-col items-center justify-center p-4 animate-fade-in cursor-zoom-out"
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center"
-          }}
-          onClick={() => setIsLightboxOpen(false)}
-        >
-          {/* Lightbox Content Container */}
-          <div 
-            className="max-w-4xl max-h-[90vh] relative flex flex-col items-center justify-center rounded-2xl overflow-hidden border border-tosca-200/20 bg-tosca-900 shadow-2xl animate-zoom-in"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Close Button (Dipindahkan ke pojok kanan atas container modal yang terpusat) */}
-            <button 
-              onClick={() => setIsLightboxOpen(false)}
-              className="absolute top-4 right-4 text-white hover:text-tosca-200 transition-colors bg-black/50 p-2.5 rounded-full hover:bg-black/75 focus:outline-none z-30 border border-white/10"
-            >
-              <X size={20} strokeWidth={2.5} />
-            </button>
-
-            <img 
-              src={activeImage} 
-              alt={activeTitle} 
-              className="max-w-full max-h-[70vh] object-contain rounded-t-2xl"
-              style={{
-                maxWidth: "90vw",
-                maxHeight: "70vh",
-                objectFit: "contain",
-                display: "block",
-                margin: "auto"
-              }}
-            />
-            
-            {/* Caption using white and dark tosca bg */}
-            <div className="w-full bg-tosca-900/90 p-5 border-t border-tosca-700/50 text-center z-10">
-              <h3 className="text-white text-lg font-black uppercase tracking-tight">{activeTitle}</h3>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Fullscreen Lightbox Modal */}
+      <ShareableImageModal
+        isOpen={isLightboxOpen}
+        onClose={() => setIsLightboxOpen(false)}
+        imageUrl={activeImage || ""}
+        title={activeTitle}
+        description={activeDescription}
+      />
     </>
   );
 }

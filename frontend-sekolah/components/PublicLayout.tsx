@@ -57,7 +57,7 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
   const accentBg = unit === "sd" ? "bg-tosca-50 text-tosca-600" : "bg-tosca-50 text-tosca-900";
 
   return (
-    <div className="min-h-screen bg-white font-sans text-gray-900">
+    <div className="min-h-screen bg-white font-sans text-gray-900 overflow-x-hidden">
       {/* Top Bar */}
       <div 
         className={`fixed top-0 left-0 right-0 z-[60] bg-[#0B6B69] text-white transition-all duration-500 ${

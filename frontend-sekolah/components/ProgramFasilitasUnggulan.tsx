@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { X, Maximize2, ImageIcon } from "lucide-react";
+import { Maximize2, ImageIcon } from "lucide-react";
+import ShareableImageModal from "./ShareableImageModal";
 import "./ProgramFasilitasUnggulan.css";
 
 // Interface untuk item Program & Fasilitas dari database/admin
@@ -138,16 +139,8 @@ export default function ProgramFasilitasUnggulan({ unit, programFasilitas }: Pro
                 <div
                   key={item.id || index}
                   className={`masonry-item ${aspectClass} ${item.nama.toLowerCase().includes("outing") ? "outing-class-card" : ""}`}
-                  onClick={(e) => {
-                    try {
-                      const cardElement = e.currentTarget;
-                      const imgElement = cardElement.querySelector("img");
-                      const src = imgElement ? imgElement.getAttribute("src") : imageSrc;
-                      openLightbox(src || "", item.nama, item.deskripsi || "");
-                    } catch (err) {
-                      console.error("Gagal mendeteksi gambar klik:", err);
-                      openLightbox(imageSrc, item.nama, item.deskripsi || "");
-                    }
+                  onClick={() => {
+                    openLightbox(imageSrc, item.nama, item.deskripsi || "");
                   }}
                 >
                   {/* Image Container */}
@@ -210,49 +203,13 @@ export default function ProgramFasilitasUnggulan({ unit, programFasilitas }: Pro
         )}
 
         {/* Fullscreen Lightbox Modal */}
-        {lightbox.isOpen && lightbox.imageUrl && (
-          <div
-            className="lightbox-backdrop"
-            onClick={() => setLightbox(prev => ({ ...prev, isOpen: false }))}
-          >
-            {/* Tombol Tutup */}
-            <button
-              onClick={() => setLightbox(prev => ({ ...prev, isOpen: false }))}
-              className="lightbox-close-btn"
-              aria-label="Tutup Pratinjau"
-            >
-              <X size={20} />
-            </button>
-
-            {/* Container Konten Lightbox */}
-            <div
-              className="lightbox-content"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Gambar Zoom */}
-              <img
-                src={lightbox.imageUrl}
-                alt={lightbox.title}
-                className="lightbox-img"
-              />
-
-              {/* Caption */}
-              <div className="lightbox-caption">
-                <h4 className="lightbox-title">
-                  {lightbox.title}
-                </h4>
-                {lightbox.description && (
-                  <p className="lightbox-desc">
-                    {lightbox.description}
-                  </p>
-                )}
-                <p className="lightbox-desc" style={{ fontSize: "10px", marginTop: "12px", opacity: 0.7 }}>
-                  <Maximize2 size={10} style={{ display: "inline", marginRight: "4px" }} /> Klik area luar untuk menutup
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
+        <ShareableImageModal
+          isOpen={lightbox.isOpen}
+          onClose={() => setLightbox(prev => ({ ...prev, isOpen: false }))}
+          imageUrl={lightbox.imageUrl}
+          title={lightbox.title}
+          description={lightbox.description}
+        />
 
       </div>
     </section>

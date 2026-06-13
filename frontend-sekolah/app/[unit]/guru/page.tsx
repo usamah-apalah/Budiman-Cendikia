@@ -19,11 +19,13 @@ interface Guru {
 
 export default function PublicGuruPage() {
   const params = useParams();
-  const unit = params.unit as "sd" | "smp";
+  const unit = params?.unit as "sd" | "smp" | undefined;
   const [guru, setGuru] = useState<Guru[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if (!unit) return;
+
     const fetchGuru = async () => {
       try {
         const response = await api.get(`/guru?unit=${unit}`);
@@ -61,6 +63,10 @@ export default function PublicGuruPage() {
   const kepalaSekolah = guru.length > 0 ? guru[0] : null;
   const daftarGuru = guru.length > 1 ? guru.slice(1) : [];
 
+  if (!unit) {
+    return null;
+  }
+
   return (
     <PublicLayout unit={unit}>
       <div className="pt-16 pb-32 bg-[#F8FAFC] min-h-screen">
@@ -89,7 +95,10 @@ export default function PublicGuruPage() {
               {kepalaSekolah && (
                 <div className="bg-white rounded-[40px] shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden flex flex-col md:flex-row group hover:shadow-2xl transition-all duration-500 scroll-animate opacity-0 translate-y-12">
                   <div className="w-full md:w-[400px] bg-tosca-50 flex-shrink-0 overflow-hidden aspect-[3/4]">
-                    <Link href={`/${unit}/guru/${kepalaSekolah.id}`} className="block w-full h-full">
+                    <Link
+                      href={`/${unit}/guru/${kepalaSekolah.id}`}
+                      className="block w-full h-full"
+                    >
                       <img
                         src={
                           kepalaSekolah.foto ||
@@ -109,7 +118,10 @@ export default function PublicGuruPage() {
                       {kepalaSekolah.jabatan}
                     </span>
                     <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-6">
-                      <Link href={`/${unit}/guru/${kepalaSekolah.id}`} className="hover:text-tosca-600 hover:underline transition-colors">
+                      <Link
+                        href={`/${unit}/guru/${kepalaSekolah.id}`}
+                        className="hover:text-tosca-600 hover:underline transition-colors"
+                      >
                         {kepalaSekolah.nama}
                       </Link>
                     </h2>
@@ -148,7 +160,10 @@ export default function PublicGuruPage() {
                       style={{ transitionDelay: `${(index % 4) * 100}ms` }}
                     >
                       <div className="aspect-[3/4] overflow-hidden bg-tosca-50 relative">
-                        <Link href={`/${unit}/guru/${item.id}`} className="block w-full h-full">
+                        <Link
+                          href={`/${unit}/guru/${item.id}`}
+                          className="block w-full h-full"
+                        >
                           <img
                             src={
                               item.foto ||
@@ -158,11 +173,11 @@ export default function PublicGuruPage() {
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                           />
                         </Link>
-                        
+
                         {/* Overlay Contacts */}
                         <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/80 via-black/40 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-500 flex justify-center gap-4 z-20">
                           {item.gmail && (
-                            <a 
+                            <a
                               href={`mailto:${item.gmail}`}
                               onClick={(e) => e.stopPropagation()}
                               className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white hover:bg-white hover:text-tosca-600 transition-all"
@@ -172,7 +187,7 @@ export default function PublicGuruPage() {
                             </a>
                           )}
                           {item.whatsapp && (
-                            <a 
+                            <a
                               href={`https://wa.me/${item.whatsapp}`}
                               target="_blank"
                               rel="noopener noreferrer"
@@ -191,7 +206,10 @@ export default function PublicGuruPage() {
                           {item.jabatan}
                         </span>
                         <h4 className="text-xl font-black text-gray-900 leading-tight mb-4 group-hover:text-tosca-600 transition-colors">
-                          <Link href={`/${unit}/guru/${item.id}`} className="hover:underline">
+                          <Link
+                            href={`/${unit}/guru/${item.id}`}
+                            className="hover:underline"
+                          >
                             {item.nama}
                           </Link>
                         </h4>
@@ -207,8 +225,12 @@ export default function PublicGuruPage() {
                               </p>
                             </div>
                             <div className="flex gap-2">
-                               {item.gmail && <Mail size={14} className="text-gray-300" />}
-                               {item.whatsapp && <Phone size={14} className="text-gray-300" />}
+                              {item.gmail && (
+                                <Mail size={14} className="text-gray-300" />
+                              )}
+                              {item.whatsapp && (
+                                <Phone size={14} className="text-gray-300" />
+                              )}
                             </div>
                           </div>
                         )}

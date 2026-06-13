@@ -50,6 +50,7 @@ export default function AdminLayout({
     { name: "Prestasi", href: `/admin/${unit}/prestasi` },
     { name: "Guru", href: `/admin/${unit}/guru` },
     { name: "Program & Fasilitas", href: `/admin/${unit}/program-fasilitas` },
+    { name: "Ekstrakurikuler", href: `/admin/${unit}/ekstrakurikuler` },
     { name: "Galeri", href: `/admin/${unit}/galeri` },
     { name: "PPDB", href: `/admin/${unit}/ppdb` },
   ];

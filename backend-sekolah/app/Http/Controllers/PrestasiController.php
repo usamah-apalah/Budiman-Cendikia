@@ -28,7 +28,7 @@ class PrestasiController extends Controller
             'judul'    => 'required|string|max:255',
             'konten'   => 'required|string',
             'tanggal'  => 'required|date',
-            'image'    => 'nullable|string',
+            'image'    => 'required|string',
             'kategori' => 'required|in:siswa,guru,sekolah',
             'tingkat'  => 'required|in:Lokal,Nasional,Internasional',
         ]);
@@ -44,7 +44,7 @@ class PrestasiController extends Controller
             'judul'    => 'sometimes|required|string|max:255',
             'konten'   => 'sometimes|required|string',
             'tanggal'  => 'sometimes|required|date',
-            'image'    => 'nullable|string',
+            'image'    => 'sometimes|required|string',
             'kategori' => 'sometimes|required|in:siswa,guru,sekolah',
             'tingkat'  => 'sometimes|required|in:Lokal,Nasional,Internasional',
         ]);

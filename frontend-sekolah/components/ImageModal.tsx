@@ -1,7 +1,7 @@
 "use client";
 
 import { X, Download, Share2, Link2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { toast } from "react-toastify";
 
 interface ImageModalProps {
@@ -12,13 +12,18 @@ interface ImageModalProps {
 }
 
 export default function ImageModal({ isOpen, onClose, imageUrl, title }: ImageModalProps) {
-  const [isMounted, setIsMounted] = useState(false);
-
   useEffect(() => {
-    setIsMounted(true);
-  }, []);
+    if (isOpen && imageUrl) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen, imageUrl]);
 
-  if (!isMounted || !isOpen) return null;
+  if (!isOpen || !imageUrl) return null;
 
   const handleShareWA = (e: React.MouseEvent) => {
     e.stopPropagation();
