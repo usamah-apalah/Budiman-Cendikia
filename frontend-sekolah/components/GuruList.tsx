@@ -3,6 +3,8 @@
 import { useEffect, useState, useCallback } from "react";
 import api from "@/lib/api";
 import { toast } from "react-toastify";
+import Link from "next/link";
+
 
 interface Guru {
   id: number;
@@ -99,9 +101,10 @@ export default function GuruList({ unit }: { unit: "sd" | "smp" }) {
                 <td className="px-8 py-5 text-gray-500 font-medium">{item.mata_pelajaran || '-'}</td>
                 {isAdmin && (
                   <td className="px-8 py-5 text-right space-x-3">
-                    <button className="text-tosca-700 hover:text-tosca-900 font-bold text-sm inline-flex items-center gap-1">
+                    <Link href={`/admin/${unit}/guru/${item.id}/edit`} className="text-tosca-700 hover:text-tosca-900 font-bold text-sm inline-flex items-center gap-1">
                       Edit
-                    </button>
+                    </Link>
+
                     <button onClick={(e) => handleDelete(e, item.id)} className="text-red-500 hover:text-red-700 font-bold text-sm inline-flex items-center gap-1">
                       Hapus
                     </button>

@@ -22,6 +22,7 @@ export default function AdminLayout({
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("admin_token");
@@ -34,6 +35,22 @@ export default function AdminLayout({
       setLoading(false);
     }
   }, [router, unit]);
+
+  useEffect(() => {
+    const fetchLogo = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+        const res = await fetch(`${apiUrl}/settings`);
+        const data = await res.json();
+        if (data && data.site_logo) {
+          setLogoUrl(data.site_logo);
+        }
+      } catch (err) {
+        console.error("Error fetching logo in admin layout:", err);
+      }
+    };
+    fetchLogo();
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("admin_token");
@@ -49,10 +66,12 @@ export default function AdminLayout({
     { name: "Agenda", href: `/admin/${unit}/agenda` },
     { name: "Prestasi", href: `/admin/${unit}/prestasi` },
     { name: "Guru", href: `/admin/${unit}/guru` },
+    { name: "Kepala Sekolah", href: `/admin/${unit}/headmaster` },
     { name: "Program & Fasilitas", href: `/admin/${unit}/program-fasilitas` },
     { name: "Ekstrakurikuler", href: `/admin/${unit}/ekstrakurikuler` },
     { name: "Galeri", href: `/admin/${unit}/galeri` },
     { name: "PPDB", href: `/admin/${unit}/ppdb` },
+    { name: "Pengaturan Website", href: `/admin/${unit}/settings` },
   ];
 
   if (loading) return null;
@@ -60,17 +79,26 @@ export default function AdminLayout({
   return (
     <div className="flex h-screen bg-gray-50 font-sans">
       <aside
-        className={`${isSidebarOpen ? "w-64" : "w-20"} transition-all duration-300 bg-gray-900 text-white flex flex-col shadow-2xl z-20`}
+        className={`${isSidebarOpen ? "w-64" : "w-20"} h-screen sticky top-0 transition-all duration-300 bg-gray-900 text-white flex flex-col shadow-2xl z-20 overflow-hidden`}
       >
         <div className="p-6 flex items-center justify-between border-b border-gray-800">
           {isSidebarOpen && (
-            <div className="flex flex-col">
-              <span className="text-xl font-bold tracking-tight">
-                Budiman Admin
-              </span>
-              <span className="text-[10px] font-black text-tosca-500 uppercase tracking-widest">
-                {unit} Panel
-              </span>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full overflow-hidden bg-tosca-500 flex items-center justify-center text-white font-black text-sm shrink-0">
+                {logoUrl ? (
+                  <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                ) : (
+                  "B"
+                )}
+              </div>
+              <div className="flex flex-col">
+                <span className="text-sm font-bold tracking-tight leading-none">
+                  Budiman Admin
+                </span>
+                <span className="text-[9px] font-black text-tosca-500 uppercase tracking-widest mt-1">
+                  {unit} Panel
+                </span>
+              </div>
             </div>
           )}
           <button
@@ -81,7 +109,8 @@ export default function AdminLayout({
           </button>
         </div>
 
-        <nav className="flex-1 mt-8 px-4 space-y-2">
+        <nav className="flex-1 mt-6 px-4 space-y-2 overflow-y-auto scrollable">
+
           {navItems.map((item) => (
             <Link
               key={item.name}
@@ -106,6 +135,7 @@ export default function AdminLayout({
           </button>
         </div>
       </aside>
+
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="bg-white border-b border-gray-200 h-20 flex items-center justify-between px-8 z-10">

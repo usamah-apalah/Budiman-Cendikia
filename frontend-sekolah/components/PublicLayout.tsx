@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Phone, Mail, Instagram, Facebook, Youtube, LogIn, Menu, X, ChevronDown } from "lucide-react";
+import { Phone, Mail, Instagram, LogIn, Menu, X, ChevronDown } from "lucide-react";
 
 interface PublicLayoutProps {
   children: React.ReactNode;
@@ -13,6 +13,7 @@ interface PublicLayoutProps {
 export default function PublicLayout({ children, unit }: PublicLayoutProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -20,6 +21,22 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
       setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll);
+    
+    // Fetch site logo
+    const fetchLogo = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+        const res = await fetch(`${apiUrl}/settings`);
+        const data = await res.json();
+        if (data && data.site_logo) {
+          setLogoUrl(data.site_logo);
+        }
+      } catch (err) {
+        console.error("Error fetching logo:", err);
+      }
+    };
+    fetchLogo();
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -27,7 +44,7 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
     { name: "Beranda", href: `/${unit}` },
     { 
       name: "Profil Sekolah", 
-      href: "#",
+      href: `/${unit}/fasilitas`,
       dropdown: [
         { name: "Visi & Misi", href: `/${unit}/visi-misi` },
         { name: "Program & Fasilitas", href: `/${unit}/fasilitas` },
@@ -36,7 +53,7 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
     },
     { 
       name: "Informasi", 
-      href: "#",
+      href: `/${unit}/berita`,
       dropdown: [
         { name: "Berita & Kegiatan", href: `/${unit}/berita` },
         { name: "Agenda Sekolah", href: `/${unit}/agenda` },
@@ -45,7 +62,7 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
     },
     { 
       name: "Galeri", 
-      href: "#",
+      href: `/${unit}/galeri`,
       dropdown: [
         { name: "Galeri Foto", href: `/${unit}/galeri` },
         { name: "Dokumentasi Video", href: `/${unit}/video` },
@@ -68,19 +85,21 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
           <div className="flex gap-10">
             <div className="flex items-center gap-2.5">
               <Phone size={14} className="text-tosca-300" />
-              <span className="opacity-80">(061) 1234567</span>
+              <span className="opacity-80">081534648183</span>
             </div>
             <div className="flex items-center gap-2.5">
               <Mail size={14} className="text-tosca-300" />
-              <span className="opacity-80">info@budimancendikia.sch.id</span>
+              <span className="opacity-80">budimancendikia304@gmail.com</span>
             </div>
           </div>
           <div className="flex items-center gap-6">
+            <a href="https://wa.me/6281534648183" target="_blank" rel="noopener noreferrer" className="hover:text-tosca-300 transition-colors" aria-label="WhatsApp">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.003 5.419 5.422.002 12.005.002c3.192.001 6.192 1.244 8.448 3.501 2.256 2.257 3.497 5.257 3.495 8.45-.004 6.581-5.424 11.998-12.008 11.998-2.005-.002-3.98-.507-5.73-1.472L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.625 1.449 5.49 0 9.957-4.467 9.96-9.96.002-2.661-1.034-5.163-2.915-7.046C16.48 1.714 13.98.674 11.32.674 5.828.674 1.36 5.14 1.358 10.63c-.001 1.704.476 3.238 1.387 4.678l-.993 3.626 3.71-.973.505.293zm9.055-6.72c-.243-.122-1.434-.708-1.656-.79-.22-.082-.38-.122-.54.122-.16.244-.622.79-.762.948-.14.158-.28.178-.522.057a7.279 7.279 0 0 1-3.233-1.993c-.886-.788-1.485-1.761-1.66-2.066-.173-.306-.018-.472.133-.623.136-.137.304-.35.457-.525.152-.174.203-.298.304-.497.102-.2.05-.374-.025-.522-.076-.148-.622-1.503-.852-2.057-.225-.54-.472-.466-.648-.475-.168-.008-.36-.01-.552-.01-.192 0-.505.072-.77.36-.264.288-1.01.986-1.01 2.404s1.03 2.788 1.173 2.98c.143.195 2.025 3.093 4.908 4.336.685.296 1.22.473 1.637.605.69.22 1.32.19 1.816.116.553-.082 1.434-.586 1.637-1.155.203-.57.203-1.057.142-1.155-.06-.1-.22-.158-.463-.28z"/>
+              </svg>
+            </a>
             <Link href="#" className="hover:text-tosca-300 transition-colors">
               <Instagram size={15} />
-            </Link>
-            <Link href="#" className="hover:text-tosca-300 transition-colors">
-              <Facebook size={15} />
             </Link>
           </div>
         </div>
@@ -111,8 +130,12 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
           {/* Logo container (flex-1 to help center the menu) */}
           <div className="flex-1 flex justify-start items-center">
             <Link href="/" className="flex items-center gap-3 pl-2 md:pl-4 group shrink-0">
-              <div className="w-10 h-10 md:w-11 md:h-11 bg-tosca-500 rounded-full flex items-center justify-center text-white font-black text-xl shadow-lg shadow-tosca-500/20 group-hover:rotate-12 transition-transform">
-                B
+              <div className="w-10 h-10 md:w-11 md:h-11 bg-tosca-500 rounded-full flex items-center justify-center text-white font-black text-xl shadow-lg shadow-tosca-500/20 group-hover:rotate-12 transition-transform overflow-hidden">
+                {logoUrl ? (
+                  <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                ) : (
+                  "B"
+                )}
               </div>
               <div className="flex flex-col">
                 <span className={`font-black text-base md:text-lg tracking-tighter leading-none ${brandColor}`}>BUDIMAN</span>
@@ -163,13 +186,13 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
           </div>
  
           {/* Action Buttons (flex-1 to help center the menu, aligned right) */}
-          <div className="flex-1 flex justify-end items-center gap-[15px] pr-2 md:pr-4">
-            {/* Tombol 'KONTAK' (Hover Effect 3D) */}
+          <div className="flex-1 flex justify-end items-center gap-[10px] md:gap-[15px] pr-2 md:pr-4">
+            {/* Tombol 'KONTAK' (Hover Effect 3D) - Hidden on Mobile (< 768px) */}
             <a
-              href="https://wa.me/628123456789"
+              href="https://wa.me/6281534648183"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] rounded-full transition-all duration-300 flex items-center justify-center whitespace-nowrap"
+              className="hidden md:inline-flex text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] rounded-full transition-all duration-300 items-center justify-center whitespace-nowrap"
               style={{
                 backgroundColor: "#2FCFC9",
                 color: "#0B6B69",
@@ -189,9 +212,10 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
               KONTAK
             </a>
  
+            {/* Tombol 'LOGIN' - Hidden on Mobile (< 768px) */}
             <Link 
               href={`/admin/login?unit=${unit}`}
-              className="bg-[#0B6B69] text-white text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] rounded-full hover:bg-tosca-900 transition-all shadow-lg shadow-tosca-900/10 flex items-center gap-2 whitespace-nowrap"
+              className="hidden md:inline-flex bg-[#0B6B69] text-white text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] rounded-full hover:bg-tosca-900 transition-all shadow-lg shadow-tosca-900/10 items-center gap-2 whitespace-nowrap"
               style={{
                 padding: "8px 20px"
               }}
@@ -209,7 +233,7 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
             </button>
           </div>
         </nav>
-
+ 
         {/* Mobile Menu */}
         <div className={`lg:hidden absolute top-full left-0 right-0 mt-3 px-4 transition-all duration-300 ${
           isMobileMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 pointer-events-none"
@@ -246,8 +270,34 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
                 )}
               </div>
             ))}
+
+            {/* Mobile Actions inside hamburger menu */}
+            <div className="flex flex-col gap-3 pt-4 border-t border-gray-100 mt-2">
+              <a
+                href="https://wa.me/6281534648183"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full text-center text-xs font-black uppercase tracking-[0.15em] rounded-2xl py-3.5 transition-all duration-300 block"
+                style={{
+                  backgroundColor: "#2FCFC9",
+                  color: "#0B6B69"
+                }}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                KONTAK
+              </a>
+              <Link 
+                href={`/admin/login?unit=${unit}`}
+                className="w-full text-center bg-[#0B6B69] text-white text-xs font-black uppercase tracking-[0.15em] rounded-2xl py-3.5 hover:bg-tosca-900 transition-all flex items-center justify-center gap-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <LogIn size={14} />
+                LOGIN
+              </Link>
+            </div>
           </div>
         </div>
+
       </div>
 
       <main className="pt-28 md:pt-44 animate-fade-in-up opacity-0" style={{ animationFillMode: 'forwards', animationDuration: '1s' }}>
@@ -279,13 +329,17 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
             <h4 className="font-black text-gray-900 uppercase tracking-widest text-xs mb-6">Kontak Kami</h4>
             <ul className="space-y-4 text-sm font-medium text-gray-500">
               <li className="flex items-start gap-3">
-                <span>Jl. Pendidikan No. 123, Kota Medan, Sumatera Utara</span>
+                <span>Jalan Alumunium III No. 79, Tanjung Mulia, Kecamatan Medan Deli, Kota Medan, Sumatera Utara 20241</span>
               </li>
               <li className="flex items-center gap-3">
-                <span>(061) 1234567</span>
+                <span>081534648183</span>
               </li>
               <li className="flex items-center gap-3">
-                <span>info@budimancendikia.sch.id</span>
+                <span>budimancendikia304@gmail.com</span>
+              </li>
+              <li className="flex flex-col gap-1 pt-2 border-t border-gray-200/50">
+                <span className="text-[10px] font-black uppercase text-tosca-600 tracking-wider">Jam Admin</span>
+                <span>Senin - Jumat 08.00 s/d 16.00</span>
               </li>
             </ul>
           </div>
@@ -293,13 +347,17 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
         <div className="max-w-7xl mx-auto px-6 pt-12 border-t border-gray-200/50 flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-gray-400 font-bold text-[10px] uppercase tracking-widest">© 2026 Budiman Cendikia. All Rights Reserved.</p>
           <div className="flex gap-4">
-             <Link 
-               href="#" 
-               aria-label="Facebook"
+             <a 
+               href="https://wa.me/6281534648183" 
+               target="_blank"
+               rel="noopener noreferrer"
+               aria-label="WhatsApp"
                className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-tosca-700 hover:bg-tosca-500 hover:text-white transition-all cursor-pointer border border-gray-100"
              >
-                <Facebook size={18} />
-             </Link>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.003 5.419 5.422.002 12.005.002c3.192.001 6.192 1.244 8.448 3.501 2.256 2.257 3.497 5.257 3.495 8.45-.004 6.581-5.424 11.998-12.008 11.998-2.005-.002-3.98-.507-5.73-1.472L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.625 1.449 5.49 0 9.957-4.467 9.96-9.96.002-2.661-1.034-5.163-2.915-7.046C16.48 1.714 13.98.674 11.32.674 5.828.674 1.36 5.14 1.358 10.63c-.001 1.704.476 3.238 1.387 4.678l-.993 3.626 3.71-.973.505.293zm9.055-6.72c-.243-.122-1.434-.708-1.656-.79-.22-.082-.38-.122-.54.122-.16.244-.622.79-.762.948-.14.158-.28.178-.522.057a7.279 7.279 0 0 1-3.233-1.993c-.886-.788-1.485-1.761-1.66-2.066-.173-.306-.018-.472.133-.623.136-.137.304-.35.457-.525.152-.174.203-.298.304-.497.102-.2.05-.374-.025-.522-.076-.148-.622-1.503-.852-2.057-.225-.54-.472-.466-.648-.475-.168-.008-.36-.01-.552-.01-.192 0-.505.072-.77.36-.264.288-1.01.986-1.01 2.404s1.03 2.788 1.173 2.98c.143.195 2.025 3.093 4.908 4.336.685.296 1.22.473 1.637.605.69.22 1.32.19 1.816.116.553-.082 1.434-.586 1.637-1.155.203-.57.203-1.057.142-1.155-.06-.1-.22-.158-.463-.28z"/>
+                </svg>
+             </a>
              <Link 
                href="#" 
                aria-label="Instagram"
@@ -309,10 +367,12 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
              </Link>
              <Link 
                href="#" 
-               aria-label="YouTube"
+               aria-label="TikTok"
                className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-tosca-700 hover:bg-tosca-500 hover:text-white transition-all cursor-pointer border border-gray-100"
              >
-                <Youtube size={18} />
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.81-.74-3.99-1.66-.22-.17-.41-.36-.6-.56v7.13c-.02 2.63-.99 5.13-2.92 6.84-2.14 1.89-5.19 2.58-7.99 1.81-2.92-.77-5.34-3.13-6.07-6.07-.9-3.41.25-7.23 2.99-9.37 1.95-1.54 4.54-2.14 7-1.63v4.05c-.86-.18-1.78-.11-2.58.26-.81.36-1.48.99-1.86 1.78-.63 1.26-.41 2.92.56 3.94.97 1.02 2.52 1.25 3.73.57.77-.43 1.22-1.22 1.23-2.1V.02z"/>
+                </svg>
              </Link>
           </div>
         </div>

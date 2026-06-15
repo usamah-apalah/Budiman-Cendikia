@@ -91,6 +91,34 @@ export default function UnitPublicHomePage() {
   
   const unit = isValidUnit ? (unitParam as "sd" | "smp") : "sd";
   const [stats, setStats] = useState(SITE_STATS[unit]);
+
+  const defaultHeadmaster = {
+    sd: {
+      name: "Dr. H. Ahmad Fauzi, M.Pd",
+      greeting: "Assalamu'alaikum Warahmatullahi Wabarakatuh,\n\nSelamat datang di website resmi SD Budiman Cendikia. Kami bangga menjadi bagian dari perjalanan pendidikan putra-putri Anda. Di sini, kami tidak hanya fokus pada prestasi akademik, tetapi juga pembentukan karakter dan nilai-nilai keagamaan yang kuat.\n\nVisi kami adalah mencetak generasi yang cerdas, kreatif, dan berakhlak mulia. Dengan dukungan tenaga pengajar yang kompeten dan fasilitas yang modern, kami berkomitmen memberikan lingkungan belajar yang terbaik.\n\nSemoga kehadiran website ini dapat mempermudah komunikasi dan akses informasi bagi seluruh civitas akademika dan masyarakat luas. Mari bersama-sama membimbing putra-putri kita menuju masa depan yang gemilang.",
+      photo: null
+    },
+    smp: {
+      name: "Drs. H. Mulyadi, M.Si",
+      greeting: "Assalamu'alaikum Warahmatullahi Wabarakatuh,\n\nSelamat datang di lingkungan belajar SMP Budiman Cendikia. Kami berkomitmen untuk mendampingi putra-putri Anda melewati masa remaja dengan bimbingan yang tepat, kurikulum yang relevan, dan pembiasaan nilai-nilai Islami.\n\nDi SMP Budiman Cendikia, kami mendorong setiap siswa untuk mengeksplorasi potensi diri, menguasai teknologi, dan memiliki kemandirian yang kuat. Bersama-sama, kita wujudkan generasi emas yang siap menghadapi tantangan zaman.\n\nWebsite ini hadir sebagai jembatan informasi antara sekolah, orang tua, and masyarakat. Mari bersinergi menciptakan ekosistem pendidikan yang kondusif bagi tumbuh kembang generasi penerus bangsa.",
+      photo: null
+    }
+  };
+
+  const [headmaster, setHeadmaster] = useState<{ name: string; greeting: string; photo: string | null }>(defaultHeadmaster[unit]);
+
+  const paragraphs = headmaster.greeting.split(/\n+/);
+
+  const getPhotoUrl = () => {
+    if (headmaster.photo) {
+      const backendBaseUrl = process.env.NEXT_PUBLIC_API_URL 
+        ? process.env.NEXT_PUBLIC_API_URL.replace('/api/v1', '') 
+        : 'http://localhost:8000';
+      return `${backendBaseUrl}/uploads/kepala_sekolah/${headmaster.photo}`;
+    }
+    return "/globe.svg";
+  };
+
   const [latestNews, setLatestNews] = useState<NewsItem[]>([]);
   const [latestArtikel, setLatestArtikel] = useState<NewsItem[]>([]);
   const [latestPrestasi, setLatestPrestasi] = useState<PrestasiItem[]>([]);
@@ -103,6 +131,7 @@ export default function UnitPublicHomePage() {
 
   useEffect(() => {
     if (!isValidUnit) return;
+    setHeadmaster(defaultHeadmaster[unit]);
     
     const fetchStats = async () => {
       try {
@@ -138,8 +167,19 @@ export default function UnitPublicHomePage() {
         console.error(e);
       }
     };
+
+    const fetchHeadmaster = async () => {
+      try {
+        const res = await api.get(`/headmaster?unit=${unit}`);
+        setHeadmaster(res.data);
+      } catch (e) {
+        console.error("Failed to fetch headmaster:", e);
+      }
+    };
+
     fetchStats();
     fetchLatest();
+    fetchHeadmaster();
   }, [unit, isValidUnit]);
 
   useEffect(() => {
@@ -223,9 +263,9 @@ export default function UnitPublicHomePage() {
           <div className="absolute top-0 left-0 w-full h-full bg-tosca-50/50 -z-10"></div>
           <div className="absolute top-0 right-0 w-1/3 h-full bg-tosca-500/10 -z-10 blur-3xl rounded-full translate-x-1/2"></div>
 
-          <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+          <div className="max-w-7xl mx-auto px-6">
             <div
-              className="animate-fade-in-right opacity-0"
+              className="animate-fade-in-right opacity-0 w-full max-w-4xl"
               style={{ animationFillMode: "forwards" }}
             >
               <PPDBBadge year="2026/2027" theme="sd" />
@@ -233,7 +273,7 @@ export default function UnitPublicHomePage() {
                 Membangun Fondasi{" "}
                 <span className="text-tosca-500">Masa Depan</span> Gemilang
               </h1>
-              <p className="text-lg text-gray-500 font-medium mb-10 leading-relaxed max-w-lg">
+              <p className="text-lg text-gray-500 font-medium mb-10 leading-relaxed max-w-3xl">
                 SD Budiman Cendikia menghadirkan pendidikan yang seimbang antara
                 akademik, karakter, dan kreativitas untuk membekali anak Anda
                 menjadi pemimpin masa depan.
@@ -251,32 +291,6 @@ export default function UnitPublicHomePage() {
                 >
                   Lihat Galeri
                 </Link>
-              </div>
-            </div>
-            <div
-              className="relative animate-fade-in-left opacity-0 delay-200"
-              style={{ animationFillMode: "forwards" }}
-            >
-              <div className="aspect-square bg-tosca-200 rounded-[60px] rotate-3 relative overflow-hidden shadow-2xl">
-                <img
-                  src="/globe.svg"
-                  alt="School"
-                  className="w-full h-full object-cover -rotate-3 p-12 opacity-50"
-                />
-              </div>
-              <div
-                className="absolute -bottom-6 -left-6 bg-white p-6 rounded-3xl shadow-xl flex items-center gap-4 animate-fade-in-up opacity-0 delay-500"
-                style={{ animationFillMode: "forwards" }}
-              >
-                <div className="w-12 h-12 bg-yellow-400 rounded-xl flex items-center justify-center text-white text-2xl">
-                  ⭐
-                </div>
-                <div>
-                  <p className="font-black text-gray-900">Akreditasi A</p>
-                  <p className="text-xs text-gray-400 font-bold">
-                    Sekolah Unggulan
-                  </p>
-                </div>
               </div>
             </div>
           </div>
@@ -306,7 +320,6 @@ export default function UnitPublicHomePage() {
             ))}
           </div>
         </section>
-
         {/* Sambutan Kepala Sekolah */}
         <section className="py-20 bg-gray-50 overflow-hidden">
           <div className="max-w-7xl mx-auto px-6">
@@ -316,14 +329,16 @@ export default function UnitPublicHomePage() {
                   <div className="absolute -inset-4 bg-tosca-100 rounded-[30px] md:rounded-[40px] -rotate-3 -z-10"></div>
                   <div className="aspect-[3/4] bg-gray-200 rounded-[24px] md:rounded-[32px] overflow-hidden shadow-2xl relative">
                     <img 
-                      src="/globe.svg" 
+                      src={getPhotoUrl()} 
                       alt="Kepala Sekolah SD" 
-                      className="w-full h-full object-cover opacity-20 p-12 md:p-20"
+                      className={headmaster.photo 
+                        ? "w-full h-full object-cover" 
+                        : "w-full h-full object-cover opacity-20 p-12 md:p-20"}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-tosca-900/20 to-transparent"></div>
                   </div>
                   <div className="mt-6 md:mt-8 text-center md:text-left">
-                    <h3 className="text-xl md:text-2xl font-black text-gray-900">Dr. H. Ahmad Fauzi, M.Pd</h3>
+                    <h3 className="text-xl md:text-2xl font-black text-gray-900">{headmaster.name}</h3>
                     <p className="text-tosca-600 font-bold uppercase tracking-widest text-[10px] md:text-xs mt-1 md:mt-2">Kepala Sekolah SD Budiman Cendikia</p>
                   </div>
                 </div>
@@ -335,44 +350,44 @@ export default function UnitPublicHomePage() {
                   <span className="text-tosca-500">Kepala Sekolah</span>
                 </h2>
                 <div className="relative space-y-6 text-gray-500 text-lg leading-relaxed font-medium">
-                  <p>
-                    Assalamu&apos;alaikum Warahmatullahi Wabarakatuh,
-                  </p>
-                  <p>
-                    Selamat datang di website resmi SD Budiman Cendikia. Kami bangga menjadi bagian dari perjalanan pendidikan putra-putri Anda. Di sini, kami tidak hanya fokus pada prestasi akademik, tetapi juga pembentukan karakter dan nilai-nilai keagamaan yang kuat.
-                  </p>
-                  <div className={`grid transition-all duration-1000 ease-in-out ${isSambutanExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
-                    <div className="overflow-hidden">
-                      <div className={`pt-6 space-y-6 transition-all duration-1000 delay-150 ${isSambutanExpanded ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"}`}>
-                        <p className="text-gray-500/80">
-                          Visi kami adalah mencetak generasi yang cerdas, kreatif, dan berakhlak mulia. Dengan dukungan tenaga pengajar yang kompeten dan fasilitas yang modern, kami berkomitmen memberikan lingkungan belajar yang terbaik.
-                        </p>
-                        <p className="text-gray-500/80">
-                          Semoga kehadiran website ini dapat mempermudah komunikasi dan akses informasi bagi seluruh civitas akademika dan masyarakat luas. Mari bersama-sama membimbing putra-putri kita menuju masa depan yang gemilang.
-                        </p>
+                  {paragraphs.slice(0, 2).map((para, idx) => (
+                    <p key={idx}>{para}</p>
+                  ))}
+                  {paragraphs.length > 2 && (
+                    <div className={`grid transition-all duration-1000 ease-in-out ${isSambutanExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
+                      <div className="overflow-hidden">
+                        <div className={`pt-6 space-y-6 transition-all duration-1000 delay-150 ${isSambutanExpanded ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"}`}>
+                          {paragraphs.slice(2).map((para, idx) => (
+                            <p key={idx} className="text-gray-500/80">{para}</p>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
                   
                   {/* Gradient Fade Overlay */}
-                  <div 
-                    className={`absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-gray-50 via-gray-50/90 to-transparent pointer-events-none transition-all duration-700 ease-in-out ${
-                      isSambutanExpanded ? "opacity-0 translate-y-8" : "opacity-100 translate-y-0"
-                    }`}
-                  ></div>
+                  {paragraphs.length > 2 && (
+                    <div 
+                      className={`absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-gray-50 via-gray-50/90 to-transparent pointer-events-none transition-all duration-700 ease-in-out ${
+                        isSambutanExpanded ? "opacity-0 translate-y-8" : "opacity-100 translate-y-0"
+                      }`}
+                    ></div>
+                  )}
                 </div>
-                <button 
-                  onClick={() => setIsSambutanExpanded(!isSambutanExpanded)}
-                  className="inline-flex items-center gap-2 mt-1 text-tosca-700 font-black uppercase tracking-widest text-[10px] md:text-xs transition-all group py-2 px-3 rounded-xl hover:bg-tosca-50"
-                >
-                  <span className="relative">
-                    {isSambutanExpanded ? "Sembunyikan" : "Baca Selengkapnya"}
-                  </span>
-                  <ChevronDown 
-                    size={16} 
-                    className={`transition-transform duration-500 ease-in-out ${isSambutanExpanded ? "rotate-180" : "rotate-0 group-hover:translate-y-0.5"}`} 
-                  />
-                </button>
+                {paragraphs.length > 2 && (
+                  <button 
+                    onClick={() => setIsSambutanExpanded(!isSambutanExpanded)}
+                    className="inline-flex items-center gap-2 mt-1 text-tosca-700 font-black uppercase tracking-widest text-[10px] md:text-xs transition-all group py-2 px-3 rounded-xl hover:bg-tosca-50"
+                  >
+                    <span className="relative">
+                      {isSambutanExpanded ? "Sembunyikan" : "Baca Selengkapnya"}
+                    </span>
+                    <ChevronDown 
+                      size={16} 
+                      className={`transition-transform duration-500 ease-in-out ${isSambutanExpanded ? "rotate-180" : "rotate-0 group-hover:translate-y-0.5"}`} 
+                    />
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -780,9 +795,9 @@ export default function UnitPublicHomePage() {
           <div className="absolute top-0 left-0 w-full h-full bg-tosca-900/5 -z-10"></div>
           <div className="absolute bottom-0 left-0 w-1/2 h-full bg-tosca-700/5 -z-10 blur-3xl rounded-full -translate-x-1/4"></div>
 
-          <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+          <div className="max-w-7xl mx-auto px-6">
             <div
-              className="order-2 md:order-1 animate-fade-in-right opacity-0"
+              className="animate-fade-in-right opacity-0 w-full max-w-4xl"
               style={{ animationFillMode: "forwards" }}
             >
               <PPDBBadge year="2026/2027" theme="smp" />
@@ -791,7 +806,7 @@ export default function UnitPublicHomePage() {
                 <span className="text-tosca-700">Raih Prestasi</span> Tanpa
                 Batas
               </h1>
-              <p className="text-lg text-gray-500 font-medium mb-10 leading-relaxed max-w-lg">
+              <p className="text-lg text-gray-500 font-medium mb-10 leading-relaxed max-w-3xl">
                 SMP Budiman Cendikia fokus pada pengembangan kemandirian,
                 penguasaan teknologi, and penguatan nilai keagamaan untuk
                 mencetak remaja yang cerdas dan berkarakter.
@@ -809,26 +824,6 @@ export default function UnitPublicHomePage() {
                 >
                   Portal Data
                 </Link>
-              </div>
-            </div>
-            <div
-              className="order-1 md:order-2 relative animate-fade-in-left opacity-0 delay-200"
-              style={{ animationFillMode: "forwards" }}
-            >
-              <div className="aspect-video bg-tosca-900 rounded-[48px] relative overflow-hidden shadow-2xl transform md:-rotate-2">
-                <img
-                  src="/globe.svg"
-                  alt="SMP Life"
-                  className="w-full h-full object-cover p-16 opacity-30"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-tosca-900/80 to-transparent flex items-end p-8">
-                  <p
-                    className="text-white font-bold italic animate-fade-in-up opacity-0 delay-500"
-                    style={{ animationFillMode: "forwards" }}
-                  >
-                    &quot;Lingkungan belajar yang inspiratif dan modern.&quot;
-                  </p>
-                </div>
               </div>
             </div>
           </div>
@@ -858,7 +853,6 @@ export default function UnitPublicHomePage() {
             ))}
           </div>
         </section>
-
         {/* Sambutan Kepala Sekolah */}
         <section className="py-20 bg-gray-50 overflow-hidden">
           <div className="max-w-7xl mx-auto px-6">
@@ -868,14 +862,16 @@ export default function UnitPublicHomePage() {
                   <div className="absolute -inset-4 bg-tosca-100 rounded-[30px] md:rounded-[40px] -rotate-3 -z-10"></div>
                   <div className="aspect-[3/4] bg-gray-200 rounded-[24px] md:rounded-[32px] overflow-hidden shadow-2xl relative">
                     <img 
-                      src="/globe.svg" 
+                      src={getPhotoUrl()} 
                       alt="Kepala Sekolah SMP" 
-                      className="w-full h-full object-cover opacity-20 p-12 md:p-20"
+                      className={headmaster.photo 
+                        ? "w-full h-full object-cover" 
+                        : "w-full h-full object-cover opacity-20 p-12 md:p-20"}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-tosca-900/20 to-transparent"></div>
                   </div>
                   <div className="mt-6 md:mt-8 text-center md:text-left">
-                    <h3 className="text-xl md:text-2xl font-black text-gray-900">Drs. H. Mulyadi, M.Si</h3>
+                    <h3 className="text-xl md:text-2xl font-black text-gray-900">{headmaster.name}</h3>
                     <p className="text-tosca-600 font-bold uppercase tracking-widest text-[10px] md:text-xs mt-1 md:mt-2">Kepala Sekolah SMP Budiman Cendikia</p>
                   </div>
                 </div>
@@ -887,44 +883,44 @@ export default function UnitPublicHomePage() {
                   <span className="text-tosca-700">Kepala Sekolah</span>
                 </h2>
                 <div className="relative space-y-6 text-gray-500 text-lg leading-relaxed font-medium">
-                  <p>
-                    Assalamu&apos;alaikum Warahmatullahi Wabarakatuh,
-                  </p>
-                  <p>
-                    Selamat datang di lingkungan belajar SMP Budiman Cendikia. Kami berkomitmen untuk mendampingi putra-putri Anda melewati masa remaja dengan bimbingan yang tepat, kurikulum yang relevan, dan pembiasaan nilai-nilai Islami.
-                  </p>
-                  <div className={`grid transition-all duration-1000 ease-in-out ${isSambutanExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
-                    <div className="overflow-hidden">
-                      <div className={`pt-6 space-y-6 transition-all duration-1000 delay-150 ${isSambutanExpanded ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"}`}>
-                        <p className="text-gray-500/80">
-                          Di SMP Budiman Cendikia, kami mendorong setiap siswa untuk mengeksplorasi potensi diri, menguasai teknologi, dan memiliki kemandirian yang kuat. Bersama-sama, kita wujudkan generasi emas yang siap menghadapi tantangan zaman.
-                        </p>
-                        <p className="text-gray-500/80">
-                          Website ini hadir sebagai jembatan informasi antara sekolah, orang tua, and masyarakat. Mari bersinergi menciptakan ekosistem pendidikan yang kondusif bagi tumbuh kembang generasi penerus bangsa.
-                        </p>
+                  {paragraphs.slice(0, 2).map((para, idx) => (
+                    <p key={idx}>{para}</p>
+                  ))}
+                  {paragraphs.length > 2 && (
+                    <div className={`grid transition-all duration-1000 ease-in-out ${isSambutanExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
+                      <div className="overflow-hidden">
+                        <div className={`pt-6 space-y-6 transition-all duration-1000 delay-150 ${isSambutanExpanded ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"}`}>
+                          {paragraphs.slice(2).map((para, idx) => (
+                            <p key={idx} className="text-gray-500/80">{para}</p>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
-
+                  )}
+                  
                   {/* Gradient Fade Overlay */}
-                  <div 
-                    className={`absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-gray-50 via-gray-50/90 to-transparent pointer-events-none transition-all duration-700 ease-in-out ${
-                      isSambutanExpanded ? "opacity-0 translate-y-8" : "opacity-100 translate-y-0"
-                    }`}
-                  ></div>
+                  {paragraphs.length > 2 && (
+                    <div 
+                      className={`absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-gray-50 via-gray-50/90 to-transparent pointer-events-none transition-all duration-700 ease-in-out ${
+                        isSambutanExpanded ? "opacity-0 translate-y-8" : "opacity-100 translate-y-0"
+                      }`}
+                    ></div>
+                  )}
                 </div>
-                <button 
-                  onClick={() => setIsSambutanExpanded(!isSambutanExpanded)}
-                  className="inline-flex items-center gap-2 mt-1 text-tosca-900 font-black uppercase tracking-widest text-[10px] md:text-xs transition-all group py-2 px-3 rounded-xl hover:bg-tosca-50"
-                >
-                  <span className="relative">
-                    {isSambutanExpanded ? "Sembunyikan" : "Baca Selengkapnya"}
-                  </span>
-                  <ChevronDown 
-                    size={16} 
-                    className={`transition-transform duration-500 ease-in-out ${isSambutanExpanded ? "rotate-180" : "rotate-0 group-hover:translate-y-0.5"}`} 
-                  />
-                </button>
+                {paragraphs.length > 2 && (
+                  <button 
+                    onClick={() => setIsSambutanExpanded(!isSambutanExpanded)}
+                    className="inline-flex items-center gap-2 mt-1 text-tosca-900 font-black uppercase tracking-widest text-[10px] md:text-xs transition-all group py-2 px-3 rounded-xl hover:bg-tosca-50"
+                  >
+                    <span className="relative">
+                      {isSambutanExpanded ? "Sembunyikan" : "Baca Selengkapnya"}
+                    </span>
+                    <ChevronDown 
+                      size={16} 
+                      className={`transition-transform duration-500 ease-in-out ${isSambutanExpanded ? "rotate-180" : "rotate-0 group-hover:translate-y-0.5"}`} 
+                    />
+                  </button>
+                )}
               </div>
             </div>
           </div>

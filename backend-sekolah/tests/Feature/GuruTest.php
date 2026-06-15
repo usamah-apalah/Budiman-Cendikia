@@ -13,9 +13,9 @@ class GuruTest extends TestCase
 
     public function test_can_list_guru(): void
     {
-        Guru::factory()->count(5)->create();
+        Guru::factory()->count(5)->create(['unit' => 'sd', 'is_aktif' => true]);
 
-        $response = $this->getJson('/api/v1/guru');
+        $response = $this->getJson('/api/v1/guru?unit=sd');
 
         $response->assertStatus(200)
             ->assertJsonCount(5);

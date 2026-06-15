@@ -12,12 +12,14 @@ use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\PrestasiController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\ProgramFasilitasController;
-
 use App\Http\Controllers\PublicController;
+use App\Http\Controllers\HeadmasterController;
+use App\Http\Controllers\Admin\SettingController;
 
 // Public routes (tidak perlu login)
 Route::prefix('v1')->group(function () {
     Route::get('/stats', [PublicController::class, 'getStats']);
+    Route::get('/settings', [PublicController::class, 'getSettings']);
     Route::post('/upload', [UploadController::class, 'upload']);
     Route::get('/berita', [BeritaController::class, 'index']);
     Route::get('/berita/{slug}', [BeritaController::class, 'show']);
@@ -39,6 +41,7 @@ Route::prefix('v1')->group(function () {
     // Auth
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
+    Route::get('/headmaster', [HeadmasterController::class, 'show']);
 });
 
 // Protected routes (admin only)
@@ -55,4 +58,6 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::apiResource('program-fasilitas', ProgramFasilitasController::class)->except(['index']);
     Route::get('/ppdb', [PpdbController::class, 'index']);
     Route::patch('/ppdb/{id}/status', [PpdbController::class, 'updateStatus']);
+    Route::post('/headmaster/update', [HeadmasterController::class, 'update']);
+    Route::post('/settings/update', [SettingController::class, 'updateApi']);
 });

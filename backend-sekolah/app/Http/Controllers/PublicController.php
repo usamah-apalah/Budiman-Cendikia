@@ -34,4 +34,12 @@ class PublicController extends Controller
             ]
         ]);
     }
+
+    public function getSettings()
+    {
+        $logo = \App\Models\Setting::where('key', 'site_logo')->value('value');
+        return response()->json([
+            'site_logo' => $logo ? asset('uploads/' . $logo) : null
+        ]);
+    }
 }

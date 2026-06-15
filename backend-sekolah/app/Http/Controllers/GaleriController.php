@@ -30,6 +30,11 @@ class GaleriController extends Controller
         return response()->json($galeri, 201);
     }
 
+    public function show(Galeri $galeri)
+    {
+        return response()->json($galeri);
+    }
+
     public function update(Request $request, Galeri $galeri)
     {
         $validated = $request->validate([

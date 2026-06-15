@@ -20,6 +20,7 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("admin_token");
@@ -29,6 +30,22 @@ export default function DashboardLayout({
       setIsAdmin(true);
     }
   }, [unit]);
+
+  useEffect(() => {
+    const fetchLogo = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+        const res = await fetch(`${apiUrl}/settings`);
+        const data = await res.json();
+        if (data && data.site_logo) {
+          setLogoUrl(data.site_logo);
+        }
+      } catch (err) {
+        console.error("Error fetching logo in dashboard layout:", err);
+      }
+    };
+    fetchLogo();
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("admin_token");
@@ -47,6 +64,7 @@ export default function DashboardLayout({
     { name: "Guru", href: `/admin/${unit}/guru` },
     { name: "Galeri", href: `/admin/${unit}/galeri` },
     { name: "PPDB", href: `/admin/${unit}/ppdb` },
+    { name: "Pengaturan Website", href: `/admin/${unit}/settings` },
   ];
 
   const themeSidebar = "bg-tosca-900";
@@ -59,15 +77,26 @@ export default function DashboardLayout({
       <aside
         className={`${
           isSidebarOpen ? "w-64" : "w-20"
-        } transition-all duration-300 ${themeSidebar} text-white flex flex-col shadow-2xl relative z-20`}
+        } h-screen sticky top-0 transition-all duration-300 ${themeSidebar} text-white flex flex-col shadow-2xl z-20 overflow-hidden`}
       >
         <div className="p-6 flex items-center justify-between border-b border-tosca-700/50">
           {isSidebarOpen && (
-            <div className="flex flex-col">
-              <span className="text-xl font-bold tracking-tight">Budiman</span>
-              <span className="text-xs font-medium text-tosca-200 uppercase tracking-widest">
-                {unit} Administrator
-              </span>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full overflow-hidden bg-tosca-500 flex items-center justify-center text-white font-black text-sm shrink-0">
+                {logoUrl ? (
+                  <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                ) : (
+                  "B"
+                )}
+              </div>
+              <div className="flex flex-col">
+                <span className="text-sm font-bold tracking-tight leading-none">
+                  Budiman
+                </span>
+                <span className="text-[9px] font-black text-tosca-200 uppercase tracking-widest mt-1">
+                  {unit} Admin
+                </span>
+              </div>
             </div>
           )}
           <button
@@ -78,7 +107,8 @@ export default function DashboardLayout({
           </button>
         </div>
 
-        <nav className="flex-1 mt-8 px-4 space-y-2">
+        <nav className="flex-1 mt-6 px-4 space-y-2 overflow-y-auto scrollable">
+
           {navItems.map((item) => (
             <Link
               key={item.name}
@@ -93,6 +123,7 @@ export default function DashboardLayout({
             </Link>
           ))}
         </nav>
+
 
         <div className="p-4 border-t border-tosca-700/50">
           {isAdmin ? (

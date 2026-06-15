@@ -267,3 +267,41 @@ body {
   cursor: pointer !important;
 }
 
+/* Scrollable auto-hide scrollbar styling to prevent layout shift and hide tracks */
+.scrollable {
+  scrollbar-width: none; /* Firefox: hide by default */
+  -ms-overflow-style: none; /* IE/Edge */
+  overflow-y: hidden !important;
+}
+
+.scrollable::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.scrollable::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollable::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 9999px;
+  transition: background 0.2s ease;
+}
+
+.scrollable:hover {
+  overflow-y: auto !important;
+  overflow-y: overlay !important; /* Webkit overlay scrollbar on top of content */
+  scrollbar-width: thin; /* Firefox: show thin on hover */
+}
+
+.scrollable:hover::-webkit-scrollbar-thumb {
+  background: rgba(126, 230, 227, 0.35); /* Elegant tosca transparent color matching the theme */
+}
+
+.scrollable:hover::-webkit-scrollbar-thumb:hover {
+  background: rgba(126, 230, 227, 0.6);
+}
+
+
+

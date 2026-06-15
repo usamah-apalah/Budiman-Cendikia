@@ -5,6 +5,8 @@ import api from "@/lib/api";
 import { toast } from "react-toastify";
 import { usePathname } from "next/navigation";
 import { MapPin } from "lucide-react";
+import Link from "next/link";
+
 import ImageModal from "./ImageModal";
 
 interface Agenda {
@@ -119,7 +121,8 @@ export default function AgendaList({ unit }: { unit: "sd" | "smp" }) {
 
             {isMounted && isAdmin && (
               <div className="absolute top-4 right-4 flex gap-1 opacity-100 transition-opacity z-10">
-                <button onClick={(e) => { e.stopPropagation(); /* edit */ }} className="px-3 py-1 bg-white border border-gray-100 text-tosca-700 hover:bg-tosca-50 rounded-xl text-xs font-bold shadow-sm">Edit</button>
+                <Link onClick={(e) => e.stopPropagation()} href={`/admin/${unit}/agenda/${item.id}/edit`} className="px-3 py-1 bg-white border border-gray-100 text-tosca-700 hover:bg-tosca-50 rounded-xl text-xs font-bold shadow-sm">Edit</Link>
+
                 <button onClick={(e) => handleDelete(e, item.id)} className="px-3 py-1 bg-white border border-gray-100 text-red-500 hover:bg-red-50 rounded-xl text-xs font-bold shadow-sm">Hapus</button>
               </div>
             )}

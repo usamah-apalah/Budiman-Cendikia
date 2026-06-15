@@ -115,4 +115,6 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    'ppdb_notification_email' => env('PPDB_NOTIFICATION_EMAIL', 'budimancendikia304@gmail.com'),
+
 ];

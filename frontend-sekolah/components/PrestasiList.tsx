@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback } from "react";
 import api from "@/lib/api";
 import { toast } from "react-toastify";
 import ImageModal from "./ImageModal";
+import Link from "next/link";
+
 
 interface Prestasi {
   id: number;
@@ -132,7 +134,8 @@ export default function PrestasiList({ unit }: { unit: "sd" | "smp" }) {
               <p className="text-gray-500 text-xs md:text-sm line-clamp-2 md:line-clamp-3 mb-4 md:mb-6 flex-1">{item.konten}</p>
               {isAdmin && (
                 <div className="flex justify-end gap-3 pt-4 border-t border-gray-50">
-                  <button onClick={(e) => { e.stopPropagation(); /* edit */ }} className="text-tosca-700 font-bold text-sm hover:underline flex items-center gap-1">Edit</button>
+                  <Link onClick={(e) => e.stopPropagation()} href={`/admin/${unit}/prestasi/${item.id}/edit`} className="text-tosca-700 font-bold text-sm hover:underline flex items-center gap-1">Edit</Link>
+
                   <button onClick={(e) => handleDelete(e, item.id)} className="text-red-500 font-bold text-sm hover:underline flex items-center gap-1">Hapus</button>
                 </div>
               )}

@@ -112,4 +112,35 @@ class GuruController extends Controller
         
         return response()->json(['message' => 'Gagal menghapus atau data tidak ditemukan', 'status' => 'failed'], 404);
     }
+
+    public function indexWeb($unit)
+    {
+        $guru = Guru::where('unit', $unit)->get();
+        return view('admin.guru.index', compact('guru', 'unit'));
+    }
+
+    public function editWeb($id)
+    {
+        $guru = Guru::findOrFail($id);
+        $unit = $guru->unit;
+        return view('admin.guru.edit', compact('guru', 'unit'));
+    }
+
+    public function updateWeb(Request $request, $id)
+    {
+        $guru = Guru::findOrFail($id);
+        $validated = $request->validate([
+            'nama'           => 'required|string|max:255',
+            'nip'            => 'nullable|string',
+            'jabatan'        => 'required|string',
+            'mata_pelajaran' => 'nullable|string',
+            'gmail'          => 'nullable|string',
+            'whatsapp'       => 'nullable|string',
+        ]);
+
+        $guru->update($validated);
+
+        return redirect()->route('guru.index', $guru->unit)->with('success', 'Data guru berhasil diperbarui!');
+    }
 }
+

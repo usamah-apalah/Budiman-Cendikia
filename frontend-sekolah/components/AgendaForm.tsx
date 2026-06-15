@@ -6,14 +6,15 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { ImagePlus, CalendarDays, Undo2, X, UploadCloud } from "lucide-react";
 
-export default function AgendaForm({ unit }: { unit: "sd" | "smp" }) {
+export default function AgendaForm({ unit, initialData }: { unit: "sd" | "smp", initialData?: any }) {
   const router = useRouter();
-  const [judul, setJudul] = useState("");
-  const [konten, setKonten] = useState("");
-  const [tanggal, setTanggal] = useState("");
-  const [lokasi, setLokasi] = useState("");
+  const [judul, setJudul] = useState(initialData?.judul || "");
+  const [konten, setKonten] = useState(initialData?.konten || "");
+  const [tanggal, setTanggal] = useState(initialData?.tanggal || "");
+  const [lokasi, setLokasi] = useState(initialData?.lokasi || "");
   const [image, setImage] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>(initialData?.image || null);
+
   const [isLoading, setIsLoading] = useState(false);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,7 +30,7 @@ export default function AgendaForm({ unit }: { unit: "sd" | "smp" }) {
     setIsLoading(true);
 
     try {
-      let imageUrl = "";
+      let imageUrl = preview;
       if (image) {
         const uploadData = new FormData();
         uploadData.append("file", image);
@@ -40,18 +41,25 @@ export default function AgendaForm({ unit }: { unit: "sd" | "smp" }) {
         imageUrl = uploadRes.data.url;
       }
 
-      await api.post("/agenda", {
+      const payload = {
         unit,
         judul,
         konten,
         tanggal,
         lokasi,
         image: imageUrl,
-      });
-      toast.success("Agenda berhasil ditambahkan!");
+      };
+
+      if (initialData) {
+        await api.put(`/agenda/${initialData.id}`, payload);
+        toast.success("Agenda berhasil diperbarui!");
+      } else {
+        await api.post("/agenda", payload);
+        toast.success("Agenda berhasil ditambahkan!");
+      }
       router.push(`/admin/${unit}/agenda`);
     } catch {
-      toast.error("Gagal menambahkan agenda.");
+      toast.error(initialData ? "Gagal memperbarui agenda." : "Gagal menambahkan agenda.");
     } finally {
       setIsLoading(false);
     }
@@ -113,7 +121,7 @@ export default function AgendaForm({ unit }: { unit: "sd" | "smp" }) {
           Batal
         </button>
         <button type="submit" disabled={isLoading} className={`px-12 py-3 rounded-2xl text-white font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center shadow-lg ${themeBtn} ${isLoading ? 'opacity-70 cursor-not-allowed scale-95' : 'hover:-translate-y-1'}`}>
-          {isLoading ? 'Menyimpan...' : 'Simpan Agenda'}
+          {isLoading ? 'Menyimpan...' : initialData ? 'Perbarui Agenda' : 'Simpan Agenda'}
         </button>
       </div>
     </form>

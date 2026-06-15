@@ -63,4 +63,43 @@ class PrestasiController extends Controller
         
         return response()->json(['message' => 'Gagal menghapus atau data tidak ditemukan', 'status' => 'failed'], 404);
     }
+
+    public function show($id)
+    {
+        $prestasi = Prestasi::find($id);
+        if (!$prestasi) {
+            return response()->json(['error' => 'Prestasi tidak ditemukan'], 404);
+        }
+        return response()->json($prestasi);
+    }
+
+    public function indexWeb($unit)
+    {
+        $prestasi = Prestasi::where('unit', $unit)->get();
+        return view('admin.prestasi.index', compact('prestasi', 'unit'));
+    }
+
+    public function editWeb($id)
+    {
+        $prestasi = Prestasi::findOrFail($id);
+        $unit = $prestasi->unit;
+        return view('admin.prestasi.edit', compact('prestasi', 'unit'));
+    }
+
+    public function updateWeb(Request $request, $id)
+    {
+        $prestasi = Prestasi::findOrFail($id);
+        $validated = $request->validate([
+            'judul'    => 'required|string|max:255',
+            'konten'   => 'required|string',
+            'tanggal'  => 'required|date',
+            'kategori' => 'required|in:siswa,guru,sekolah',
+            'tingkat'  => 'required|in:Lokal,Nasional,Internasional',
+        ]);
+
+        $prestasi->update($validated);
+
+        return redirect()->route('prestasi.index', $prestasi->unit)->with('success', 'Prestasi berhasil diperbarui!');
+    }
 }
+
