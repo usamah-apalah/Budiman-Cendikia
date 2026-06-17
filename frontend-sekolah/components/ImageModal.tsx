@@ -25,10 +25,14 @@ export default function ImageModal({ isOpen, onClose, imageUrl, title }: ImageMo
 
   if (!isOpen || !imageUrl) return null;
 
-  const handleShareWA = (e: React.MouseEvent) => {
+  const handleShareClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const text = `Lihat prestasi ini: ${title || ""} - ${imageUrl}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+    const urlGambar = imageUrl;
+    navigator.clipboard.writeText(urlGambar).then(() => {
+      alert('Link foto berhasil disalin!');
+    }).catch((err) => {
+      console.error("Gagal menyalin link:", err);
+    });
   };
 
   const handleCopyLink = (e: React.MouseEvent) => {
@@ -101,9 +105,9 @@ export default function ImageModal({ isOpen, onClose, imageUrl, title }: ImageMo
             </a>
             
             <button 
-              onClick={handleShareWA}
+              onClick={handleShareClick}
               className="p-2 bg-green-600/70 hover:bg-green-600 text-white rounded-full transition-colors border border-white/10"
-              title="Bagikan ke WhatsApp"
+              title="Bagikan Foto (Salin Link)"
             >
               <Share2 size={16} />
             </button>

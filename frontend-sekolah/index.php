@@ -1,3 +1,21 @@
+<?php
+try {
+    $db = new PDO('mysql:host=127.0.0.1;dbname=BudimanCendikia', 'root', '');
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $stmt = $db->query("SELECT `key`, `value` FROM settings");
+    $settings = [];
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $settings[$row['key']] = $row['value'];
+    }
+} catch (PDOException $e) {
+    $settings = [];
+}
+
+$instagram_title = isset($settings['instagram_title']) ? $settings['instagram_title'] : 'Yuk, Kepoin Keseruan Kami di Instagram';
+$instagram_description = isset($settings['instagram_description']) ? $settings['instagram_description'] : 'Mulai dari keseruan belajar di kelas, tawa ceria saat bermain, hingga momen-momen penuh prestasi. Semuanya kami bagikan lewat cerita harian dan galeri foto aesthetic di Instagram. Yuk, follow biar nggak ketinggalan keseruannya!';
+$instagram_url = isset($settings['instagram_url']) ? $settings['instagram_url'] : 'https://www.instagram.com/sat_almanshurah/';
+$instagram_username = isset($settings['instagram_username']) ? $settings['instagram_username'] : 'sat_almanshurah';
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -85,14 +103,14 @@
                         <span class="text-[10px] font-black uppercase tracking-widest">Momen Harian</span>
                     </div>
                     <h2 class="text-3xl md:text-4xl font-black text-[#0B6B69] tracking-tight mb-4 uppercase">
-                        Yuk, Kepoin Keseruan Kami di Instagram
+                        <?php echo htmlspecialchars($instagram_title); ?>
                     </h2>
                     <p class="text-[#0B6B69] font-medium text-lg leading-relaxed max-w-xl">
-                        Mulai dari keseruan belajar di kelas, tawa ceria saat bermain, hingga momen-momen penuh prestasi. Semuanya kami bagikan lewat cerita harian dan galeri foto aesthetic di Instagram. Yuk, follow biar nggak ketinggalan keseruannya!
+                        <?php echo htmlspecialchars($instagram_description); ?>
                     </p>
                     <div class="mt-8 flex flex-wrap justify-center md:justify-start gap-4">
                         <a 
-                            href="https://www.instagram.com/sat_almanshurah/" 
+                            href="<?php echo htmlspecialchars($instagram_url); ?>" 
                             target="_blank" 
                             rel="noopener noreferrer"
                             class="px-10 py-4 bg-[#0FA8A4] hover:bg-[#0B6B69] text-white hover:text-[#C8F7F5] font-black rounded-2xl shadow-xl shadow-[#0FA8A4]/20 hover:-translate-y-1 transition-all flex items-center gap-3 uppercase tracking-widest text-xs"
@@ -102,7 +120,12 @@
                         </a>
                     </div>
                 </div>
-                <div class="w-full md:w-1/3 aspect-square max-w-[300px] relative">
+                <a 
+                    href="<?php echo htmlspecialchars($instagram_url); ?>" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="w-full md:w-1/3 aspect-square max-w-[300px] relative block hover:scale-105 transition-all duration-300"
+                >
                     <div class="absolute inset-0 bg-[#7EE6E3] rounded-[48px] rotate-6"></div>
                     <div class="absolute inset-0 bg-white rounded-[48px] shadow-xl flex items-center justify-center p-10 border border-[#2FCFC9]">
                         <svg class="absolute w-[120px] h-[120px] text-[#2FCFC9] opacity-10" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
@@ -111,12 +134,12 @@
                                 <svg class="w-12 h-12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
                             </div>
                             <div class="text-center">
-                                <p class="font-black text-[#0B6B69] leading-none mb-1">@sat_almanshurah</p>
+                                <p class="font-black text-[#0B6B69] leading-none mb-1">@<?php echo htmlspecialchars($instagram_username); ?></p>
                                 <p class="text-[10px] font-bold text-[#0B6B69]/60 uppercase tracking-widest">Official Instagram</p>
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
     </section>

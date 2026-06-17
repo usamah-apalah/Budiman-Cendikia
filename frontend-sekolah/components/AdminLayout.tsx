@@ -37,6 +37,18 @@ export default function AdminLayout({
   }, [router, unit]);
 
   useEffect(() => {
+    document.body.classList.remove("theme-sd", "theme-smp");
+    if (unit === "sd") {
+      document.body.classList.add("theme-sd");
+    } else if (unit === "smp") {
+      document.body.classList.add("theme-smp");
+    }
+    return () => {
+      document.body.classList.remove("theme-sd", "theme-smp");
+    };
+  }, [unit]);
+
+  useEffect(() => {
     const fetchLogo = async () => {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";

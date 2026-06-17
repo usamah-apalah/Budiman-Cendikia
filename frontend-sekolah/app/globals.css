@@ -5,129 +5,201 @@
   --foreground: #171717;
 }
 
+/* Dynamic theme variables based on school unit class on body */
+.theme-sd {
+  /* Unified Color Palette - Bright and Energetic Tosca */
+  --bg-utama: #C8F7F5;
+  --border-halus: #7EE6E3;
+  --warna-sorotan: #2FCFC9;
+  --bg-tombol-utama: #0FA8A4;
+  --warna-teks-mutlak: #0B6B69;
+
+  /* Compatibility Mapping with Original Tailwind Configuration */
+  --bg-komponen: #FFFFFF;
+  --bg-kartu-komponen: #FFFFFF;
+  --bg-lapisan-dimensi: #C8F7F5;
+  --bg-aksen-kokoh: linear-gradient(135deg, #0FA8A4 0%, #0B6B69 100%);
+  --warna-teks-utama: var(--warna-teks-mutlak);
+  --warna-teks-redup: rgba(11, 107, 105, 0.6);
+  --warna-aksen: var(--warna-sorotan);
+  --warna-fade-sambutan: #C8F7F5;
+  --warna-fade-sambutan-90: rgba(200, 247, 245, 0.9);
+  
+  /* Helper Variables */
+  --warna-nav-hover: #C8F7F5;
+  --warna-teks-tombol-kontras: #0B6B69;
+  --bg-nav-dropdown: #0B6B69;
+  --bg-nav-login-btn: #063A38;
+  --bg-nav-login-btn-hover: #042524;
+}
+
+.theme-smp {
+  /* Unified Color Palette - Bright and Energetic Tosca */
+  --bg-utama: #C8F7F5;
+  --border-halus: #7EE6E3;
+  --warna-sorotan: #2FCFC9;
+  --bg-tombol-utama: #0FA8A4;
+  --warna-teks-mutlak: #0B6B69;
+
+  /* Compatibility Mapping with Original Tailwind Configuration */
+  --bg-komponen: #FFFFFF;
+  --bg-kartu-komponen: #FFFFFF;
+  --bg-lapisan-dimensi: #C8F7F5;
+  --bg-aksen-kokoh: linear-gradient(135deg, #0FA8A4 0%, #0B6B69 100%);
+  --warna-teks-utama: var(--warna-teks-mutlak);
+  --warna-teks-redup: rgba(11, 107, 105, 0.6);
+  --warna-aksen: var(--warna-sorotan);
+  --warna-fade-sambutan: #C8F7F5;
+  --warna-fade-sambutan-90: rgba(200, 247, 245, 0.9);
+  
+  /* Helper Variables */
+  --warna-nav-hover: #C8F7F5;
+  --warna-teks-tombol-kontras: #0B6B69;
+  --bg-nav-dropdown: #0B6B69;
+  --bg-nav-login-btn: #063A38;
+  --bg-nav-login-btn-hover: #042524;
+}
+
 @theme inline {
+  --color-bg-utama: var(--bg-utama);
+  --color-border-halus: var(--border-halus);
+  --color-warna-sorotan: var(--warna-sorotan);
+  --color-bg-tombol-utama: var(--bg-tombol-utama);
+  --color-warna-teks-mutlak: var(--warna-teks-mutlak);
+  --color-bg-kartu-komponen: var(--bg-kartu-komponen);
+  --color-bg-lapisan-dimensi: var(--bg-lapisan-dimensi);
+  --color-bg-aksen-kokoh: var(--bg-aksen-kokoh);
+  --color-warna-fade-sambutan: var(--warna-fade-sambutan);
+
+  --color-bg-komponen: var(--bg-komponen);
+  --color-warna-teks-utama: var(--warna-teks-utama);
+  --color-warna-teks-redup: var(--warna-teks-redup);
+  --color-warna-aksen: var(--warna-aksen);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  --color-tosca-50: #C8F7F5;
-  --color-tosca-200: #7EE6E3;
-  --color-tosca-500: #2FCFC9;
-  --color-tosca-700: #0FA8A4;
-  --color-tosca-900: #0B6B69;
+  --color-white: var(--bg-komponen);
 
-  /* Force standard gray/slate/zinc/neutral to map to tosca palette */
-  --color-gray-50: #ffffff;
-  --color-gray-100: #C8F7F5;
-  --color-gray-200: #C8F7F5;
-  --color-gray-300: #7EE6E3;
-  --color-gray-400: #7EE6E3;
-  --color-gray-500: #2FCFC9;
-  --color-gray-600: #0FA8A4;
-  --color-gray-700: #0FA8A4;
-  --color-gray-800: #0B6B69;
-  --color-gray-900: #0B6B69;
+  --color-tosca-50: var(--bg-utama);
+  --color-tosca-200: var(--warna-aksen);
+  --color-tosca-500: var(--warna-aksen);
+  --color-tosca-700: var(--warna-teks-utama);
+  --color-tosca-900: var(--warna-teks-utama);
 
-  --color-slate-50: #ffffff;
-  --color-slate-100: #C8F7F5;
-  --color-slate-200: #C8F7F5;
-  --color-slate-300: #7EE6E3;
-  --color-slate-400: #7EE6E3;
-  --color-slate-500: #2FCFC9;
-  --color-slate-600: #0FA8A4;
-  --color-slate-700: #0FA8A4;
-  --color-slate-800: #0B6B69;
-  --color-slate-900: #0B6B69;
+  /* Force standard gray/slate/zinc/neutral to map to dynamic variable palette */
+  --color-gray-50: var(--bg-komponen);
+  --color-gray-100: var(--bg-utama);
+  --color-gray-200: var(--bg-utama);
+  --color-gray-300: var(--warna-aksen);
+  --color-gray-400: var(--warna-teks-redup);
+  --color-gray-500: var(--warna-teks-redup);
+  --color-gray-600: var(--warna-teks-utama);
+  --color-gray-700: var(--warna-teks-utama);
+  --color-gray-800: var(--warna-teks-utama);
+  --color-gray-900: var(--warna-teks-utama);
 
-  --color-zinc-50: #ffffff;
-  --color-zinc-100: #C8F7F5;
-  --color-zinc-200: #C8F7F5;
-  --color-zinc-300: #7EE6E3;
-  --color-zinc-400: #7EE6E3;
-  --color-zinc-500: #2FCFC9;
-  --color-zinc-600: #0FA8A4;
-  --color-zinc-700: #0FA8A4;
-  --color-zinc-800: #0B6B69;
-  --color-zinc-900: #0B6B69;
+  --color-slate-50: var(--bg-komponen);
+  --color-slate-100: var(--bg-utama);
+  --color-slate-200: var(--bg-utama);
+  --color-slate-300: var(--warna-aksen);
+  --color-slate-400: var(--warna-teks-redup);
+  --color-slate-500: var(--warna-teks-redup);
+  --color-slate-600: var(--warna-teks-utama);
+  --color-slate-700: var(--warna-teks-utama);
+  --color-slate-800: var(--warna-teks-utama);
+  --color-slate-900: var(--warna-teks-utama);
 
-  --color-neutral-50: #ffffff;
-  --color-neutral-100: #C8F7F5;
-  --color-neutral-200: #C8F7F5;
-  --color-neutral-300: #7EE6E3;
-  --color-neutral-400: #7EE6E3;
-  --color-neutral-500: #2FCFC9;
-  --color-neutral-600: #0FA8A4;
-  --color-neutral-700: #0FA8A4;
-  --color-neutral-800: #0B6B69;
-  --color-neutral-900: #0B6B69;
+  --color-zinc-50: var(--bg-komponen);
+  --color-zinc-100: var(--bg-utama);
+  --color-zinc-200: var(--bg-utama);
+  --color-zinc-300: var(--warna-aksen);
+  --color-zinc-400: var(--warna-teks-redup);
+  --color-zinc-500: var(--warna-teks-redup);
+  --color-zinc-600: var(--warna-teks-utama);
+  --color-zinc-700: var(--warna-teks-utama);
+  --color-zinc-800: var(--warna-teks-utama);
+  --color-zinc-900: var(--warna-teks-utama);
 
-  /* Force blue to map to tosca palette */
-  --color-blue-50: #C8F7F5;
-  --color-blue-100: #C8F7F5;
-  --color-blue-200: #7EE6E3;
-  --color-blue-300: #7EE6E3;
-  --color-blue-400: #2FCFC9;
-  --color-blue-500: #2FCFC9;
-  --color-blue-600: #0FA8A4;
-  --color-blue-700: #0FA8A4;
-  --color-blue-800: #0B6B69;
-  --color-blue-900: #0B6B69;
+  --color-neutral-50: var(--bg-komponen);
+  --color-neutral-100: var(--bg-utama);
+  --color-neutral-200: var(--bg-utama);
+  --color-neutral-300: var(--warna-aksen);
+  --color-neutral-400: var(--warna-teks-redup);
+  --color-neutral-500: var(--warna-teks-redup);
+  --color-neutral-600: var(--warna-teks-utama);
+  --color-neutral-700: var(--warna-teks-utama);
+  --color-neutral-800: var(--warna-teks-utama);
+  --color-neutral-900: var(--warna-teks-utama);
 
-  /* Force other colors to map to tosca palette to eliminate non-palette colors */
-  --color-red-50: #C8F7F5;
-  --color-red-100: #C8F7F5;
-  --color-red-200: #7EE6E3;
-  --color-red-500: #2FCFC9;
-  --color-red-600: #0FA8A4;
-  --color-red-700: #0FA8A4;
-  --color-red-800: #0B6B69;
-  --color-red-900: #0B6B69;
+  /* Force blue to map to dynamic variable palette */
+  --color-blue-50: var(--bg-utama);
+  --color-blue-100: var(--bg-utama);
+  --color-blue-200: var(--warna-aksen);
+  --color-blue-300: var(--warna-aksen);
+  --color-blue-400: var(--warna-aksen);
+  --color-blue-500: var(--warna-aksen);
+  --color-blue-600: var(--warna-teks-utama);
+  --color-blue-700: var(--warna-teks-utama);
+  --color-blue-800: var(--warna-teks-utama);
+  --color-blue-900: var(--warna-teks-utama);
 
-  --color-green-50: #C8F7F5;
-  --color-green-100: #C8F7F5;
-  --color-green-200: #7EE6E3;
-  --color-green-500: #2FCFC9;
-  --color-green-600: #0FA8A4;
-  --color-green-700: #0FA8A4;
-  --color-green-800: #0B6B69;
-  --color-green-900: #0B6B69;
+  /* Force other colors to map to dynamic variable palette */
+  --color-red-50: var(--bg-utama);
+  --color-red-100: var(--bg-utama);
+  --color-red-200: var(--warna-aksen);
+  --color-red-500: var(--warna-aksen);
+  --color-red-600: var(--warna-teks-utama);
+  --color-red-700: var(--warna-teks-utama);
+  --color-red-800: var(--warna-teks-utama);
+  --color-red-900: var(--warna-teks-utama);
 
-  --color-pink-50: #C8F7F5;
-  --color-pink-100: #C8F7F5;
-  --color-pink-200: #7EE6E3;
-  --color-pink-500: #2FCFC9;
-  --color-pink-600: #0FA8A4;
-  --color-pink-700: #0FA8A4;
-  --color-pink-800: #0B6B69;
-  --color-pink-900: #0B6B69;
+  --color-green-50: var(--bg-utama);
+  --color-green-100: var(--bg-utama);
+  --color-green-200: var(--warna-aksen);
+  --color-green-500: var(--warna-aksen);
+  --color-green-600: var(--warna-teks-utama);
+  --color-green-700: var(--warna-teks-utama);
+  --color-green-800: var(--warna-teks-utama);
+  --color-green-900: var(--warna-teks-utama);
 
-  --color-yellow-50: #C8F7F5;
-  --color-yellow-100: #C8F7F5;
-  --color-yellow-200: #7EE6E3;
-  --color-yellow-500: #2FCFC9;
-  --color-yellow-600: #0FA8A4;
-  --color-yellow-700: #0FA8A4;
-  --color-yellow-800: #0B6B69;
-  --color-yellow-900: #0B6B69;
+  --color-pink-50: var(--bg-utama);
+  --color-pink-100: var(--bg-utama);
+  --color-pink-200: var(--warna-aksen);
+  --color-pink-500: var(--warna-aksen);
+  --color-pink-600: var(--warna-teks-utama);
+  --color-pink-700: var(--warna-teks-utama);
+  --color-pink-800: var(--warna-teks-utama);
+  --color-pink-900: var(--warna-teks-utama);
 
-  --color-amber-50: #C8F7F5;
-  --color-amber-100: #C8F7F5;
-  --color-amber-200: #7EE6E3;
-  --color-amber-500: #2FCFC9;
-  --color-amber-600: #0FA8A4;
-  --color-amber-700: #0FA8A4;
-  --color-amber-800: #0B6B69;
-  --color-amber-900: #0B6B69;
+  --color-yellow-50: var(--bg-utama);
+  --color-yellow-100: var(--bg-utama);
+  --color-yellow-200: var(--warna-aksen);
+  --color-yellow-500: var(--warna-aksen);
+  --color-yellow-600: var(--warna-teks-utama);
+  --color-yellow-700: var(--warna-teks-utama);
+  --color-yellow-800: var(--warna-teks-utama);
+  --color-yellow-900: var(--warna-teks-utama);
 
-  --color-emerald-50: #C8F7F5;
-  --color-emerald-100: #C8F7F5;
-  --color-emerald-200: #7EE6E3;
-  --color-emerald-500: #2FCFC9;
-  --color-emerald-600: #0FA8A4;
-  --color-emerald-700: #0FA8A4;
-  --color-emerald-800: #0B6B69;
-  --color-emerald-900: #0B6B69;
+  --color-amber-50: var(--bg-utama);
+  --color-amber-100: var(--bg-utama);
+  --color-amber-200: var(--warna-aksen);
+  --color-amber-500: var(--warna-aksen);
+  --color-amber-600: var(--warna-teks-utama);
+  --color-amber-700: var(--warna-teks-utama);
+  --color-amber-800: var(--warna-teks-utama);
+  --color-amber-900: var(--warna-teks-utama);
+
+  --color-emerald-50: var(--bg-utama);
+  --color-emerald-100: var(--bg-utama);
+  --color-emerald-200: var(--warna-aksen);
+  --color-emerald-500: var(--warna-aksen);
+  --color-emerald-600: var(--warna-teks-utama);
+  --color-emerald-700: var(--warna-teks-utama);
+  --color-emerald-800: var(--warna-teks-utama);
+  --color-emerald-900: var(--warna-teks-utama);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -138,9 +210,10 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--bg-utama, var(--background));
+  color: var(--warna-teks-utama, var(--foreground));
   font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 @keyframes marquee {

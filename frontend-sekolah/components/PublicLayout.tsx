@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Phone, Mail, Instagram, LogIn, Menu, X, ChevronDown } from "lucide-react";
@@ -15,6 +15,9 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const pathname = usePathname();
+  
+  const linkRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [bubbleStyle, setBubbleStyle] = useState<{ left: number; width: number; height: number; top: number } | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -40,7 +43,24 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navLinks = [
+  useEffect(() => {
+    document.body.classList.remove("theme-sd", "theme-smp");
+    if (unit === "sd") {
+      document.body.classList.add("theme-sd");
+    } else if (unit === "smp") {
+      document.body.classList.add("theme-smp");
+    }
+    return () => {
+      document.body.classList.remove("theme-sd", "theme-smp");
+    };
+  }, [unit]);
+
+  const navLinks: {
+    name: string;
+    href: string;
+    isExternal?: boolean;
+    dropdown?: { name: string; href: string }[];
+  }[] = [
     { name: "Beranda", href: `/${unit}` },
     { 
       name: "Profil Sekolah", 
@@ -70,37 +90,95 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
     },
   ];
 
+  const activeIndex = navLinks.findIndex(link => 
+    pathname === link.href || (link.dropdown && link.dropdown.some(s => pathname === s.href))
+  );
+
+  useEffect(() => {
+    const updateBubble = () => {
+      if (activeIndex !== -1 && linkRefs.current[activeIndex]) {
+        const activeElement = linkRefs.current[activeIndex];
+        if (activeElement) {
+          setBubbleStyle({
+            left: activeElement.offsetLeft,
+            width: activeElement.offsetWidth,
+            height: activeElement.offsetHeight,
+            top: activeElement.offsetTop,
+          });
+        }
+      } else {
+        setBubbleStyle(null);
+      }
+    };
+
+    updateBubble();
+    const timer = setTimeout(updateBubble, 100);
+    window.addEventListener("resize", updateBubble);
+    return () => {
+      window.removeEventListener("resize", updateBubble);
+      clearTimeout(timer);
+    };
+  }, [activeIndex, pathname]);
+
   const brandColor = unit === "sd" ? "text-tosca-600" : "text-tosca-900";
   const accentBg = unit === "sd" ? "bg-tosca-50 text-tosca-600" : "bg-tosca-50 text-tosca-900";
 
   return (
     <div className="min-h-screen bg-white font-sans text-gray-900 overflow-x-hidden">
+      {/* Strict Mobile CSS Fallbacks */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @media (max-width: 768px) {
+          .desktop-nav-menu {
+            display: none !important;
+          }
+          .desktop-login-btn {
+            display: none !important;
+          }
+          .mobile-hamburger-btn {
+            display: flex !important;
+          }
+        }
+      `}} />
       {/* Top Bar */}
       <div 
         className={`fixed top-0 left-0 right-0 z-[60] bg-[#0B6B69] text-white transition-all duration-500 ${
           isScrolled ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-6 py-2.5 flex justify-between items-center text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] grid-cols-2">
-          <div className="flex gap-10">
-            <div className="flex items-center gap-2.5">
-              <Phone size={14} className="text-tosca-300" />
-              <span className="opacity-80">081534648183</span>
+        <div className="max-w-7xl mx-auto px-6 py-2 flex justify-between items-center text-[11px] md:text-xs font-bold uppercase tracking-wider">
+          <div className="flex items-center gap-4 sm:gap-6 md:gap-8">
+            <div className="flex items-center gap-2">
+              <Phone size={14} className="text-tosca-300 shrink-0" />
+              <span className="opacity-90 select-all">081534648183</span>
             </div>
-            <div className="flex items-center gap-2.5">
-              <Mail size={14} className="text-tosca-300" />
-              <span className="opacity-80">budimancendikia304@gmail.com</span>
+            <div className="flex items-center gap-2 hidden sm:flex">
+              <Mail size={14} className="text-tosca-300 shrink-0" />
+              <span className="opacity-90 normal-case select-all">budimancendikia304@gmail.com</span>
             </div>
           </div>
-          <div className="flex items-center gap-6">
-            <a href="https://wa.me/6281534648183" target="_blank" rel="noopener noreferrer" className="hover:text-tosca-300 transition-colors" aria-label="WhatsApp">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <a 
+              href="https://wa.me/6281534648183" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="hover:text-tosca-300 transition-colors inline-flex items-center gap-2 hover:bg-white/10 px-2 py-1 sm:px-2.5 sm:py-1 rounded-full transition-all" 
+              aria-label="WhatsApp"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 24 24" className="shrink-0" style={{ display: 'block', lineHeight: 'normal' }}>
                 <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.003 5.419 5.422.002 12.005.002c3.192.001 6.192 1.244 8.448 3.501 2.256 2.257 3.497 5.257 3.495 8.45-.004 6.581-5.424 11.998-12.008 11.998-2.005-.002-3.98-.507-5.73-1.472L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.625 1.449 5.49 0 9.957-4.467 9.96-9.96.002-2.661-1.034-5.163-2.915-7.046C16.48 1.714 13.98.674 11.32.674 5.828.674 1.36 5.14 1.358 10.63c-.001 1.704.476 3.238 1.387 4.678l-.993 3.626 3.71-.973.505.293zm9.055-6.72c-.243-.122-1.434-.708-1.656-.79-.22-.082-.38-.122-.54.122-.16.244-.622.79-.762.948-.14.158-.28.178-.522.057a7.279 7.279 0 0 1-3.233-1.993c-.886-.788-1.485-1.761-1.66-2.066-.173-.306-.018-.472.133-.623.136-.137.304-.35.457-.525.152-.174.203-.298.304-.497.102-.2.05-.374-.025-.522-.076-.148-.622-1.503-.852-2.057-.225-.54-.472-.466-.648-.475-.168-.008-.36-.01-.552-.01-.192 0-.505.072-.77.36-.264.288-1.01.986-1.01 2.404s1.03 2.788 1.173 2.98c.143.195 2.025 3.093 4.908 4.336.685.296 1.22.473 1.637.605.69.22 1.32.19 1.816.116.553-.082 1.434-.586 1.637-1.155.203-.57.203-1.057.142-1.155-.06-.1-.22-.158-.463-.28z"/>
               </svg>
+              <span className="hidden sm:inline">WhatsApp</span>
             </a>
-            <Link href="#" className="hover:text-tosca-300 transition-colors">
-              <Instagram size={15} />
-            </Link>
+            <a 
+              href="https://www.instagram.com/sat_almanshurah/" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="hover:text-tosca-300 transition-colors inline-flex items-center gap-2 hover:bg-white/10 px-2 py-1 sm:px-2.5 sm:py-1 rounded-full transition-all" 
+              aria-label="Instagram"
+            >
+              <Instagram size={14} className="shrink-0" style={{ display: 'block', lineHeight: 'normal' }} />
+              <span className="hidden sm:inline">Instagram</span>
+            </a>
           </div>
         </div>
       </div>
@@ -114,22 +192,23 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
           style={{
             backdropFilter: "blur(20px)",
             WebkitBackdropFilter: "blur(20px)",
-            background: "rgba(200, 247, 245, 0.65)",
-            border: "1.5px solid rgba(11, 107, 105, 0.22)",
-            boxShadow: "inset 0 1px 2px rgba(255,255,255,0.4), 0 12px 30px rgba(11, 107, 105, 0.12)",
+            background: "var(--bg-aksen-kokoh)",
+            border: "1px solid rgba(255, 255, 255, 0.15)",
+            boxShadow: "0 12px 30px rgba(0, 0, 0, 0.25)",
             overflow: "visible",
             boxSizing: "border-box",
-            maxWidth: "min(95%, 1100px)", // Dikembalikan ke max width yang pas
+            maxWidth: "min(95%, 1100px)",
             width: "100%",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "15px 30px" // Dikurangi kembali ke tinggi yang ramping dan elegan
+            padding: "0 30px",
+            height: "76px"
           }}
         >
           {/* Logo container (flex-1 to help center the menu) */}
           <div className="flex-1 flex justify-start items-center">
-            <Link href="/" className="flex items-center gap-3 pl-2 md:pl-4 group shrink-0">
+            <Link href="/" className="flex items-center gap-3 md:gap-4 pl-2 md:pl-4 group shrink-0 mr-6 xl:mr-10">
               <div className="w-10 h-10 md:w-11 md:h-11 bg-tosca-500 rounded-full flex items-center justify-center text-white font-black text-xl shadow-lg shadow-tosca-500/20 group-hover:rotate-12 transition-transform overflow-hidden">
                 {logoUrl ? (
                   <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
@@ -137,164 +216,325 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
                   "B"
                 )}
               </div>
-              <div className="flex flex-col">
-                <span className={`font-black text-base md:text-lg tracking-tighter leading-none ${brandColor}`}>BUDIMAN</span>
-                <span className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.3em] text-gray-400">CENDIKIA {unit}</span>
-              </div>
-            </Link>
-          </div>
- 
-          {/* Desktop Menu (Centered, gap 20px - 30px) */}
-          <div className="hidden lg:flex items-center justify-center gap-[20px] xl:gap-[30px] flex-initial mx-2">
-            {navLinks.map((link) => (
               <div 
-                key={link.name} 
-                className="relative group"
+                className="flex flex-col justify-center"
+                style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}
               >
-                <Link 
-                  href={link.href}
-                  className={`flex items-center gap-1.5 px-[15px] py-[8px] text-[13px] xl:text-[14px] font-black uppercase tracking-wider transition-all rounded-full whitespace-nowrap ${
-                    pathname === link.href || (link.dropdown && link.dropdown.some(s => pathname === s.href))
-                      ? accentBg
-                      : "text-gray-700 hover:text-tosca-600 hover:bg-tosca-50/50"
-                  }`}
+                <span className="font-black text-sm min-[375px]:text-base md:text-lg tracking-tighter leading-none text-white transition-colors group-hover:text-[var(--warna-nav-hover)]">BUDIMAN</span>
+                <span 
+                  className="font-bold uppercase tracking-[0.2em] text-[var(--warna-nav-hover)]/60 text-[9px] min-[375px]:text-[10px]"
+                  style={{ lineHeight: "1.2" }}
                 >
-                  <span>{link.name}</span>
-                  {link.dropdown && <ChevronDown size={12} className="transition-transform duration-300 opacity-50 group-hover:rotate-180" />}
-                </Link>
-
-                {/* Dropdown */}
-                {link.dropdown && (
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 transition-all duration-300 z-[60] opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto">
-                    <div className="bg-white/95 backdrop-blur-xl border border-gray-100 shadow-2xl rounded-[24px] p-2 min-w-[220px] flex flex-col gap-1">
-                      {link.dropdown.map((sub) => (
-                        <Link 
-                          key={sub.name}
-                          href={sub.href}
-                          className={`px-5 py-3 text-[11px] font-bold rounded-xl transition-all whitespace-nowrap ${
-                            pathname === sub.href ? "text-tosca-700 bg-tosca-50" : "text-gray-600 hover:text-tosca-700 hover:bg-tosca-50"
-                          }`}
-                        >
-                          {sub.name}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                  CENDIKIA {unit.toUpperCase()}
+                </span>
               </div>
-            ))}
+            </Link>
           </div>
  
-          {/* Action Buttons (flex-1 to help center the menu, aligned right) */}
+          {/* Desktop Menu (Centered within single container wrapper) */}
+          <div 
+            className="hidden md:flex items-center justify-center flex-initial mx-2 desktop-nav-menu"
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "32px",
+              background: "rgba(0, 0, 0, 0.12)",
+              boxShadow: "inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 1px 1px rgba(255, 255, 255, 0.1)",
+              borderRadius: "30px",
+              padding: "10px 28px",
+              height: "auto"
+            }}
+          >
+            {navLinks.map((link, index) => {
+              const isActive = pathname === link.href || (link.dropdown && link.dropdown.some(s => pathname === s.href));
+              const linkClass = `flex items-center gap-1.5 px-[15px] py-[8px] text-[13px] xl:text-[14px] font-semibold uppercase tracking-wider leading-none whitespace-nowrap transition-all duration-300 ${
+                isActive ? "text-white active opacity-100" : "text-[var(--warna-nav-hover)] opacity-[0.65] hover:opacity-[0.85]"
+              }`;
+              
+              return (
+                <div 
+                  key={link.name} 
+                  ref={(el) => { linkRefs.current[index] = el; }}
+                  className="relative group z-10"
+                >
+                  {link.isExternal ? (
+                    <a 
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={linkClass}
+                    >
+                      <span>{link.name}</span>
+                    </a>
+                  ) : (
+                    <Link 
+                      href={link.href}
+                      className={linkClass}
+                    >
+                      <span>{link.name}</span>
+                      {link.dropdown && <ChevronDown size={12} className="transition-transform duration-300 opacity-50 group-hover:rotate-180" />}
+                    </Link>
+                  )}
+
+                  {link.dropdown && (
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 transition-all duration-300 z-[60] opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto">
+                      <div 
+                        className="p-1.5 min-w-[200px] flex flex-col gap-0.5"
+                        style={{
+                          background: "#0B6B69",
+                          borderRadius: "8px",
+                          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                          border: "1px solid rgba(255, 255, 255, 0.1)"
+                        }}
+                      >
+                        {link.dropdown.map((sub) => (
+                          <Link 
+                            key={sub.name}
+                            href={sub.href}
+                            className={`px-4 py-2 text-[12px] font-medium rounded transition-all whitespace-nowrap ${
+                              pathname === sub.href ? "text-white bg-white/10" : "text-[var(--warna-nav-hover)]/80 hover:text-white hover:bg-white/5"
+                            }`}
+                          >
+                            {sub.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+  
           <div className="flex-1 flex justify-end items-center gap-[10px] md:gap-[15px] pr-2 md:pr-4">
-            {/* Tombol 'KONTAK' (Hover Effect 3D) - Hidden on Mobile (< 768px) */}
-            <a
-              href="https://wa.me/6281534648183"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden md:inline-flex text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] rounded-full transition-all duration-300 items-center justify-center whitespace-nowrap"
-              style={{
-                backgroundColor: "#2FCFC9",
-                color: "#0B6B69",
-                transition: "all 0.3s ease",
-                padding: "8px 20px",
-                whiteSpace: "nowrap"
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#0FA8A4";
-                e.currentTarget.style.transform = "translateY(-1.5px) scale(1.02)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#2FCFC9";
-                e.currentTarget.style.transform = "translateY(0) scale(1)";
-              }}
-            >
-              KONTAK
-            </a>
+            <div className="relative group z-[70] hidden md:block desktop-login-btn">
+              <div 
+                className="cursor-pointer text-white text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] rounded-full transition-all flex items-center gap-2 whitespace-nowrap"
+                style={{
+                  padding: "8px 20px",
+                  background: "var(--bg-nav-login-btn)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)"
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "var(--bg-nav-login-btn-hover)";
+                  e.currentTarget.style.transform = "translateY(-1px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "var(--bg-nav-login-btn)";
+                  e.currentTarget.style.transform = "translateY(0)";
+                }}
+              >
+                <LogIn size={13} className="hidden sm:block" />
+                <span>LOGIN</span>
+                <ChevronDown size={12} className="transition-transform duration-300 opacity-70 group-hover:rotate-180" />
+              </div>
+
+              {/* Dropdown Menu */}
+              <div 
+                className="absolute top-full pt-3 transition-all duration-300 z-[80] opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto"
+                style={{ right: 0, left: "auto" }}
+              >
+                <div 
+                  className="flex flex-col"
+                  style={{
+                    background: "var(--bg-nav-dropdown)",
+                    borderRadius: "20px",
+                    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
+                    border: "1px solid rgba(255, 255, 255, 0.15)",
+                    padding: "12px 20px",
+                    width: "max-content",
+                    minWidth: "160px",
+                    gap: "10px"
+                  }}
+                >
+                  <Link 
+                    href={`/admin/login?unit=${unit}`}
+                    className="pb-2 text-[12px] font-bold text-[var(--warna-nav-hover)]/80 hover:text-white transition-all whitespace-nowrap uppercase tracking-wider block"
+                    style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.1)" }}
+                  >
+                    Login Admin
+                  </Link>
+                  <a 
+                    href="https://wa.me/6281534648183" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[12px] font-bold text-[var(--warna-nav-hover)]/80 hover:text-white transition-all whitespace-nowrap uppercase tracking-wider block"
+                  >
+                    Hubungi Kontak
+                  </a>
+                </div>
+              </div>
+            </div>
  
-            {/* Tombol 'LOGIN' - Hidden on Mobile (< 768px) */}
-            <Link 
-              href={`/admin/login?unit=${unit}`}
-              className="hidden md:inline-flex bg-[#0B6B69] text-white text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] rounded-full hover:bg-tosca-900 transition-all shadow-lg shadow-tosca-900/10 items-center gap-2 whitespace-nowrap"
-              style={{
-                padding: "8px 20px"
-              }}
-            >
-              <LogIn size={13} className="hidden sm:block" />
-              LOGIN
-            </Link>
- 
-            {/* Mobile Toggle */}
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
-              className="lg:hidden w-9 h-9 flex items-center justify-center bg-gray-50 text-tosca-900 rounded-full hover:bg-tosca-100 transition-colors"
+              className="md:hidden w-9 h-9 flex items-center justify-center bg-white/10 text-white rounded-full hover:bg-white/20 transition-all mobile-hamburger-btn"
             >
               {isMobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
           </div>
         </nav>
  
-        {/* Mobile Menu */}
-        <div className={`lg:hidden absolute top-full left-0 right-0 mt-3 px-4 transition-all duration-300 ${
+        <div className={`md:hidden absolute top-full left-0 right-0 mt-3 px-4 transition-all duration-300 ${
           isMobileMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 pointer-events-none"
         }`}>
-          <div className="bg-white/95 backdrop-blur-2xl rounded-[32px] shadow-2xl border border-gray-100 p-6 flex flex-col gap-3 overflow-hidden">
-            {navLinks.map((link) => (
-              <div key={link.name}>
-                {link.dropdown ? (
-                  <div className="space-y-1 mb-2">
-                    <p className="px-4 flex items-center gap-2 text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">
-                      {link.name}
-                    </p>
-                    <div className="grid grid-cols-1 gap-1 pl-2">
-                      {link.dropdown.map(sub => (
-                        <Link 
-                          key={sub.name} 
-                          href={sub.href}
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className={`block text-xs font-bold p-3.5 rounded-2xl transition-colors ${pathname === sub.href ? "bg-tosca-50 text-tosca-700" : "text-gray-600 hover:bg-gray-50"}`}
-                        >
-                          {sub.name}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <Link 
-                    href={link.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 text-xs font-bold p-3.5 rounded-2xl transition-colors ${pathname === link.href ? "bg-tosca-50 text-tosca-700" : "text-gray-600 hover:bg-gray-50"}`}
-                  >
-                    {link.name}
-                  </Link>
-                )}
-              </div>
-            ))}
+          <div 
+            className="rounded-[24px] shadow-2xl border border-white/10 p-6 flex flex-col gap-4 overflow-hidden"
+            style={{ background: "#0B6B69" }}
+          >
+            {/* BERANDA */}
+            <Link 
+              href={`/${unit}`}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={`block text-xs font-bold rounded-xl transition-all uppercase tracking-wider text-center ${
+                pathname === `/${unit}` 
+                  ? "bg-white/20 text-white font-extrabold" 
+                  : "text-white hover:bg-white/5"
+              }`}
+              style={{ padding: "12px" }}
+            >
+              BERANDA
+            </Link>
 
-            {/* Mobile Actions inside hamburger menu */}
-            <div className="flex flex-col gap-3 pt-4 border-t border-gray-100 mt-2">
-              <a
-                href="https://wa.me/6281534648183"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full text-center text-xs font-black uppercase tracking-[0.15em] rounded-2xl py-3.5 transition-all duration-300 block"
-                style={{
-                  backgroundColor: "#2FCFC9",
-                  color: "#0B6B69"
-                }}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                KONTAK
-              </a>
-              <Link 
-                href={`/admin/login?unit=${unit}`}
-                className="w-full text-center bg-[#0B6B69] text-white text-xs font-black uppercase tracking-[0.15em] rounded-2xl py-3.5 hover:bg-tosca-900 transition-all flex items-center justify-center gap-2"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <LogIn size={14} />
-                LOGIN
-              </Link>
+            {/* PROFIL SEKOLAH */}
+            <div className="space-y-1.5">
+              <p className="px-3 text-[10px] font-black text-white/50 uppercase tracking-[0.2em] mb-1.5">
+                PROFIL SEKOLAH
+              </p>
+              <div className="grid grid-cols-1 gap-1 pl-3 border-l border-white/10">
+                <Link 
+                  href={`/${unit}/visi-misi`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block text-xs font-semibold rounded-xl transition-colors ${
+                    pathname === `/${unit}/visi-misi` ? "bg-white/15 text-white font-bold" : "text-white/80 hover:bg-white/5 hover:text-white"
+                  }`}
+                  style={{ padding: "12px" }}
+                >
+                  Visi & Misi
+                </Link>
+                <Link 
+                  href={`/${unit}/fasilitas`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block text-xs font-semibold rounded-xl transition-colors ${
+                    pathname === `/${unit}/fasilitas` ? "bg-white/15 text-white font-bold" : "text-white/80 hover:bg-white/5 hover:text-white"
+                  }`}
+                  style={{ padding: "12px" }}
+                >
+                  Program & Fasilitas
+                </Link>
+                <Link 
+                  href={`/${unit}/guru`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block text-xs font-semibold rounded-xl transition-colors ${
+                    pathname === `/${unit}/guru` ? "bg-white/15 text-white font-bold" : "text-white/80 hover:bg-white/5 hover:text-white"
+                  }`}
+                  style={{ padding: "12px" }}
+                >
+                  Tenaga Pengajar (Guru)
+                </Link>
+              </div>
             </div>
+
+            {/* INFORMASI */}
+            <div className="space-y-1.5">
+              <p className="px-3 text-[10px] font-black text-white/50 uppercase tracking-[0.2em] mb-1.5">
+                INFORMASI
+              </p>
+              <div className="grid grid-cols-1 gap-1 pl-3 border-l border-white/10">
+                <Link 
+                  href={`/${unit}/berita`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block text-xs font-semibold rounded-xl transition-colors ${
+                    pathname === `/${unit}/berita` ? "bg-white/15 text-white font-bold" : "text-white/80 hover:bg-white/5 hover:text-white"
+                  }`}
+                  style={{ padding: "12px" }}
+                >
+                  Berita & Kegiatan
+                </Link>
+                <Link 
+                  href={`/${unit}/agenda`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block text-xs font-semibold rounded-xl transition-colors ${
+                    pathname === `/${unit}/agenda` ? "bg-white/15 text-white font-bold" : "text-white/80 hover:bg-white/5 hover:text-white"
+                  }`}
+                  style={{ padding: "12px" }}
+                >
+                  Agenda Sekolah
+                </Link>
+                <Link 
+                  href={`/${unit}/prestasi`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block text-xs font-semibold rounded-xl transition-colors ${
+                    pathname === `/${unit}/prestasi` ? "bg-white/15 text-white font-bold" : "text-white/80 hover:bg-white/5 hover:text-white"
+                  }`}
+                  style={{ padding: "12px" }}
+                >
+                  Prestasi Siswa
+                </Link>
+              </div>
+            </div>
+
+            {/* GALERI */}
+            <div className="space-y-1.5">
+              <p className="px-3 text-[10px] font-black text-white/50 uppercase tracking-[0.2em] mb-1.5">
+                GALERI
+              </p>
+              <div className="grid grid-cols-1 gap-1 pl-3 border-l border-white/10">
+                <Link 
+                  href={`/${unit}/galeri`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block text-xs font-semibold rounded-xl transition-colors ${
+                    pathname === `/${unit}/galeri` ? "bg-white/15 text-white font-bold" : "text-white/80 hover:bg-white/5 hover:text-white"
+                  }`}
+                  style={{ padding: "12px" }}
+                >
+                  Galeri Foto
+                </Link>
+                <Link 
+                  href={`/${unit}/video`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block text-xs font-semibold rounded-xl transition-colors ${
+                    pathname === `/${unit}/video` ? "bg-white/15 text-white font-bold" : "text-white/80 hover:bg-white/5 hover:text-white"
+                  }`}
+                  style={{ padding: "12px" }}
+                >
+                  Dokumentasi Video
+                </Link>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="h-[1px] bg-white/10 my-1" />
+
+            {/* LOGIN ADMIN */}
+            <Link 
+              href={`/admin/login?unit=${unit}`}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={`flex items-center justify-center gap-2 text-center text-xs font-black uppercase tracking-[0.15em] rounded-xl py-3.5 hover:bg-white/20 transition-all ${
+                pathname.startsWith("/admin/login") 
+                  ? "bg-white/25 text-white" 
+                  : "bg-white/10 text-white border border-white/20"
+              }`}
+              style={{ padding: "12px" }}
+            >
+              <LogIn size={14} />
+              LOGIN ADMIN
+            </Link>
+
+            {/* HUBUNGI KONTAK */}
+            <a 
+              href="https://wa.me/6281534648183"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full text-center bg-white/10 border border-white/20 text-white text-xs font-black uppercase tracking-[0.15em] rounded-xl py-3.5 hover:bg-white/20 transition-all flex items-center justify-center gap-2"
+              style={{ padding: "12px" }}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              HUBUNGI KONTAK
+            </a>
           </div>
         </div>
 
@@ -305,29 +545,50 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-50 pt-24 pb-12 border-t border-gray-100">
+      <footer 
+        className="pt-24 pb-12 border-t border-white/10"
+        style={{ background: "var(--bg-aksen-kokoh)" }}
+      >
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-12 mb-16">
           <div className="md:col-span-2">
             <div className="flex items-center gap-3 mb-6">
-              <span className={`text-2xl font-black tracking-tighter ${brandColor}`}>Budiman Cendikia {unit.toUpperCase()}</span>
+              <span className="text-2xl font-black tracking-tighter text-white">Budiman Cendikia {unit.toUpperCase()}</span>
             </div>
-            <p className="text-gray-400 font-medium leading-relaxed max-w-md">
+            <p className="font-medium leading-relaxed max-w-md text-white/80">
               Lembaga pendidikan yang berkomitmen mencetak generasi unggul dalam iman, taqwa, dan ilmu pengetahuan. Menjadi rumah kedua yang nyaman bagi perkembangan anak.
             </p>
           </div>
           <div>
-            <h4 className="font-black text-gray-900 uppercase tracking-widest text-xs mb-6">Navigasi</h4>
+            <h4 className="font-black uppercase tracking-widest text-xs mb-6 text-white">Navigasi</h4>
             <ul className="space-y-4">
               {navLinks.map(link => (
                 <li key={link.name}>
-                  <Link href={link.href} className="text-gray-500 font-bold text-sm hover:text-tosca-500 transition-colors">{link.name}</Link>
+                  {link.name === "Beranda" ? (
+                    <a 
+                      href="#" 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="text-white/80 hover:text-border-halus font-bold text-sm transition-colors"
+                    >
+                      {link.name}
+                    </a>
+                  ) : (
+                    <Link 
+                      href={link.href} 
+                      className="text-white/80 hover:text-border-halus font-bold text-sm transition-colors"
+                    >
+                      {link.name}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
           </div>
           <div>
-            <h4 className="font-black text-gray-900 uppercase tracking-widest text-xs mb-6">Kontak Kami</h4>
-            <ul className="space-y-4 text-sm font-medium text-gray-500">
+            <h4 className="font-black uppercase tracking-widest text-xs mb-6 text-white">Kontak Kami</h4>
+            <ul className="space-y-4 text-sm font-medium text-white/80">
               <li className="flex items-start gap-3">
                 <span>Jalan Alumunium III No. 79, Tanjung Mulia, Kecamatan Medan Deli, Kota Medan, Sumatera Utara 20241</span>
               </li>
@@ -337,38 +598,40 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
               <li className="flex items-center gap-3">
                 <span>budimancendikia304@gmail.com</span>
               </li>
-              <li className="flex flex-col gap-1 pt-2 border-t border-gray-200/50">
-                <span className="text-[10px] font-black uppercase text-tosca-600 tracking-wider">Jam Admin</span>
+              <li className="flex flex-col gap-1 pt-2 border-t border-white/10">
+                <span className="text-[10px] font-black uppercase tracking-wider text-border-halus">Jam Admin</span>
                 <span>Senin - Jumat 08.00 s/d 16.00</span>
               </li>
             </ul>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto px-6 pt-12 border-t border-gray-200/50 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-gray-400 font-bold text-[10px] uppercase tracking-widest">© 2026 Budiman Cendikia. All Rights Reserved.</p>
+        <div className="max-w-7xl mx-auto px-6 pt-12 border-t flex flex-col md:flex-row justify-between items-center gap-6 border-white/15">
+          <p className="font-bold text-[10px] uppercase tracking-widest text-white/60">© 2026 Budiman Cendikia. All Rights Reserved.</p>
           <div className="flex gap-4">
              <a 
                href="https://wa.me/6281534648183" 
                target="_blank"
                rel="noopener noreferrer"
                aria-label="WhatsApp"
-               className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-tosca-700 hover:bg-tosca-500 hover:text-white transition-all cursor-pointer border border-gray-100"
+               className="w-10 h-10 rounded-xl shadow-sm flex items-center justify-center transition-all cursor-pointer border bg-white/10 text-white hover:bg-white hover:text-warna-teks-mutlak border-white/20"
              >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.003 5.419 5.422.002 12.005.002c3.192.001 6.192 1.244 8.448 3.501 2.256 2.257 3.497 5.257 3.495 8.45-.004 6.581-5.424 11.998-12.008 11.998-2.005-.002-3.98-.507-5.73-1.472L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.625 1.449 5.49 0 9.957-4.467 9.96-9.96.002-2.661-1.034-5.163-2.915-7.046C16.48 1.714 13.98.674 11.32.674 5.828.674 1.36 5.14 1.358 10.63c-.001 1.704.476 3.238 1.387 4.678l-.993 3.626 3.71-.973.505.293zm9.055-6.72c-.243-.122-1.434-.708-1.656-.79-.22-.082-.38-.122-.54.122-.16.244-.622.79-.762.948-.14.158-.28.178-.522.057a7.279 7.279 0 0 1-3.233-1.993c-.886-.788-1.485-1.761-1.66-2.066-.173-.306-.018-.472.133-.623.136-.137.304-.35.457-.525.152-.174.203-.298.304-.497.102-.2.05-.374-.025-.522-.076-.148-.622-1.503-.852-2.057-.225-.54-.472-.466-.648-.475-.168-.008-.36-.01-.552-.01-.192 0-.505.072-.77.36-.264.288-1.01.986-1.01 2.404s1.03 2.788 1.173 2.98c.143.195 2.025 3.093 4.908 4.336.685.296 1.22.473 1.637.605.69.22 1.32.19 1.816.116.553-.082 1.434-.586 1.637-1.155.203-.57.203-1.057.142-1.155-.06-.1-.22-.158-.463-.28z"/>
                 </svg>
              </a>
-             <Link 
-               href="#" 
+             <a 
+               href="https://www.instagram.com/sat_almanshurah/" 
+               target="_blank"
+               rel="noopener noreferrer"
                aria-label="Instagram"
-               className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-tosca-700 hover:bg-tosca-500 hover:text-white transition-all cursor-pointer border border-gray-100"
+               className="w-10 h-10 rounded-xl shadow-sm flex items-center justify-center transition-all cursor-pointer border bg-white/10 text-white hover:bg-white hover:text-warna-teks-mutlak border-white/20"
              >
                 <Instagram size={18} />
-             </Link>
+             </a>
              <Link 
                href="#" 
                aria-label="TikTok"
-               className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-tosca-700 hover:bg-tosca-500 hover:text-white transition-all cursor-pointer border border-gray-100"
+               className="w-10 h-10 rounded-xl shadow-sm flex items-center justify-center transition-all cursor-pointer border bg-white/10 text-white hover:bg-white hover:text-warna-teks-mutlak border-white/20"
              >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.81-.74-3.99-1.66-.22-.17-.41-.36-.6-.56v7.13c-.02 2.63-.99 5.13-2.92 6.84-2.14 1.89-5.19 2.58-7.99 1.81-2.92-.77-5.34-3.13-6.07-6.07-.9-3.41.25-7.23 2.99-9.37 1.95-1.54 4.54-2.14 7-1.63v4.05c-.86-.18-1.78-.11-2.58.26-.81.36-1.48.99-1.86 1.78-.63 1.26-.41 2.92.56 3.94.97 1.02 2.52 1.25 3.73.57.77-.43 1.22-1.22 1.23-2.1V.02z"/>

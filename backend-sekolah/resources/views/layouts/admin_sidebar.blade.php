@@ -34,7 +34,7 @@
         </a>
         <!-- Menu Pengaturan Website -->
         <a href="{{ route('admin.settings.edit') }}" class="flex items-center p-3 rounded-xl hover:bg-gray-800 transition-all font-semibold text-sm">
-            Ubah Logo Website
+            Pengaturan Website
         </a>
     </nav>
 </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import api from "@/lib/api";
 import { toast, ToastContainer } from "react-toastify";
@@ -13,6 +13,18 @@ function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    document.body.classList.remove("theme-sd", "theme-smp");
+    if (unit === "sd") {
+      document.body.classList.add("theme-sd");
+    } else if (unit === "smp") {
+      document.body.classList.add("theme-smp");
+    }
+    return () => {
+      document.body.classList.remove("theme-sd", "theme-smp");
+    };
+  }, [unit]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

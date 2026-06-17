@@ -148,7 +148,7 @@ export default function PengumumanDetailPage() {
                     </a>
                     {/* Instagram Button */}
                     <a 
-                      href="https://instagram.com" 
+                      href="https://www.instagram.com/sat_almanshurah/" 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="w-9 h-9 rounded-full bg-tosca-50 hover:bg-tosca-900 text-tosca-900 hover:text-white flex items-center justify-center transition-colors duration-300 ease-in-out shadow-sm border border-tosca-200"

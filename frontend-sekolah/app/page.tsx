@@ -84,7 +84,7 @@ export default function Home() {
         <div className="mt-20 pt-10 border-t border-gray-200/50 flex flex-col md:flex-row items-center justify-between gap-6 text-gray-400 font-bold text-xs uppercase tracking-widest">
           <p>© 2026 Budiman Cendikia Educational Foundation</p>
           <div className="flex gap-6">
-            <a href="#" aria-label="Instagram" className="hover:text-tosca-700 transition-colors">
+            <a href="https://www.instagram.com/sat_almanshurah/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:text-tosca-700 transition-colors">
               <Instagram size={20} />
             </a>
             <a href="#" aria-label="YouTube" className="hover:text-tosca-700 transition-colors">

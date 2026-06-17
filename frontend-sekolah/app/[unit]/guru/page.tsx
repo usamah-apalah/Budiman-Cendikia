@@ -23,6 +23,19 @@ export default function PublicGuruPage() {
   const [guru, setGuru] = useState<Guru[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Helper to format WhatsApp number to international format starting with 62
+  const formatWhatsApp = (num: string | null) => {
+    if (!num) return "";
+    const cleanNum = num.replace(/\D/g, "");
+    if (cleanNum.startsWith("0")) {
+      return "62" + cleanNum.slice(1);
+    }
+    if (cleanNum.startsWith("62")) {
+      return cleanNum;
+    }
+    return "62" + cleanNum;
+  };
+
   useEffect(() => {
     if (!unit) return;
 
@@ -188,7 +201,7 @@ export default function PublicGuruPage() {
                           )}
                           {item.whatsapp && (
                             <a
-                              href={`https://wa.me/${item.whatsapp}`}
+                              href={`https://wa.me/${formatWhatsApp(item.whatsapp)}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => e.stopPropagation()}

@@ -38,5 +38,6 @@ Route::post('/admin/profile/logo', [ProfileController::class, 'updateLogo'])->na
 // Web Admin Routes for Website Settings (Ubah Logo)
 Route::get('/admin/settings', [SettingController::class, 'edit'])->name('admin.settings.edit');
 Route::post('/admin/settings/logo/update', [SettingController::class, 'updateLogo'])->name('admin.settings.updateLogo');
+Route::post('/admin/settings/instagram/update', [SettingController::class, 'updateInstagram'])->name('admin.settings.updateInstagram');
 
 

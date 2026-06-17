@@ -8,7 +8,7 @@ import AnimatedCounter from "@/components/AnimatedCounter";
 import PPDBBadge from "@/components/PPDBBadge";
 import Link from "next/link";
 import { useParams, notFound } from "next/navigation";
-import { ChevronDown, Monitor, Calendar, Megaphone, Newspaper, MapPin, ChevronRight, Instagram, Beaker, BookOpen, Cpu, FileText } from "lucide-react";
+import { ChevronDown, Monitor, Calendar, Megaphone, Newspaper, MapPin, ChevronRight, Instagram, Beaker, BookOpen, Cpu, FileText, X, Download, Share2, Link2 } from "lucide-react";
 import ProgramFasilitasUnggulan from "@/components/ProgramFasilitasUnggulan";
 import { SITE_STATS } from "@/lib/constants";
 import ShareableImageModal from "@/components/ShareableImageModal";
@@ -123,11 +123,31 @@ export default function UnitPublicHomePage() {
   const [latestArtikel, setLatestArtikel] = useState<NewsItem[]>([]);
   const [latestPrestasi, setLatestPrestasi] = useState<PrestasiItem[]>([]);
   const [selectedPrestasi, setSelectedPrestasi] = useState<PrestasiItem | null>(null);
+  const [selectedGalleryItem, setSelectedGalleryItem] = useState<{ img: string; title: string; desc: string } | null>(null);
+  const [galeriItems, setGaleriItems] = useState<any[]>([]);
   const [programFasilitas, setProgramFasilitas] = useState<ProgramItem[]>([]);
   const [ekskul, setEkskul] = useState<any[]>([]);
   const [latestAgenda, setLatestAgenda] = useState<AgendaItem[]>([]);
   const [latestPengumuman, setLatestPengumuman] = useState<PengumumanItem[]>([]);
   const [isSambutanExpanded, setIsSambutanExpanded] = useState(false);
+
+  const [instagramSettings, setInstagramSettings] = useState({
+    title: "Yuk, Kepoin Keseruan Kami di Instagram",
+    description: "Mulai dari keseruan belajar di kelas, tawa ceria saat bermain, hingga momen-momen penuh prestasi. Semuanya kami bagikan lewat cerita harian dan galeri foto aesthetic di Instagram. Yuk, follow biar nggak ketinggalan keseruannya!",
+    url: "https://www.instagram.com/sat_almanshurah/",
+    username: "sat_almanshurah"
+  });
+
+  useEffect(() => {
+    if (selectedGalleryItem) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [selectedGalleryItem]);
 
   useEffect(() => {
     if (!isValidUnit) return;
@@ -149,13 +169,14 @@ export default function UnitPublicHomePage() {
 
     const fetchLatest = async () => {
       try {
-        const [newsRes, artikelRes, prestasiRes, programRes, agendaRes, pengumumanRes] = await Promise.all([
+        const [newsRes, artikelRes, prestasiRes, programRes, agendaRes, pengumumanRes, galeriRes] = await Promise.all([
           api.get(`/berita?unit=${unit}`),
           api.get(`/artikel?unit=${unit}`),
           api.get(`/prestasi?unit=${unit}&limit=3`),
           api.get(`/program-fasilitas?unit=${unit}`),
           api.get(`/agenda?unit=${unit}`),
-          api.get(`/pengumuman?unit=${unit}`)
+          api.get(`/pengumuman?unit=${unit}`),
+          api.get(`/galeri?unit=${unit}`)
         ]);
         setLatestNews(newsRes.data.data.slice(0, 3));
         setLatestArtikel(artikelRes.data.data.slice(0, 3));
@@ -163,6 +184,7 @@ export default function UnitPublicHomePage() {
         setProgramFasilitas(programRes.data);
         setLatestAgenda(agendaRes.data.slice(0, 3));
         setLatestPengumuman(pengumumanRes.data.slice(0, 3));
+        setGaleriItems(galeriRes.data);
       } catch (e) {
         console.error(e);
       }
@@ -177,9 +199,26 @@ export default function UnitPublicHomePage() {
       }
     };
 
+    const fetchInstagramSettings = async () => {
+      try {
+        const res = await api.get("/settings");
+        if (res.data) {
+          setInstagramSettings({
+            title: res.data.instagram_title || "Yuk, Kepoin Keseruan Kami di Instagram",
+            description: res.data.instagram_description || "Mulai dari keseruan belajar di kelas, tawa ceria saat bermain, hingga momen-momen penuh prestasi. Semuanya kami bagikan lewat cerita harian dan galeri foto aesthetic di Instagram. Yuk, follow biar nggak ketinggalan keseruannya!",
+            url: res.data.instagram_url || "https://www.instagram.com/sat_almanshurah/",
+            username: res.data.instagram_username || "sat_almanshurah"
+          });
+        }
+      } catch (err) {
+        console.error("Gagal memuat pengaturan Instagram:", err);
+      }
+    };
+
     fetchStats();
     fetchLatest();
     fetchHeadmaster();
+    fetchInstagramSettings();
   }, [unit, isValidUnit]);
 
   useEffect(() => {
@@ -321,25 +360,45 @@ export default function UnitPublicHomePage() {
           </div>
         </section>
         {/* Sambutan Kepala Sekolah */}
-        <section className="py-20 bg-gray-50 overflow-hidden">
+        <section className="py-20 overflow-hidden" style={{ background: "var(--bg-utama)" }}>
           <div className="max-w-7xl mx-auto px-6">
             <div className="grid md:grid-cols-12 gap-10 md:gap-16 items-center">
               <div className="md:col-span-5 scroll-animate opacity-0 translate-y-12 transition-all duration-700">
-                <div className="relative">
-                  <div className="absolute -inset-4 bg-tosca-100 rounded-[30px] md:rounded-[40px] -rotate-3 -z-10"></div>
-                  <div className="aspect-[3/4] bg-gray-200 rounded-[24px] md:rounded-[32px] overflow-hidden shadow-2xl relative">
-                    <img 
-                      src={getPhotoUrl()} 
-                      alt="Kepala Sekolah SD" 
-                      className={headmaster.photo 
-                        ? "w-full h-full object-cover" 
-                        : "w-full h-full object-cover opacity-20 p-12 md:p-20"}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-tosca-900/20 to-transparent"></div>
-                  </div>
-                  <div className="mt-6 md:mt-8 text-center md:text-left">
-                    <h3 className="text-xl md:text-2xl font-black text-gray-900">{headmaster.name}</h3>
-                    <p className="text-tosca-600 font-bold uppercase tracking-widest text-[10px] md:text-xs mt-1 md:mt-2">Kepala Sekolah SD Budiman Cendikia</p>
+                <div 
+                  className="rounded-[32px] border border-border-halus bg-border-halus/40"
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "24px",
+                    boxSizing: "border-box",
+                    overflow: "hidden",
+                    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.4)"
+                  }}
+                >
+                  <img 
+                    src={getPhotoUrl()} 
+                    alt="Kepala Sekolah SD" 
+                    className={headmaster.photo 
+                      ? "" 
+                      : "opacity-20 p-6 md:p-12 bg-white"}
+                    style={{
+                      width: "100%",
+                      maxWidth: "100%",
+                      height: "auto",
+                      borderRadius: "16px",
+                      objectFit: "cover"
+                    }}
+                  />
+                  <div 
+                    className="w-full text-center"
+                    style={{
+                      marginTop: "16px"
+                    }}
+                  >
+                    <h3 className="text-xl md:text-2xl font-black text-warna-teks-mutlak">{headmaster.name}</h3>
+                    <p className="text-bg-tombol-utama font-bold uppercase tracking-widest text-[10px] md:text-xs mt-1 md:mt-2">Kepala Sekolah SD Budiman Cendikia</p>
                   </div>
                 </div>
               </div>
@@ -349,38 +408,61 @@ export default function UnitPublicHomePage() {
                   Sambutan <br className="hidden md:block" />
                   <span className="text-tosca-500">Kepala Sekolah</span>
                 </h2>
-                <div className="relative space-y-6 text-gray-500 text-lg leading-relaxed font-medium">
-                  {paragraphs.slice(0, 2).map((para, idx) => (
-                    <p key={idx}>{para}</p>
-                  ))}
-                  {paragraphs.length > 2 && (
-                    <div className={`grid transition-all duration-1000 ease-in-out ${isSambutanExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
-                      <div className="overflow-hidden">
-                        <div className={`pt-6 space-y-6 transition-all duration-1000 delay-150 ${isSambutanExpanded ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"}`}>
-                          {paragraphs.slice(2).map((para, idx) => (
-                            <p key={idx} className="text-gray-500/80">{para}</p>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Gradient Fade Overlay */}
-                  {paragraphs.length > 2 && (
-                    <div 
-                      className={`absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-gray-50 via-gray-50/90 to-transparent pointer-events-none transition-all duration-700 ease-in-out ${
-                        isSambutanExpanded ? "opacity-0 translate-y-8" : "opacity-100 translate-y-0"
-                      }`}
-                    ></div>
-                  )}
+                <style dangerouslySetInnerHTML={{__html: `
+                  .sambutan-text-container {
+                    max-height: 180px !important;
+                    overflow: hidden !important;
+                    position: relative !important;
+                    transition: max-height 0.8s ease-in-out !important;
+                    margin-bottom: 15px !important;
+                  }
+                  .sambutan-text-container.open {
+                    max-height: 1500px !important;
+                  }
+                  .sambutan-text-container::after {
+                    content: "" !important;
+                    position: absolute !important;
+                    bottom: 0 !important;
+                    left: 0 !important;
+                    width: 100% !important;
+                    height: 120px !important;
+                    pointer-events: none !important;
+                    background: linear-gradient(
+                      to bottom,
+                      rgba(200, 247, 245, 0) 0%,
+                      rgba(200, 247, 245, 0.25) 25%,
+                      rgba(200, 247, 245, 0.5) 50%,
+                      rgba(200, 247, 245, 0.75) 75%,
+                      rgba(200, 247, 245, 1) 100%
+                    ) !important;
+                    opacity: 1 !important;
+                    transition: opacity 0.8s ease-in-out !important;
+                  }
+                  .sambutan-text-container.open::after {
+                    opacity: 0 !important;
+                  }
+                  @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                  }
+                  .gallery-modal-fade {
+                    animation: fadeIn 0.3s ease-in-out forwards;
+                  }
+                `}} />
+                <div className={`sambutan-text-container relative ${isSambutanExpanded ? 'open' : ''}`}>
+                  <div className="space-y-6 text-warna-teks-mutlak text-lg leading-relaxed font-semibold">
+                    {paragraphs.map((para, idx) => (
+                      <p key={idx} className={idx >= 2 ? "text-warna-teks-mutlak/85" : ""}>{para}</p>
+                    ))}
+                  </div>
                 </div>
                 {paragraphs.length > 2 && (
                   <button 
                     onClick={() => setIsSambutanExpanded(!isSambutanExpanded)}
-                    className="inline-flex items-center gap-2 mt-1 text-tosca-700 font-black uppercase tracking-widest text-[10px] md:text-xs transition-all group py-2 px-3 rounded-xl hover:bg-tosca-50"
+                    className="inline-flex items-center gap-2 text-warna-teks-mutlak hover:text-bg-tombol-utama font-black uppercase tracking-widest text-[10px] md:text-xs transition-all group py-2 px-3 rounded-xl hover:bg-[#FFFFFF]/40"
                   >
                     <span className="relative">
-                      {isSambutanExpanded ? "Sembunyikan" : "Baca Selengkapnya"}
+                      {isSambutanExpanded ? "TAMPILKAN LEBIH SEDIKIT" : "BACA SELENGKAPNYA"}
                     </span>
                     <ChevronDown 
                       size={16} 
@@ -579,17 +661,17 @@ export default function UnitPublicHomePage() {
 
         {/* Prestasi Membanggakan */}
         {latestPrestasi.length > 0 && (
-          <section id="prestasi" className="py-20 bg-[#C8F7F5] w-full text-left my-16 border-t border-b border-[#7EE6E3] rounded-none">
+          <section id="prestasi" className="py-20 bg-bg-utama w-full text-left my-16 border-t border-b border-border-halus rounded-none">
             <div className="max-w-7xl mx-auto px-6">
               {/* Header Section */}
               <div className="flex justify-between items-center mb-10">
                 <div>
-                  <span className="text-[#2FCFC9] font-black uppercase tracking-[0.2em] text-xs mb-2 block">Prestasi</span>
-                  <h2 className="text-3xl md:text-4xl font-black text-[#0B6B69] tracking-tight uppercase">Prestasi Siswa</h2>
+                  <span className="text-warna-sorotan font-black uppercase tracking-[0.2em] text-xs mb-2 block">Prestasi</span>
+                  <h2 className="text-3xl md:text-4xl font-black text-warna-teks-mutlak tracking-tight uppercase">Prestasi Siswa</h2>
                 </div>
                 <Link 
                   href={`/${unit}/prestasi`} 
-                  className="flex items-center gap-2 text-[#0FA8A4] hover:text-[#0B6B69] font-black uppercase tracking-widest text-xs transition-colors"
+                  className="flex items-center gap-2 text-bg-tombol-utama hover:text-warna-teks-mutlak font-black uppercase tracking-widest text-xs transition-colors"
                 >
                   Lihat Semua 
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
@@ -601,11 +683,11 @@ export default function UnitPublicHomePage() {
                 {latestPrestasi.map((item, i) => (
                   <div 
                     key={item.id} 
-                    className="relative bg-white/40 backdrop-blur-md rounded-3xl shadow-[0_8px_32px_rgba(11,107,105,0.06)] border border-[#7EE6E3]/50 flex flex-col hover:-translate-y-2 hover:shadow-xl transition-all duration-300 group overflow-hidden"
+                    className="relative bg-white/40 backdrop-blur-md rounded-3xl shadow-[0_8px_32px_rgba(11,107,105,0.06)] border border-border-halus/50 flex flex-col hover:-translate-y-2 hover:shadow-xl transition-all duration-300 group overflow-hidden"
                   >
                     {/* Image Container with Badge Overlay */}
                     <div 
-                      className="relative w-full aspect-video bg-[#C8F7F5]/30 overflow-hidden cursor-pointer"
+                      className="relative w-full aspect-video bg-bg-utama/30 overflow-hidden cursor-pointer"
                       onClick={(e) => {
                         e.stopPropagation();
                         if (item.image) {
@@ -620,8 +702,8 @@ export default function UnitPublicHomePage() {
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-[#C8F7F5]/30">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#2FCFC9]"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        <div className="w-full h-full flex items-center justify-center bg-bg-utama/30">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-warna-sorotan"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                         </div>
                       )}
                       {/* Expand Icon Overlay (Shows on hover) */}
@@ -631,7 +713,7 @@ export default function UnitPublicHomePage() {
                         </div>
                       )}
                       {/* Badge Overlay */}
-                      <span className="absolute top-4 left-4 z-10 inline-block text-[9px] font-black px-2.5 py-1 bg-[#2FCFC9]/90 backdrop-blur-sm text-[#0B6B69] rounded-full border border-[#7EE6E3]/60 uppercase tracking-wider">
+                      <span className="absolute top-4 left-4 z-10 inline-block text-[9px] font-black px-2.5 py-1 bg-warna-sorotan/90 backdrop-blur-sm text-warna-teks-mutlak rounded-full border border-border-halus/60 uppercase tracking-wider">
                         {item.tingkat}
                       </span>
                     </div>
@@ -639,10 +721,10 @@ export default function UnitPublicHomePage() {
                     {/* Text Area */}
                     <div className="p-6 flex-1 flex flex-col justify-between">
                       <div>
-                        <p className="text-[10px] text-[#0B6B69]/60 font-bold uppercase tracking-wider">
+                        <p className="text-[10px] text-warna-teks-mutlak/60 font-bold uppercase tracking-wider">
                           {new Date(item.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </p>
-                        <h3 className="font-bold text-[#0B6B69] text-base leading-tight mt-2 line-clamp-2 group-hover:text-[#0FA8A4] transition-colors" title={item.judul}>
+                        <h3 className="font-bold text-warna-teks-mutlak text-base leading-tight mt-2 line-clamp-2 group-hover:text-bg-tombol-utama transition-colors" title={item.judul}>
                           {item.judul}
                         </h3>
                       </div>
@@ -718,45 +800,52 @@ export default function UnitPublicHomePage() {
         {/* Instagram Section */}
         <section className="py-20 bg-white">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="bg-[#C8F7F5] rounded-[40px] p-8 md:p-12 border border-[#2FCFC9] flex flex-col md:flex-row items-center justify-between gap-10 scroll-animate opacity-0 translate-y-12 transition-all duration-700">
+            <div className="bg-bg-utama rounded-[40px] p-8 md:p-12 border border-warna-sorotan flex flex-col md:flex-row items-center justify-between gap-10 scroll-animate opacity-0 translate-y-12 transition-all duration-700">
               <div className="flex-1 text-center md:text-left">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#7EE6E3]/20 text-[#0B6B69] rounded-full mb-6">
-                  <Instagram size={16} className="text-[#2FCFC9]" />
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-border-halus/20 text-warna-teks-mutlak rounded-full mb-6">
+                  <Instagram size={16} className="text-warna-sorotan" />
                   <span className="text-[10px] font-black uppercase tracking-widest">Momen Harian</span>
                 </div>
-                <h2 className="text-3xl md:text-4xl font-black text-[#0B6B69] tracking-tight mb-4 uppercase">
-                  Yuk, Kepoin Keseruan Kami di Instagram
+                <h2 className="text-3xl md:text-4xl font-black text-warna-teks-mutlak tracking-tight mb-4 uppercase">
+                  {instagramSettings.title}
                 </h2>
-                <p className="text-[#0B6B69] font-medium text-lg leading-relaxed max-w-xl">
-                  Mulai dari keseruan belajar di kelas, tawa ceria saat bermain, hingga momen-momen penuh prestasi. Semuanya kami bagikan lewat cerita harian dan galeri foto aesthetic di Instagram. Yuk, follow biar nggak ketinggalan keseruannya!
+                <p className="text-warna-teks-mutlak font-medium text-lg leading-relaxed max-w-xl">
+                  {instagramSettings.description}
                 </p>
                 <div className="mt-8 flex flex-wrap justify-center md:justify-start gap-4">
                   <a 
-                    href="https://www.instagram.com/sat_almanshurah/" 
+                    href={instagramSettings.url} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="px-10 py-4 bg-[#0FA8A4] hover:bg-[#0B6B69] text-white hover:text-[#C8F7F5] font-black rounded-2xl shadow-xl shadow-[#0FA8A4]/20 hover:-translate-y-1 transition-all flex items-center gap-3 uppercase tracking-widest text-xs"
+                    className="px-10 py-4 bg-bg-tombol-utama hover:bg-warna-teks-mutlak text-white hover:text-bg-utama font-black rounded-2xl shadow-xl shadow-bg-tombol-utama/20 hover:-translate-y-1 transition-all flex items-center gap-3 uppercase tracking-widest text-xs"
                   >
                     <Instagram size={18} className="text-current" />
                     Follow Instagram Kami
                   </a>
                 </div>
               </div>
-              <div className="w-full md:w-1/3 aspect-square max-w-[300px] relative">
-                <div className="absolute inset-0 bg-[#7EE6E3] rounded-[48px] rotate-6"></div>
-                <div className="absolute inset-0 bg-white rounded-[48px] shadow-xl flex items-center justify-center p-10 border border-[#2FCFC9]">
-                  <Instagram size={120} className="text-[#2FCFC9] opacity-10" />
+              <a
+                href={instagramSettings.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full md:w-1/3 aspect-square max-w-[300px] relative block hover:scale-105 transition-all duration-300"
+              >
+                <div className="absolute inset-0 bg-border-halus rounded-[48px] rotate-6"></div>
+                <div className="absolute inset-0 bg-white rounded-[48px] shadow-xl flex items-center justify-center p-10 border border-warna-sorotan">
+                  <Instagram size={120} className="text-warna-sorotan opacity-10" />
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
-                    <div className="w-24 h-24 rounded-3xl bg-[#0B6B69] flex items-center justify-center text-[#2FCFC9] shadow-lg">
-                      <Instagram size={48} className="text-[#2FCFC9]" />
+                    <div className="w-24 h-24 rounded-3xl bg-warna-teks-mutlak flex items-center justify-center text-warna-sorotan shadow-lg">
+                      <Instagram size={48} className="text-warna-sorotan" />
                     </div>
                     <div className="text-center">
-                      <p className="font-black text-[#0B6B69] leading-none mb-1">@sat_almanshurah</p>
-                      <p className="text-[10px] font-bold text-[#0B6B69]/60 uppercase tracking-widest">Official Instagram</p>
+                      <p className="font-black text-warna-teks-mutlak leading-none mb-1">
+                        @{instagramSettings.username}
+                      </p>
+                      <p className="text-[10px] font-bold text-warna-teks-mutlak/60 uppercase tracking-widest">Official Instagram</p>
                     </div>
                   </div>
                 </div>
-              </div>
+              </a>
             </div>
           </div>
         </section>
@@ -774,6 +863,59 @@ export default function UnitPublicHomePage() {
           <GuruMarquee unit="sd" />
         </section>
 
+        {/* Galeri Kegiatan Section */}
+        <section className="galeri-section py-20" style={{ background: "var(--bg-utama)" }}>
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-center mb-12 scroll-animate opacity-0 translate-y-12 transition-all duration-700">
+              <span className="text-tosca-500 font-black uppercase tracking-[0.3em] text-[9px] md:text-[10px] mb-2 block">Dokumentasi</span>
+              <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight uppercase">
+                Galeri Kegiatan
+              </h2>
+              <div className="w-24 h-1 bg-tosca-500 mx-auto mt-4 rounded-full"></div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {galeriItems.length > 0 ? (
+                galeriItems.map((item, idx) => {
+                  const mappedItem = {
+                    img: item.image || "/globe.svg",
+                    title: item.judul,
+                    desc: item.deskripsi || "Dokumentasi SD"
+                  };
+                  return (
+                    <div 
+                      key={item.id || idx} 
+                      className="scroll-animate opacity-0 translate-y-12 transition-all duration-700 bg-white rounded-xl overflow-hidden shadow-md group border border-border-halus/20 cursor-pointer hover:shadow-lg transition-shadow duration-300"
+                      data-title={mappedItem.title}
+                      data-description={mappedItem.desc}
+                      onClick={() => setSelectedGalleryItem(mappedItem)}
+                      style={{ transitionDelay: `${idx * 100}ms` }}
+                    >
+                      <div className="overflow-hidden aspect-video bg-gray-100 relative">
+                        <img 
+                          src={mappedItem.img} 
+                          alt={mappedItem.title} 
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                          <p className="text-white text-xs font-black uppercase tracking-wider">{mappedItem.title}</p>
+                        </div>
+                      </div>
+                      <div className="p-4 bg-white">
+                        <h4 className="text-sm font-black text-gray-900 line-clamp-1 group-hover:text-tosca-500 transition-colors uppercase tracking-tight">{mappedItem.title}</h4>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Dokumentasi SD</p>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="col-span-full py-20 text-center bg-white/45 rounded-[32px] border border-dashed border-border-halus/50">
+                  <p className="text-warna-teks-mutlak font-bold">Belum ada dokumentasi kegiatan.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
       </PublicLayout>
       <ShareableImageModal
         isOpen={selectedPrestasi !== null}
@@ -783,6 +925,91 @@ export default function UnitPublicHomePage() {
         description={selectedPrestasi?.keterangan || (selectedPrestasi as any)?.konten || ""}
         tingkat={selectedPrestasi?.tingkat}
       />
+      {/* Gallery Lightbox Modal */}
+      {selectedGalleryItem && (
+        <div 
+          className="fixed top-0 left-0 z-[9999] flex items-center justify-center bg-black/80 gallery-modal-fade"
+          style={{ width: "100vw", height: "100vh" }}
+          onClick={() => setSelectedGalleryItem(null)}
+        >
+          <button 
+            className="absolute top-6 right-6 text-white hover:text-gray-300 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              setSelectedGalleryItem(null);
+            }}
+          >
+            <X size={24} />
+          </button>
+          <div 
+            className="relative max-w-[90%] md:max-w-[70%] flex flex-col items-center justify-start animate-fade-in"
+            style={{ maxHeight: "90vh", overflowY: "auto" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img 
+              src={selectedGalleryItem.img} 
+              alt={selectedGalleryItem.title} 
+              className="max-h-[60vh] object-contain rounded-lg shadow-xl"
+            />
+            <div className="w-full text-center mt-6 max-w-xl">
+              <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tight mb-2">
+                {selectedGalleryItem.title}
+              </h3>
+              <p className="text-sm md:text-base text-gray-300 font-medium leading-relaxed">
+                {selectedGalleryItem.desc}
+              </p>
+              <div className="flex items-center gap-3 mt-4 justify-center">
+                {/* Tombol Download */}
+                <a
+                  href={selectedGalleryItem.img}
+                  download
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full bg-warna-teks-mutlak/40 hover:bg-warna-teks-mutlak/60 text-white flex items-center justify-center transition-all cursor-pointer hover:scale-105 border border-white/10"
+                  title="Unduh Foto"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Download size={18} className="text-white" />
+                </a>
+
+                {/* Tombol Share */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const urlGambar = selectedGalleryItem.img;
+                    navigator.clipboard.writeText(urlGambar).then(() => {
+                      alert('Link foto berhasil disalin!');
+                    }).catch((err) => {
+                      console.error("Gagal menyalin link:", err);
+                    });
+                  }}
+                  className="w-10 h-10 rounded-full bg-warna-teks-mutlak/40 hover:bg-warna-teks-mutlak/60 text-white flex items-center justify-center transition-all cursor-pointer hover:scale-105 border border-white/10"
+                  title="Bagikan Foto (Salin Link)"
+                >
+                  <Share2 size={18} className="text-white" />
+                </button>
+
+                {/* Tombol Link */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const urlGambar = selectedGalleryItem.img;
+                    navigator.clipboard.writeText(urlGambar).then(() => {
+                      alert('Link foto berhasil disalin!');
+                    }).catch((err) => {
+                      console.error("Gagal menyalin link:", err);
+                    });
+                  }}
+                  className="w-10 h-10 rounded-full bg-warna-teks-mutlak/40 hover:bg-warna-teks-mutlak/60 text-white flex items-center justify-center transition-all cursor-pointer hover:scale-105 border border-white/10"
+                  title="Salin Link Gambar"
+                >
+                  <Link2 size={18} className="text-white" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
   }
@@ -791,46 +1018,43 @@ export default function UnitPublicHomePage() {
       <>
         <PublicLayout unit="smp">
         {/* Hero Section */}
-        <section className="relative pt-12 pb-20 md:pt-20 md:pb-32 overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-tosca-900/5 -z-10"></div>
-          <div className="absolute bottom-0 left-0 w-1/2 h-full bg-tosca-700/5 -z-10 blur-3xl rounded-full -translate-x-1/4"></div>
-
+        <section className="relative pt-12 pb-20 md:pt-20 md:pb-32 overflow-hidden" style={{ background: "linear-gradient(90deg, var(--border-halus) 0%, var(--bg-tombol-utama) 100%)" }}>
           <div className="max-w-7xl mx-auto px-6">
             <div
               className="animate-fade-in-right opacity-0 w-full max-w-4xl"
               style={{ animationFillMode: "forwards" }}
             >
               <PPDBBadge year="2026/2027" theme="smp" />
-              <h1 className="text-5xl md:text-7xl font-black text-gray-900 leading-tight mb-6 tracking-tight">
+              <h1 className="text-5xl md:text-7xl font-black leading-tight mb-6" style={{ color: "#FFFFFF", opacity: 1, textShadow: "0 2px 4px rgba(0,0,0,0.15)" }}>
                 Eksplorasi Potensi,{" "}
-                <span className="text-tosca-700">Raih Prestasi</span> Tanpa
-                Batas
+                <span className="text-[var(--border-halus)]">Raih Prestasi</span> Tanpa Batas
               </h1>
-              <p className="text-lg text-gray-500 font-medium mb-10 leading-relaxed max-w-3xl">
+              <p className="text-lg font-medium mb-10 leading-relaxed max-w-3xl text-[var(--bg-utama)]">
                 SMP Budiman Cendikia fokus pada pengembangan kemandirian,
-                penguasaan teknologi, and penguatan nilai keagamaan untuk
+                penguasaan teknologi, dan penguatan nilai keagamaan untuk
                 mencetak remaja yang cerdas dan berkarakter.
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link
-                  href="/smp/ppdb"
-                  className="px-10 py-5 bg-tosca-900 text-white font-black rounded-2xl shadow-xl shadow-tosca-900/30 hover:bg-tosca-700 hover:-translate-y-1 transition-all uppercase tracking-widest text-xs"
+                  href={`/${unit}/ppdb`}
+                  className="px-8 py-4 font-black rounded-2xl shadow-lg hover:-translate-y-1 transition-all uppercase tracking-widest text-xs"
+                  style={{ background: "#FFFFFF", color: "var(--warna-teks-tombol-kontras)" }}
                 >
-                  Mulai Pendaftaran
+                  Daftar Sekarang
                 </Link>
                 <Link
-                  href="/smp-old/dashboard"
-                  className="px-10 py-5 bg-white text-tosca-900 font-black rounded-2xl border-2 border-tosca-900/10 hover:border-tosca-900 transition-all uppercase tracking-widest text-xs"
+                  href={`/${unit}/galeri`}
+                  className="px-8 py-4 bg-transparent text-white font-black rounded-2xl border border-white/30 hover:bg-white/10 transition-all uppercase tracking-widest text-xs"
                 >
-                  Portal Data
+                  Lihat Galeri
                 </Link>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Stats with Animated Counters */}
-        <section className="py-20 bg-white">
+        {/* Stats */}
+        <section className="py-20 border-t border-b border-border-halus" style={{ background: "var(--bg-utama)" }}>
           <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
               { label: "Siswa Aktif", end: stats.siswa, suffix: "+" },
@@ -843,77 +1067,120 @@ export default function UnitPublicHomePage() {
                 className="text-center group scroll-animate opacity-0 translate-y-12 transition-all duration-700"
                 style={{ transitionDelay: `${i * 100}ms` }}
               >
-                <p className="text-4xl font-black text-tosca-900 mb-2 group-hover:scale-110 transition-transform duration-300">
+                <p className="text-4xl font-black text-[#0B6B69] mb-2 group-hover:scale-110 transition-transform duration-300">
                   <AnimatedCounter end={stat.end} suffix={stat.suffix} />
                 </p>
-                <p className="text-xs font-black text-gray-400 uppercase tracking-widest">
+                <p className="text-xs font-black text-[#0B6B69]/65 uppercase tracking-widest">
                   {stat.label}
                 </p>
               </div>
             ))}
           </div>
         </section>
+
         {/* Sambutan Kepala Sekolah */}
-        <section className="py-20 bg-gray-50 overflow-hidden">
+        <section className="py-20 overflow-hidden" style={{ background: "var(--bg-utama)" }}>
           <div className="max-w-7xl mx-auto px-6">
             <div className="grid md:grid-cols-12 gap-10 md:gap-16 items-center">
               <div className="md:col-span-5 scroll-animate opacity-0 translate-y-12 transition-all duration-700">
-                <div className="relative">
-                  <div className="absolute -inset-4 bg-tosca-100 rounded-[30px] md:rounded-[40px] -rotate-3 -z-10"></div>
-                  <div className="aspect-[3/4] bg-gray-200 rounded-[24px] md:rounded-[32px] overflow-hidden shadow-2xl relative">
-                    <img 
-                      src={getPhotoUrl()} 
-                      alt="Kepala Sekolah SMP" 
-                      className={headmaster.photo 
-                        ? "w-full h-full object-cover" 
-                        : "w-full h-full object-cover opacity-20 p-12 md:p-20"}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-tosca-900/20 to-transparent"></div>
-                  </div>
-                  <div className="mt-6 md:mt-8 text-center md:text-left">
-                    <h3 className="text-xl md:text-2xl font-black text-gray-900">{headmaster.name}</h3>
-                    <p className="text-tosca-600 font-bold uppercase tracking-widest text-[10px] md:text-xs mt-1 md:mt-2">Kepala Sekolah SMP Budiman Cendikia</p>
+                <div 
+                  className="rounded-[32px] border border-border-halus bg-border-halus/40"
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "24px",
+                    boxSizing: "border-box",
+                    overflow: "hidden",
+                    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.4)"
+                  }}
+                >
+                  <img 
+                    src={getPhotoUrl()} 
+                    alt="Kepala Sekolah SMP" 
+                    className={headmaster.photo 
+                      ? "" 
+                      : "opacity-20 p-6 md:p-12 bg-white"}
+                    style={{
+                      width: "100%",
+                      maxWidth: "100%",
+                      height: "auto",
+                      borderRadius: "16px",
+                      objectFit: "cover"
+                    }}
+                  />
+                  <div 
+                    className="w-full text-center"
+                    style={{
+                      marginTop: "16px"
+                    }}
+                  >
+                    <h3 className="text-xl md:text-2xl font-black text-warna-teks-mutlak">{headmaster.name || "Hemi Nurul Afifah, S.Pd.I, Gr"}</h3>
+                    <p className="text-bg-tombol-utama font-bold uppercase tracking-widest text-[10px] md:text-xs mt-1 md:mt-2">Kepala Sekolah SMP Budiman Cendikia</p>
                   </div>
                 </div>
               </div>
               <div className="md:col-span-7 scroll-animate opacity-0 translate-y-12 transition-all duration-700 delay-200">
-                <span className="text-tosca-500 font-black uppercase tracking-[0.3em] text-[9px] md:text-[10px] mb-2 md:mb-4 block">Welcome Message</span>
-                <h2 className="text-3xl md:text-5xl font-black text-gray-900 leading-tight mb-4 md:mb-8 uppercase">
-                  Sambutan <br className="hidden md:block" />
-                  <span className="text-tosca-700">Kepala Sekolah</span>
+                <span className="text-bg-tombol-utama font-black uppercase tracking-[0.3em] text-[9px] md:text-[10px] mb-2 md:mb-4 block">Welcome Message</span>
+                <h2 className="text-3xl md:text-5xl font-black text-warna-teks-mutlak leading-tight mb-4 md:mb-8 uppercase">
+                  SAMBUTAN KEPALA SEKOLAH
                 </h2>
-                <div className="relative space-y-6 text-gray-500 text-lg leading-relaxed font-medium">
-                  {paragraphs.slice(0, 2).map((para, idx) => (
-                    <p key={idx}>{para}</p>
-                  ))}
-                  {paragraphs.length > 2 && (
-                    <div className={`grid transition-all duration-1000 ease-in-out ${isSambutanExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
-                      <div className="overflow-hidden">
-                        <div className={`pt-6 space-y-6 transition-all duration-1000 delay-150 ${isSambutanExpanded ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"}`}>
-                          {paragraphs.slice(2).map((para, idx) => (
-                            <p key={idx} className="text-gray-500/80">{para}</p>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Gradient Fade Overlay */}
-                  {paragraphs.length > 2 && (
-                    <div 
-                      className={`absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-gray-50 via-gray-50/90 to-transparent pointer-events-none transition-all duration-700 ease-in-out ${
-                        isSambutanExpanded ? "opacity-0 translate-y-8" : "opacity-100 translate-y-0"
-                      }`}
-                    ></div>
-                  )}
+                <style dangerouslySetInnerHTML={{__html: `
+                  .sambutan-text-container {
+                    max-height: 180px !important;
+                    overflow: hidden !important;
+                    position: relative !important;
+                    transition: max-height 0.8s ease-in-out !important;
+                    margin-bottom: 15px !important;
+                  }
+                  .sambutan-text-container.open {
+                    max-height: 1500px !important;
+                  }
+                  .sambutan-text-container::after {
+                    content: "" !important;
+                    position: absolute !important;
+                    bottom: 0 !important;
+                    left: 0 !important;
+                    width: 100% !important;
+                    height: 120px !important;
+                    pointer-events: none !important;
+                    background: linear-gradient(
+                      to bottom,
+                      rgba(200, 247, 245, 0) 0%,
+                      rgba(200, 247, 245, 0.25) 25%,
+                      rgba(200, 247, 245, 0.5) 50%,
+                      rgba(200, 247, 245, 0.75) 75%,
+                      rgba(200, 247, 245, 1) 100%
+                    ) !important;
+                    opacity: 1 !important;
+                    transition: opacity 0.8s ease-in-out !important;
+                  }
+                  .sambutan-text-container.open::after {
+                    opacity: 0 !important;
+                  }
+                  @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                  }
+                  .gallery-modal-fade {
+                    animation: fadeIn 0.3s ease-in-out forwards;
+                  }
+                `}} />
+                <div className={`sambutan-text-container relative ${isSambutanExpanded ? 'open' : ''}`}>
+                  <div className="space-y-6 text-warna-teks-mutlak text-lg leading-relaxed font-semibold">
+                    {paragraphs.map((para, idx) => (
+                      <p key={idx} className={idx >= 2 ? "text-warna-teks-mutlak/85" : ""}>{para}</p>
+                    ))}
+                  </div>
                 </div>
                 {paragraphs.length > 2 && (
                   <button 
                     onClick={() => setIsSambutanExpanded(!isSambutanExpanded)}
-                    className="inline-flex items-center gap-2 mt-1 text-tosca-900 font-black uppercase tracking-widest text-[10px] md:text-xs transition-all group py-2 px-3 rounded-xl hover:bg-tosca-50"
+                    className="inline-flex items-center gap-2 text-warna-teks-mutlak hover:text-bg-tombol-utama font-black uppercase tracking-widest text-[10px] md:text-xs transition-all group py-2 px-3 rounded-xl hover:bg-[#FFFFFF]/40"
                   >
                     <span className="relative">
-                      {isSambutanExpanded ? "Sembunyikan" : "Baca Selengkapnya"}
+                      {isSambutanExpanded ? "TAMPILKAN LEBIH SEDIKIT" : "BACA SELENGKAPNYA"}
                     </span>
                     <ChevronDown 
                       size={16} 
@@ -927,18 +1194,25 @@ export default function UnitPublicHomePage() {
         </section>
 
         {/* Informasi Terkini (Agenda, Pengumuman, Artikel) */}
-        <section className="py-20 bg-white">
+        <section className="py-20" style={{ background: "var(--bg-utama)" }}>
           <div className="max-w-7xl mx-auto px-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-10">
               
               {/* Card 1: Agenda Kegiatan */}
-              <div className="bg-white p-7 md:p-8 rounded-[24px] border border-gray-100 shadow-[0_12px_36px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 flex flex-col h-[490px] w-full scroll-animate opacity-0 translate-y-12">
-                <div className="flex justify-between items-center pb-4 border-b border-gray-100/70 mb-5 flex-shrink-0">
-                  <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <Calendar size={18} className="text-tosca-700" />
+              <div 
+                className="p-7 md:p-8 rounded-[24px] hover:-translate-y-1 hover:shadow-lg transition-all duration-300 flex flex-col h-[490px] w-full scroll-animate opacity-0 translate-y-12"
+                style={{
+                  background: "var(--bg-komponen)",
+                  border: "1px solid var(--border-halus)",
+                  boxShadow: "0 8px 32px rgba(11, 107, 105, 0.05)"
+                }}
+              >
+                <div className="flex justify-between items-center pb-4 border-b border-border-halus mb-5 flex-shrink-0">
+                  <h3 className="text-lg font-bold text-warna-teks-mutlak flex items-center gap-2">
+                    <Calendar size={18} className="text-bg-tombol-utama" />
                     Agenda
                   </h3>
-                  <Link href={`/${unit}/agenda`} className="text-xs font-bold text-tosca-700 hover:text-tosca-900 flex items-center gap-1 transition-colors uppercase tracking-wider">
+                  <Link href={`/${unit}/agenda`} className="text-xs font-bold text-bg-tombol-utama hover:text-warna-teks-mutlak flex items-center gap-1 transition-colors uppercase tracking-wider">
                     Lihat Semua <ChevronRight size={14} />
                   </Link>
                 </div>
@@ -949,24 +1223,24 @@ export default function UnitPublicHomePage() {
                       <Link 
                         key={item.id} 
                         href={`/${unit}/agenda`}
-                        className="flex gap-4 items-center group p-2 rounded-2xl hover:bg-gray-50/50 transition-all duration-200"
+                        className="flex gap-4 items-center group p-2 rounded-2xl hover:bg-bg-utama/30 transition-all duration-200"
                       >
                         {/* Date badge */}
-                        <div className="w-[52px] h-[58px] bg-tosca-50 text-tosca-700 rounded-xl flex flex-col items-center justify-center border border-tosca-100/40 group-hover:bg-tosca-700 group-hover:border-tosca-700 transition-all duration-300 flex-shrink-0">
-                          <span className="text-[9px] font-bold text-tosca-700 group-hover:text-white/85 uppercase tracking-widest leading-none mb-1">
+                        <div className="w-[52px] h-[58px] bg-bg-utama text-warna-teks-mutlak rounded-xl flex flex-col items-center justify-center border border-border-halus group-hover:bg-bg-tombol-utama group-hover:text-white transition-all duration-300 flex-shrink-0">
+                          <span className="text-[9px] font-bold text-bg-tombol-utama group-hover:text-white/85 uppercase tracking-widest leading-none mb-1">
                             {getMonthName(item.tanggal)}
                           </span>
-                          <span className="text-lg font-extrabold text-tosca-900 group-hover:text-white leading-none">
+                          <span className="text-lg font-extrabold text-warna-teks-mutlak group-hover:text-white leading-none">
                             {getDayNum(item.tanggal)}
                           </span>
                         </div>
                         {/* Details */}
                         <div className="flex-1 min-w-0">
-                          <h4 className="text-sm font-semibold text-gray-800 leading-snug group-hover:text-tosca-700 transition-colors line-clamp-2">
+                          <h4 className="text-sm font-semibold text-warna-teks-mutlak leading-snug group-hover:text-bg-tombol-utama transition-colors line-clamp-2">
                             {item.judul}
                           </h4>
-                          <span className="text-[11px] font-medium text-gray-400 mt-1.5 flex items-center gap-1 truncate">
-                            <MapPin size={11} className="text-gray-300 flex-shrink-0" />
+                          <span className="text-[11px] font-medium text-bg-tombol-utama mt-1.5 flex items-center gap-1 truncate">
+                            <MapPin size={11} className="text-bg-tombol-utama flex-shrink-0" />
                             {item.lokasi || 'Budiman Cendikia'}
                           </span>
                         </div>
@@ -974,15 +1248,15 @@ export default function UnitPublicHomePage() {
                     ))}
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center justify-center p-6 text-center flex-1 bg-gradient-to-b from-gray-50/50 to-white rounded-2xl border border-gray-100/50">
+                  <div className="flex flex-col items-center justify-center p-6 text-center flex-1 bg-bg-utama/30 rounded-2xl border border-border-halus">
                     <div className="relative mb-4">
-                      <div className="absolute inset-0 bg-tosca-100/30 rounded-full blur-xl scale-150"></div>
-                      <svg className="w-16 h-16 text-tosca-700 relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                      <div className="absolute inset-0 bg-border-halus/10 rounded-full blur-xl scale-150"></div>
+                      <svg className="w-16 h-16 text-bg-tombol-utama relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
                       </svg>
                     </div>
-                    <h4 className="text-sm font-bold text-gray-800 tracking-tight">Semua Kegiatan Terencana</h4>
-                    <p className="text-xs text-gray-400 max-w-[210px] mt-1.5 leading-relaxed font-medium">
+                    <h4 className="text-sm font-bold text-warna-teks-mutlak tracking-tight">Semua Kegiatan Terencana</h4>
+                    <p className="text-xs text-warna-teks-mutlak/70 max-w-[210px] mt-1.5 leading-relaxed font-medium">
                       Jadwal kegiatan sekolah berikutnya sedang disiapkan. Tetap pantau halaman ini!
                     </p>
                   </div>
@@ -990,13 +1264,20 @@ export default function UnitPublicHomePage() {
               </div>
 
               {/* Card 2: Pengumuman Resmi */}
-              <div className="bg-white p-7 md:p-8 rounded-[24px] border border-gray-100 shadow-[0_12px_36px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 flex flex-col h-[490px] w-full scroll-animate opacity-0 translate-y-12 delay-150">
-                <div className="flex justify-between items-center pb-4 border-b border-gray-100/70 mb-5 flex-shrink-0">
-                  <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <Megaphone size={18} className="text-tosca-700" />
+              <div 
+                className="p-7 md:p-8 rounded-[24px] hover:-translate-y-1 hover:shadow-lg transition-all duration-300 flex flex-col h-[490px] w-full scroll-animate opacity-0 translate-y-12 delay-150"
+                style={{
+                  background: "var(--bg-komponen)",
+                  border: "1px solid var(--border-halus)",
+                  boxShadow: "0 8px 32px rgba(11, 107, 105, 0.05)"
+                }}
+              >
+                <div className="flex justify-between items-center pb-4 border-b border-border-halus mb-5 flex-shrink-0">
+                  <h3 className="text-lg font-bold text-warna-teks-mutlak flex items-center gap-2">
+                    <Megaphone size={18} className="text-bg-tombol-utama" />
                     Pengumuman
                   </h3>
-                  <Link href={`/${unit}/pengumuman`} className="text-xs font-bold text-tosca-700 hover:text-tosca-900 flex items-center gap-1 transition-colors uppercase tracking-wider">
+                  <Link href={`/${unit}/pengumuman`} className="text-xs font-bold text-bg-tombol-utama hover:text-warna-teks-mutlak flex items-center gap-1 transition-colors uppercase tracking-wider">
                     Lihat Semua <ChevronRight size={14} />
                   </Link>
                 </div>
@@ -1007,19 +1288,19 @@ export default function UnitPublicHomePage() {
                       <Link 
                         key={item.id} 
                         href={`/${unit}/pengumuman/${item.id}`}
-                        className="flex gap-4 items-center group p-2 rounded-2xl hover:bg-gray-50/50 transition-all duration-200"
+                        className="flex gap-4 items-center group p-2 rounded-2xl hover:bg-bg-utama/30 transition-all duration-200"
                       >
                         {/* Icon Container */}
-                        <div className="w-[52px] h-[52px] bg-yellow-50 text-yellow-600 rounded-xl flex items-center justify-center border border-yellow-100/40 group-hover:bg-yellow-500 group-hover:text-white group-hover:border-yellow-500 transition-all duration-300 flex-shrink-0">
+                        <div className="w-[52px] h-[52px] bg-bg-utama text-warna-teks-mutlak rounded-xl flex items-center justify-center border border-border-halus group-hover:bg-bg-tombol-utama group-hover:text-white transition-all duration-300 flex-shrink-0">
                           <Megaphone size={18} />
                         </div>
                         {/* Details */}
                         <div className="flex-1 min-w-0">
-                          <h4 className="text-sm font-semibold text-gray-800 leading-snug group-hover:text-tosca-700 transition-colors line-clamp-2">
+                          <h4 className="text-sm font-semibold text-warna-teks-mutlak leading-snug group-hover:text-bg-tombol-utama transition-colors line-clamp-2">
                             {item.judul}
                           </h4>
-                          <span className="text-[11px] font-medium text-gray-400 mt-1.5 flex items-center gap-1">
-                            <Calendar size={11} className="text-gray-300 flex-shrink-0" />
+                          <span className="text-[11px] font-medium text-bg-tombol-utama mt-1.5 flex items-center gap-1">
+                            <Calendar size={11} className="text-bg-tombol-utama flex-shrink-0" />
                             {new Date(item.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                           </span>
                         </div>
@@ -1027,15 +1308,15 @@ export default function UnitPublicHomePage() {
                     ))}
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center justify-center p-6 text-center flex-1 bg-gradient-to-b from-gray-50/50 to-white rounded-2xl border border-gray-100/50">
+                  <div className="flex flex-col items-center justify-center p-6 text-center flex-1 bg-bg-utama/30 rounded-2xl border border-border-halus">
                     <div className="relative mb-4">
-                      <div className="absolute inset-0 bg-yellow-100/30 rounded-full blur-xl scale-150"></div>
-                      <svg className="w-16 h-16 text-yellow-500 relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                      <div className="absolute inset-0 bg-border-halus/10 rounded-full blur-xl scale-150"></div>
+                      <svg className="w-16 h-16 text-bg-tombol-utama relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 01-1.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
                       </svg>
                     </div>
-                    <h4 className="text-sm font-bold text-gray-800 tracking-tight">Belum Ada Pengumuman</h4>
-                    <p className="text-xs text-gray-400 max-w-[210px] mt-1.5 leading-relaxed font-medium">
+                    <h4 className="text-sm font-bold text-warna-teks-mutlak tracking-tight">Belum Ada Pengumuman</h4>
+                    <p className="text-xs text-warna-teks-mutlak/70 max-w-[210px] mt-1.5 leading-relaxed font-medium">
                       Saat ini papan informasi bersih. Pengumuman penting akan disematkan di sini.
                     </p>
                   </div>
@@ -1043,13 +1324,20 @@ export default function UnitPublicHomePage() {
               </div>
 
               {/* Card 3: Artikel & Berita */}
-              <div className="bg-white p-7 md:p-8 rounded-[24px] border border-gray-100 shadow-[0_12px_36px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 flex flex-col h-[490px] w-full scroll-animate opacity-0 translate-y-12 delay-300">
-                <div className="flex justify-between items-center pb-4 border-b border-gray-100/70 mb-5 flex-shrink-0">
-                  <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <Newspaper size={18} className="text-tosca-700" />
+              <div 
+                className="p-7 md:p-8 rounded-[24px] hover:-translate-y-1 hover:shadow-lg transition-all duration-300 flex flex-col h-[490px] w-full scroll-animate opacity-0 translate-y-12 delay-300"
+                style={{
+                  background: "var(--bg-komponen)",
+                  border: "1px solid var(--border-halus)",
+                  boxShadow: "0 8px 32px rgba(11, 107, 105, 0.05)"
+                }}
+              >
+                <div className="flex justify-between items-center pb-4 border-b border-border-halus mb-5 flex-shrink-0">
+                  <h3 className="text-lg font-bold text-warna-teks-mutlak flex items-center gap-2">
+                    <Newspaper size={18} className="text-bg-tombol-utama" />
                     Artikel
                   </h3>
-                  <Link href={`/${unit}/artikel`} className="text-xs font-bold text-tosca-700 hover:text-tosca-900 flex items-center gap-1 transition-colors uppercase tracking-wider">
+                  <Link href={`/${unit}/artikel`} className="text-xs font-bold text-bg-tombol-utama hover:text-warna-teks-mutlak flex items-center gap-1 transition-colors uppercase tracking-wider">
                     Lihat Semua <ChevronRight size={14} />
                   </Link>
                 </div>
@@ -1060,29 +1348,29 @@ export default function UnitPublicHomePage() {
                       <Link 
                         key={item.id} 
                         href={`/${unit}/artikel/${item.slug}`}
-                        className="flex gap-4 items-center group p-2 rounded-2xl hover:bg-gray-50/50 transition-all duration-200"
+                        className="flex gap-4 items-center group p-2 rounded-2xl hover:bg-bg-utama/30 transition-all duration-200"
                       >
                         {/* Thumbnail */}
-                        <div className="w-[64px] h-[64px] rounded-xl overflow-hidden flex-shrink-0 bg-tosca-50 border border-gray-100 group-hover:scale-105 transition-transform duration-300 relative shadow-sm">
+                        <div className="w-[64px] h-[64px] rounded-xl overflow-hidden flex-shrink-0 bg-bg-utama border border-border-halus group-hover:scale-105 transition-transform duration-300 relative shadow-sm">
                           {item.thumbnail ? (
                             <img src={item.thumbnail} alt={item.judul} className="w-full h-full object-cover" />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center text-xl bg-tosca-50 text-tosca-400">
+                            <div className="w-full h-full flex items-center justify-center text-xl bg-bg-utama text-bg-tombol-utama/50">
                               📰
                             </div>
                           )}
                         </div>
                         {/* Details */}
                         <div className="flex-1 min-w-0">
-                          <span className="text-[10px] font-bold text-tosca-700 uppercase tracking-wider mb-0.5 block truncate">
+                          <span className="text-[10px] font-bold text-bg-tombol-utama uppercase tracking-wider mb-0.5 block truncate">
                             {item.kategori}
                           </span>
-                          <h4 className="text-sm font-semibold text-gray-800 leading-snug group-hover:text-tosca-700 transition-colors line-clamp-2">
+                          <h4 className="text-sm font-semibold text-warna-teks-mutlak group-hover:text-bg-tombol-utama transition-colors line-clamp-2">
                             {item.judul}
                           </h4>
                           {item.tanggal && (
-                            <span className="text-[11px] font-medium text-gray-400 mt-1 flex items-center gap-1">
-                              <Calendar size={11} className="text-gray-300 flex-shrink-0" />
+                            <span className="text-[11px] font-medium text-warna-teks-mutlak/70 mt-1 flex items-center gap-1">
+                              <Calendar size={11} className="text-bg-tombol-utama flex-shrink-0" />
                               {new Date(item.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                             </span>
                           )}
@@ -1091,15 +1379,15 @@ export default function UnitPublicHomePage() {
                     ))}
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center justify-center p-6 text-center flex-1 bg-gradient-to-b from-gray-50/50 to-white rounded-2xl border border-gray-100/50">
+                  <div className="flex flex-col items-center justify-center p-6 text-center flex-1 bg-bg-utama/30 rounded-2xl border border-border-halus">
                     <div className="relative mb-4">
-                      <div className="absolute inset-0 bg-tosca-100/30 rounded-full blur-xl scale-150"></div>
-                      <svg className="w-16 h-16 text-tosca-700 relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                      <div className="absolute inset-0 bg-border-halus/10 rounded-full blur-xl scale-150"></div>
+                      <svg className="w-16 h-16 text-bg-tombol-utama relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5M6 7.5h3v3H6v-3z" />
                       </svg>
                     </div>
-                    <h4 className="text-sm font-bold text-gray-800 tracking-tight">Kabar Terbaru Segera Hadir</h4>
-                    <p className="text-xs text-gray-400 max-w-[210px] mt-1.5 leading-relaxed font-medium">
+                    <h4 className="text-sm font-bold text-warna-teks-mutlak tracking-tight">Kabar Terbaru Segera Hadir</h4>
+                    <p className="text-xs text-warna-teks-mutlak/70 max-w-[210px] mt-1.5 leading-relaxed font-medium">
                       Kami sedang menyusun berita dan cerita menarik seputar sekolah untuk Anda.
                     </p>
                   </div>
@@ -1112,17 +1400,17 @@ export default function UnitPublicHomePage() {
 
         {/* Prestasi Membanggakan */}
         {latestPrestasi.length > 0 && (
-          <section id="prestasi" className="py-20 bg-[#C8F7F5] w-full text-left my-16 border-t border-b border-[#7EE6E3] rounded-none">
+          <section id="prestasi" className="py-20 w-full text-left my-16 border-t border-b border-border-halus rounded-none" style={{ background: "var(--bg-utama)" }}>
             <div className="max-w-7xl mx-auto px-6">
               {/* Header Section */}
               <div className="flex justify-between items-center mb-10">
                 <div>
-                  <span className="text-[#2FCFC9] font-black uppercase tracking-[0.2em] text-xs mb-2 block">Prestasi</span>
-                  <h2 className="text-3xl md:text-4xl font-black text-[#0B6B69] tracking-tight uppercase">Prestasi Siswa</h2>
+                  <span className="text-bg-tombol-utama font-black uppercase tracking-[0.2em] text-xs mb-2 block">Prestasi</span>
+                  <h2 className="text-3xl md:text-4xl font-black text-warna-teks-mutlak tracking-tight uppercase">Prestasi Siswa</h2>
                 </div>
                 <Link 
                   href={`/${unit}/prestasi`} 
-                  className="flex items-center gap-2 text-[#0FA8A4] hover:text-[#0B6B69] font-black uppercase tracking-widest text-xs transition-colors"
+                  className="flex items-center gap-2 text-bg-tombol-utama hover:text-warna-teks-mutlak font-black uppercase tracking-widest text-xs transition-colors"
                 >
                   Lihat Semua 
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
@@ -1134,11 +1422,15 @@ export default function UnitPublicHomePage() {
                 {latestPrestasi.map((item, i) => (
                   <div 
                     key={item.id} 
-                    className="relative bg-white/40 backdrop-blur-md rounded-3xl shadow-[0_8px_32px_rgba(11,107,105,0.06)] border border-[#7EE6E3]/50 flex flex-col hover:-translate-y-2 hover:shadow-xl transition-all duration-300 group overflow-hidden"
+                    className="relative rounded-3xl shadow-[0_8px_32px_rgba(11,107,105,0.05)] flex flex-col hover:-translate-y-2 hover:shadow-xl transition-all duration-300 group overflow-hidden"
+                    style={{
+                      background: "var(--bg-komponen)",
+                      border: "1px solid var(--border-halus)"
+                    }}
                   >
                     {/* Image Container with Badge Overlay */}
                     <div 
-                      className="relative w-full aspect-video bg-[#C8F7F5]/30 overflow-hidden cursor-pointer"
+                      className="relative w-full aspect-video bg-bg-utama/30 overflow-hidden cursor-pointer"
                       onClick={(e) => {
                         e.stopPropagation();
                         if (item.image) {
@@ -1153,8 +1445,8 @@ export default function UnitPublicHomePage() {
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-[#C8F7F5]/30">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#2FCFC9]"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        <div className="w-full h-full flex items-center justify-center bg-bg-utama/30">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-bg-tombol-utama"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                         </div>
                       )}
                       {/* Expand Icon Overlay (Shows on hover) */}
@@ -1164,7 +1456,7 @@ export default function UnitPublicHomePage() {
                         </div>
                       )}
                       {/* Badge Overlay */}
-                      <span className="absolute top-4 left-4 z-10 inline-block text-[9px] font-black px-2.5 py-1 bg-[#2FCFC9]/90 backdrop-blur-sm text-[#0B6B69] rounded-full border border-[#7EE6E3]/60 uppercase tracking-wider">
+                      <span className="absolute top-4 left-4 z-10 inline-block text-[9px] font-black px-2.5 py-1 bg-border-halus text-warna-teks-mutlak rounded-full border border-white/20 uppercase tracking-wider">
                         {item.tingkat}
                       </span>
                     </div>
@@ -1172,10 +1464,10 @@ export default function UnitPublicHomePage() {
                     {/* Text Area */}
                     <div className="p-6 flex-1 flex flex-col justify-between">
                       <div>
-                        <p className="text-[10px] text-[#0B6B69]/60 font-bold uppercase tracking-wider">
+                        <p className="text-[10px] text-warna-teks-mutlak/60 font-bold uppercase tracking-wider">
                           {new Date(item.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </p>
-                        <h3 className="font-bold text-[#0B6B69] text-base leading-tight mt-2 line-clamp-2 group-hover:text-[#0FA8A4] transition-colors" title={item.judul}>
+                        <h3 className="font-bold text-warna-teks-mutlak text-base leading-tight mt-2 line-clamp-2 group-hover:text-bg-tombol-utama transition-colors" title={item.judul}>
                           {item.judul}
                         </h3>
                       </div>
@@ -1191,25 +1483,25 @@ export default function UnitPublicHomePage() {
         <ProgramFasilitasUnggulan unit={unit} programFasilitas={programFasilitas} />
 
         {/* Extracurricular Section */}
-        <section className="py-20 bg-white">
+        <section className="py-20" style={{ background: "var(--bg-utama)" }}>
           <div className="max-w-7xl mx-auto px-6">
             
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
               <div>
-                <span className="inline-block text-[10px] font-black px-3 py-1 bg-tosca-50 text-tosca-600 rounded-full uppercase tracking-widest mb-3 border border-tosca-100">
+                <span className="inline-block text-[10px] font-black px-3 py-1 bg-[#FFFFFF]/20 text-bg-tombol-utama rounded-full uppercase tracking-widest mb-3 border border-border-halus">
                   Ekstrakurikuler
                 </span>
-                <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight uppercase">
+                <h2 className="text-3xl md:text-4xl font-black text-warna-teks-mutlak tracking-tight uppercase">
                   Kegiatan Ekstrakurikuler
                 </h2>
-                <p className="text-gray-400 font-medium text-sm md:text-base mt-2 max-w-xl">
+                <p className="text-warna-teks-mutlak/70 font-medium text-sm md:text-base mt-2 max-w-xl">
                   Mengembangkan bakat, minat, dan potensi siswa di luar bidang akademik untuk mencetak generasi yang aktif dan kreatif.
                 </p>
               </div>
               <Link 
                 href={`/${unit}/ekstrakurikuler`} 
-                className="inline-flex items-center gap-2 text-tosca-600 hover:text-tosca-800 transition-colors font-black uppercase tracking-widest text-xs shrink-0"
+                className="inline-flex items-center gap-2 text-bg-tombol-utama hover:text-warna-teks-mutlak transition-colors font-black uppercase tracking-widest text-xs shrink-0"
               >
                 Lihat Semua <ChevronRight size={14} />
               </Link>
@@ -1221,23 +1513,27 @@ export default function UnitPublicHomePage() {
                 <Link 
                   key={item.id} 
                   href={`/${unit}/ekstrakurikuler/${item.slug || item.id}`}
-                  className="bg-white border border-gray-100 rounded-2xl p-8 flex flex-col items-center text-center shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
+                  className="rounded-2xl p-8 flex flex-col items-center text-center shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
+                  style={{
+                    background: "var(--bg-komponen)",
+                    border: "1px solid var(--border-halus)"
+                  }}
                 >
-                  <div className="w-16 h-16 rounded-full bg-tosca-50 text-tosca-600 flex items-center justify-center mb-6 overflow-hidden border border-tosca-100 shrink-0 group-hover:scale-105 transition-transform duration-300">
+                  <div className="w-16 h-16 rounded-full bg-bg-utama text-warna-teks-mutlak flex items-center justify-center mb-6 overflow-hidden border border-border-halus shrink-0 group-hover:scale-105 transition-transform duration-300">
                     {item.image ? (
                       <img src={item.image} alt={item.nama} className="w-full h-full object-cover" />
                     ) : (
                       getEkskulIcon(item.nama)
                     )}
                   </div>
-                  <h3 className="text-lg font-black text-gray-900 group-hover:text-tosca-500 uppercase tracking-tight mb-2 transition-colors">
+                  <h3 className="text-lg font-black text-warna-teks-mutlak group-hover:text-bg-tombol-utama uppercase tracking-tight mb-2 transition-colors">
                     {item.nama}
                   </h3>
-                  <p className="text-gray-400 font-medium text-xs md:text-sm">
+                  <p className="text-warna-teks-mutlak/70 font-medium text-xs md:text-sm">
                     {item.deskripsi}
                   </p>
                   {item.jadwal && (
-                    <div className="mt-4 px-3 py-1 bg-gray-50 text-gray-500 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                    <div className="mt-4 px-3 py-1 bg-bg-utama text-warna-teks-mutlak rounded-full text-[10px] font-bold uppercase tracking-wider">
                       Jadwal: {item.jadwal}
                     </div>
                   )}
@@ -1249,62 +1545,128 @@ export default function UnitPublicHomePage() {
         </section>
 
         {/* Instagram Section */}
-        <section className="py-20 bg-white">
+        <section className="py-20" style={{ background: "var(--bg-komponen)" }}>
           <div className="max-w-7xl mx-auto px-6">
-            <div className="bg-[#C8F7F5] rounded-[40px] p-8 md:p-12 border border-[#2FCFC9] flex flex-col md:flex-row items-center justify-between gap-10 scroll-animate opacity-0 translate-y-12 transition-all duration-700">
+            <div 
+              className="rounded-[40px] p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-10 scroll-animate opacity-0 translate-y-12 transition-all duration-700"
+              style={{
+                background: "var(--bg-utama)",
+                border: "1px solid var(--border-halus)"
+              }}
+            >
               <div className="flex-1 text-center md:text-left">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#7EE6E3]/20 text-[#0B6B69] rounded-full mb-6">
-                  <Instagram size={16} className="text-[#2FCFC9]" />
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-border-halus/20 text-warna-teks-mutlak rounded-full mb-6">
+                  <Instagram size={16} className="text-bg-tombol-utama" />
                   <span className="text-[10px] font-black uppercase tracking-widest">Momen Harian</span>
                 </div>
-                <h2 className="text-3xl md:text-4xl font-black text-[#0B6B69] tracking-tight mb-4 uppercase">
-                  Yuk, Kepoin Keseruan Kami di Instagram
+                <h2 className="text-3xl md:text-4xl font-black text-warna-teks-mutlak tracking-tight mb-4 uppercase">
+                  {instagramSettings.title}
                 </h2>
-                <p className="text-[#0B6B69] font-medium text-lg leading-relaxed max-w-xl">
-                  Mulai dari keseruan belajar di kelas, tawa ceria saat bermain, hingga momen-momen penuh prestasi. Semuanya kami bagikan lewat cerita harian dan galeri foto aesthetic di Instagram. Yuk, follow biar nggak ketinggalan keseruannya!
+                <p className="text-warna-teks-mutlak/80 font-medium text-lg leading-relaxed max-w-xl">
+                  {instagramSettings.description}
                 </p>
                 <div className="mt-8 flex flex-wrap justify-center md:justify-start gap-4">
                   <a 
-                    href="https://www.instagram.com/sat_almanshurah/" 
+                    href={instagramSettings.url} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="px-10 py-4 bg-[#0FA8A4] hover:bg-[#0B6B69] text-white hover:text-[#C8F7F5] font-black rounded-2xl shadow-xl shadow-[#0FA8A4]/20 hover:-translate-y-1 transition-all flex items-center gap-3 uppercase tracking-widest text-xs"
+                    className="px-10 py-4 bg-bg-tombol-utama hover:bg-warna-teks-mutlak text-white hover:text-bg-utama font-black rounded-2xl shadow-xl hover:-translate-y-1 transition-all flex items-center gap-3 uppercase tracking-widest text-xs"
                   >
                     <Instagram size={18} className="text-current" />
                     Follow Instagram Kami
                   </a>
                 </div>
               </div>
-              <div className="w-full md:w-1/3 aspect-square max-w-[300px] relative">
-                <div className="absolute inset-0 bg-[#7EE6E3] rounded-[48px] rotate-6"></div>
-                <div className="absolute inset-0 bg-white rounded-[48px] shadow-xl flex items-center justify-center p-10 border border-[#2FCFC9]">
-                  <Instagram size={120} className="text-[#2FCFC9] opacity-10" />
+              <a
+                href={instagramSettings.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full md:w-1/3 aspect-square max-w-[300px] relative block hover:scale-105 transition-all duration-300"
+              >
+                <div className="absolute inset-0 bg-border-halus rounded-[48px] rotate-6"></div>
+                <div className="absolute inset-0 bg-white rounded-[48px] shadow-xl flex items-center justify-center p-10 border border-border-halus">
+                  <Instagram size={120} className="text-bg-tombol-utama opacity-10" />
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
-                    <div className="w-24 h-24 rounded-3xl bg-[#0B6B69] flex items-center justify-center text-[#2FCFC9] shadow-lg">
-                      <Instagram size={48} className="text-[#2FCFC9]" />
+                    <div className="w-24 h-24 rounded-3xl bg-warna-teks-mutlak flex items-center justify-center text-border-halus shadow-lg">
+                      <Instagram size={48} className="text-border-halus" />
                     </div>
                     <div className="text-center">
-                      <p className="font-black text-[#0B6B69] leading-none mb-1">@sat_almanshurah</p>
-                      <p className="text-[10px] font-bold text-[#0B6B69]/60 uppercase tracking-widest">Official Instagram</p>
+                      <p className="font-black text-warna-teks-mutlak leading-none mb-1">
+                        @{instagramSettings.username}
+                      </p>
+                      <p className="text-[10px] font-bold text-warna-teks-mutlak/60 uppercase tracking-widest">Official Instagram</p>
                     </div>
                   </div>
                 </div>
-              </div>
+              </a>
             </div>
           </div>
         </section>
 
-        {/* Tim Pengajar Kami Marquee */}
-        <section className={`py-20 ${latestPrestasi.length > 0 ? 'bg-gray-50' : 'bg-white'} scroll-animate opacity-0 translate-y-12 transition-all duration-1000`}>
+        {/* Tenaga Pengajar Marquee */}
+        <section className="py-20 scroll-animate opacity-0 translate-y-12 transition-all duration-1000" style={{ background: "var(--bg-komponen)" }}>
           <div className="max-w-7xl mx-auto px-6 text-center">
-            <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight mb-4 uppercase">
-              Tim Pengajar Kami
+            <h2 className="text-3xl md:text-4xl font-black text-warna-teks-mutlak tracking-tight mb-4 uppercase">
+              Tenaga Pengajar Profesional
             </h2>
-            <p className="text-gray-400 text-sm md:text-base font-medium max-w-xl mx-auto">
-              Dididik dan dibimbing oleh para ahli dan praktisi di bidangnya masing-masing.
+            <p className="text-bg-tombol-utama text-sm md:text-base font-medium max-w-xl mx-auto">
+              Dididik dan dibimbing oleh para ahli di bidangnya masing-masing.
             </p>
           </div>
           <GuruMarquee unit="smp" />
+        </section>
+
+        {/* Galeri Kegiatan Section */}
+        <section className="galeri-section py-20" style={{ background: "var(--bg-utama)" }}>
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-center mb-12 scroll-animate opacity-0 translate-y-12 transition-all duration-700">
+              <span className="text-bg-tombol-utama font-black uppercase tracking-[0.3em] text-[9px] md:text-[10px] mb-2 block">Dokumentasi</span>
+              <h2 className="text-3xl md:text-4xl font-black text-warna-teks-mutlak tracking-tight uppercase">
+                Galeri Kegiatan
+              </h2>
+              <div className="w-24 h-1 bg-bg-tombol-utama mx-auto mt-4 rounded-full"></div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {galeriItems.length > 0 ? (
+                galeriItems.map((item, idx) => {
+                  const mappedItem = {
+                    img: item.image || "/globe.svg",
+                    title: item.judul,
+                    desc: item.deskripsi || "Dokumentasi SMP"
+                  };
+                  return (
+                    <div 
+                      key={item.id || idx} 
+                      className="scroll-animate opacity-0 translate-y-12 transition-all duration-700 bg-white rounded-xl overflow-hidden shadow-md group border border-border-halus/20 cursor-pointer hover:shadow-lg transition-shadow duration-300"
+                      data-title={mappedItem.title}
+                      data-description={mappedItem.desc}
+                      onClick={() => setSelectedGalleryItem(mappedItem)}
+                      style={{ transitionDelay: `${idx * 100}ms` }}
+                    >
+                      <div className="overflow-hidden aspect-video bg-gray-100 relative">
+                        <img 
+                          src={mappedItem.img} 
+                          alt={mappedItem.title} 
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                          <p className="text-white text-xs font-black uppercase tracking-wider">{mappedItem.title}</p>
+                        </div>
+                      </div>
+                      <div className="p-4 bg-white">
+                        <h4 className="text-sm font-black text-warna-teks-mutlak line-clamp-1 group-hover:text-bg-tombol-utama transition-colors uppercase tracking-tight">{mappedItem.title}</h4>
+                        <p className="text-[10px] text-bg-tombol-utama/60 font-bold uppercase tracking-widest mt-1">Dokumentasi SMP</p>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="col-span-full py-20 text-center bg-white/45 rounded-[32px] border border-dashed border-border-halus/50">
+                  <p className="text-warna-teks-mutlak font-bold">Belum ada dokumentasi kegiatan.</p>
+                </div>
+              )}
+            </div>
+          </div>
         </section>
 
       </PublicLayout>
@@ -1316,6 +1678,91 @@ export default function UnitPublicHomePage() {
         description={selectedPrestasi?.keterangan || (selectedPrestasi as any)?.konten || ""}
         tingkat={selectedPrestasi?.tingkat}
       />
+      {/* Gallery Lightbox Modal */}
+      {selectedGalleryItem && (
+        <div 
+          className="fixed top-0 left-0 z-[9999] flex items-center justify-center bg-black/80 gallery-modal-fade"
+          style={{ width: "100vw", height: "100vh" }}
+          onClick={() => setSelectedGalleryItem(null)}
+        >
+          <button 
+            className="absolute top-6 right-6 text-white hover:text-gray-300 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              setSelectedGalleryItem(null);
+            }}
+          >
+            <X size={24} />
+          </button>
+          <div 
+            className="relative max-w-[90%] md:max-w-[70%] flex flex-col items-center justify-start animate-fade-in"
+            style={{ maxHeight: "90vh", overflowY: "auto" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img 
+              src={selectedGalleryItem.img} 
+              alt={selectedGalleryItem.title} 
+              className="max-h-[60vh] object-contain rounded-lg shadow-xl"
+            />
+            <div className="w-full text-center mt-6 max-w-xl">
+              <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tight mb-2">
+                {selectedGalleryItem.title}
+              </h3>
+              <p className="text-sm md:text-base text-gray-300 font-medium leading-relaxed">
+                {selectedGalleryItem.desc}
+              </p>
+              <div className="flex items-center gap-3 mt-4 justify-center">
+                {/* Tombol Download */}
+                <a
+                  href={selectedGalleryItem.img}
+                  download
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full bg-warna-teks-mutlak/40 hover:bg-warna-teks-mutlak/60 text-white flex items-center justify-center transition-all cursor-pointer hover:scale-105 border border-white/10"
+                  title="Unduh Foto"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Download size={18} className="text-white" />
+                </a>
+
+                {/* Tombol Share */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const urlGambar = selectedGalleryItem.img;
+                    navigator.clipboard.writeText(urlGambar).then(() => {
+                      alert('Link foto berhasil disalin!');
+                    }).catch((err) => {
+                      console.error("Gagal menyalin link:", err);
+                    });
+                  }}
+                  className="w-10 h-10 rounded-full bg-warna-teks-mutlak/40 hover:bg-warna-teks-mutlak/60 text-white flex items-center justify-center transition-all cursor-pointer hover:scale-105 border border-white/10"
+                  title="Bagikan Foto (Salin Link)"
+                >
+                  <Share2 size={18} className="text-white" />
+                </button>
+
+                {/* Tombol Link */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const urlGambar = selectedGalleryItem.img;
+                    navigator.clipboard.writeText(urlGambar).then(() => {
+                      alert('Link foto berhasil disalin!');
+                    }).catch((err) => {
+                      console.error("Gagal menyalin link:", err);
+                    });
+                  }}
+                  className="w-10 h-10 rounded-full bg-warna-teks-mutlak/40 hover:bg-warna-teks-mutlak/60 text-white flex items-center justify-center transition-all cursor-pointer hover:scale-105 border border-white/10"
+                  title="Salin Link Gambar"
+                >
+                  <Link2 size={18} className="text-white" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
   }

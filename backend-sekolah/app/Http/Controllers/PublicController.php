@@ -37,9 +37,15 @@ class PublicController extends Controller
 
     public function getSettings()
     {
-        $logo = \App\Models\Setting::where('key', 'site_logo')->value('value');
+        $settings = \App\Models\Setting::pluck('value', 'key');
+        $logo = $settings->get('site_logo');
+
         return response()->json([
-            'site_logo' => $logo ? asset('uploads/' . $logo) : null
+            'site_logo' => $logo ? asset('uploads/' . $logo) : null,
+            'instagram_title' => $settings->get('instagram_title', 'Yuk, Kepoin Keseruan Kami di Instagram'),
+            'instagram_description' => $settings->get('instagram_description', 'Mulai dari keseruan belajar di kelas, tawa ceria saat bermain, hingga momen-momen penuh prestasi. Semuanya kami bagikan lewat cerita harian dan galeri foto aesthetic di Instagram. Yuk, follow biar nggak ketinggalan keseruannya!'),
+            'instagram_url' => $settings->get('instagram_url', 'https://www.instagram.com/sat_almanshurah/'),
+            'instagram_username' => $settings->get('instagram_username', 'sat_almanshurah'),
         ]);
     }
 }

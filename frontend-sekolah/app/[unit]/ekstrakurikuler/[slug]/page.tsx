@@ -397,7 +397,7 @@ export default function EkstrakurikulerDetailPage() {
                 
                 {/* Email Registration */}
                 <a
-                  href="mailto:Budimancendikia304@gmail.com"
+                  href="mailto:budimancendikia304@gmail.com"
                   className="w-full py-4 bg-[#0B6B69] hover:bg-[#085351] text-white font-black text-xs uppercase tracking-widest rounded-2xl transition-all hover:-translate-y-0.5 shadow-md flex items-center justify-center gap-2"
                 >
                   <Mail size={16} /> Daftar via Email
