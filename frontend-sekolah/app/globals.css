@@ -376,5 +376,7 @@ body {
   background: rgba(126, 230, 227, 0.6);
 }
 
-
-
+body { background-color: #C8F7F5 !important; }
+.bg-main { background-color: #C8F7F5 !important; }
+.bg-navbar { background-color: #0FA8A4 !important; }
+.text-title { color: #0B6B69 !important; }

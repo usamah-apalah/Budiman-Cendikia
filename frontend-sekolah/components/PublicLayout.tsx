@@ -124,7 +124,7 @@ export default function PublicLayout({ children, unit }: PublicLayoutProps) {
   const accentBg = unit === "sd" ? "bg-tosca-50 text-tosca-600" : "bg-tosca-50 text-tosca-900";
 
   return (
-    <div className="min-h-screen bg-white font-sans text-gray-900 overflow-x-hidden">
+    <div className="min-h-screen bg-main font-sans text-gray-900 overflow-x-hidden">
       {/* Strict Mobile CSS Fallbacks */}
       <style dangerouslySetInnerHTML={{__html: `
         @media (max-width: 768px) {
