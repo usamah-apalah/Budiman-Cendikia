@@ -299,7 +299,7 @@ export default function UnitPublicHomePage() {
         <PublicLayout unit="sd">
         {/* Hero Section */}
         <section className="relative pt-12 pb-20 md:pt-20 md:pb-32 overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-tosca-50/50 -z-10"></div>
+          <div className="absolute top-0 left-0 w-full h-full bg-main -z-10"></div>
           <div className="absolute top-0 right-0 w-1/3 h-full bg-tosca-500/10 -z-10 blur-3xl rounded-full translate-x-1/2"></div>
 
           <div className="max-w-7xl mx-auto px-6">
@@ -336,7 +336,7 @@ export default function UnitPublicHomePage() {
         </section>
 
         {/* Stats */}
-        <section className="py-20 bg-white">
+        <section className="py-20 bg-main">
           <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
               { label: "Siswa Aktif", end: stats.siswa, suffix: "+" },
@@ -360,7 +360,7 @@ export default function UnitPublicHomePage() {
           </div>
         </section>
         {/* Sambutan Kepala Sekolah */}
-        <section className="py-20 overflow-hidden" style={{ background: "var(--bg-utama)" }}>
+        <section className="py-20 overflow-hidden bg-main">
           <div className="max-w-7xl mx-auto px-6">
             <div className="grid md:grid-cols-12 gap-10 md:gap-16 items-center">
               <div className="md:col-span-5 scroll-animate opacity-0 translate-y-12 transition-all duration-700">
@@ -476,7 +476,7 @@ export default function UnitPublicHomePage() {
         </section>
 
         {/* Informasi Terkini (Agenda, Pengumuman, Artikel) */}
-        <section className="py-20 bg-white">
+        <section className="py-20 bg-main">
           <div className="max-w-7xl mx-auto px-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-10">
               
@@ -661,7 +661,7 @@ export default function UnitPublicHomePage() {
 
         {/* Prestasi Membanggakan */}
         {latestPrestasi.length > 0 && (
-          <section id="prestasi" className="py-20 bg-bg-utama w-full text-left my-16 border-t border-b border-border-halus rounded-none">
+          <section id="prestasi" className="py-20 bg-main w-full text-left my-16 border-t border-b border-border-halus rounded-none">
             <div className="max-w-7xl mx-auto px-6">
               {/* Header Section */}
               <div className="flex justify-between items-center mb-10">
@@ -740,7 +740,7 @@ export default function UnitPublicHomePage() {
         <ProgramFasilitasUnggulan unit={unit} programFasilitas={programFasilitas} />
 
         {/* Extracurricular Section */}
-        <section className="py-20 bg-white">
+        <section className="py-20 bg-main">
           <div className="max-w-7xl mx-auto px-6">
             
             {/* Header Section */}
@@ -798,7 +798,7 @@ export default function UnitPublicHomePage() {
         </section>
 
         {/* Instagram Section */}
-        <section className="py-20 bg-white">
+        <section className="py-20 bg-main">
           <div className="max-w-7xl mx-auto px-6">
             <div className="bg-bg-utama rounded-[40px] p-8 md:p-12 border border-warna-sorotan flex flex-col md:flex-row items-center justify-between gap-10 scroll-animate opacity-0 translate-y-12 transition-all duration-700">
               <div className="flex-1 text-center md:text-left">
@@ -851,7 +851,7 @@ export default function UnitPublicHomePage() {
         </section>
 
         {/* Tenaga Pengajar Marquee */}
-        <section className={`py-20 ${latestPrestasi.length > 0 ? 'bg-gray-50' : 'bg-white'} scroll-animate opacity-0 translate-y-12 transition-all duration-1000`}>
+        <section className="py-20 bg-main scroll-animate opacity-0 translate-y-12 transition-all duration-1000">
           <div className="max-w-7xl mx-auto px-6 text-center">
             <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight mb-4 uppercase">
               Tenaga Pengajar Profesional
@@ -864,7 +864,7 @@ export default function UnitPublicHomePage() {
         </section>
 
         {/* Galeri Kegiatan Section */}
-        <section className="galeri-section py-20" style={{ background: "var(--bg-utama)" }}>
+        <section className="galeri-section py-20 bg-main">
           <div className="max-w-7xl mx-auto px-6">
             <div className="text-center mb-12 scroll-animate opacity-0 translate-y-12 transition-all duration-700">
               <span className="text-tosca-500 font-black uppercase tracking-[0.3em] text-[9px] md:text-[10px] mb-2 block">Dokumentasi</span>
@@ -1054,7 +1054,7 @@ export default function UnitPublicHomePage() {
         </section>
 
         {/* Stats */}
-        <section className="py-20 border-t border-b border-border-halus" style={{ background: "var(--bg-utama)" }}>
+        <section className="py-20 border-t border-b border-border-halus bg-main">
           <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
               { label: "Siswa Aktif", end: stats.siswa, suffix: "+" },
@@ -1079,7 +1079,7 @@ export default function UnitPublicHomePage() {
         </section>
 
         {/* Sambutan Kepala Sekolah */}
-        <section className="py-20 overflow-hidden" style={{ background: "var(--bg-utama)" }}>
+        <section className="py-20 overflow-hidden bg-main">
           <div className="max-w-7xl mx-auto px-6">
             <div className="grid md:grid-cols-12 gap-10 md:gap-16 items-center">
               <div className="md:col-span-5 scroll-animate opacity-0 translate-y-12 transition-all duration-700">
@@ -1194,7 +1194,7 @@ export default function UnitPublicHomePage() {
         </section>
 
         {/* Informasi Terkini (Agenda, Pengumuman, Artikel) */}
-        <section className="py-20" style={{ background: "var(--bg-utama)" }}>
+        <section className="py-20 bg-main">
           <div className="max-w-7xl mx-auto px-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-10">
               
@@ -1400,7 +1400,7 @@ export default function UnitPublicHomePage() {
 
         {/* Prestasi Membanggakan */}
         {latestPrestasi.length > 0 && (
-          <section id="prestasi" className="py-20 w-full text-left my-16 border-t border-b border-border-halus rounded-none" style={{ background: "var(--bg-utama)" }}>
+          <section id="prestasi" className="py-20 w-full text-left my-16 border-t border-b border-border-halus rounded-none bg-main">
             <div className="max-w-7xl mx-auto px-6">
               {/* Header Section */}
               <div className="flex justify-between items-center mb-10">
@@ -1483,7 +1483,7 @@ export default function UnitPublicHomePage() {
         <ProgramFasilitasUnggulan unit={unit} programFasilitas={programFasilitas} />
 
         {/* Extracurricular Section */}
-        <section className="py-20" style={{ background: "var(--bg-utama)" }}>
+        <section className="py-20 bg-main">
           <div className="max-w-7xl mx-auto px-6">
             
             {/* Header Section */}
@@ -1545,7 +1545,7 @@ export default function UnitPublicHomePage() {
         </section>
 
         {/* Instagram Section */}
-        <section className="py-20" style={{ background: "var(--bg-komponen)" }}>
+        <section className="py-20 bg-main">
           <div className="max-w-7xl mx-auto px-6">
             <div 
               className="rounded-[40px] p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-10 scroll-animate opacity-0 translate-y-12 transition-all duration-700"
@@ -1604,7 +1604,7 @@ export default function UnitPublicHomePage() {
         </section>
 
         {/* Tenaga Pengajar Marquee */}
-        <section className="py-20 scroll-animate opacity-0 translate-y-12 transition-all duration-1000" style={{ background: "var(--bg-komponen)" }}>
+        <section className="py-20 scroll-animate opacity-0 translate-y-12 transition-all duration-1000 bg-main">
           <div className="max-w-7xl mx-auto px-6 text-center">
             <h2 className="text-3xl md:text-4xl font-black text-warna-teks-mutlak tracking-tight mb-4 uppercase">
               Tenaga Pengajar Profesional
@@ -1617,7 +1617,7 @@ export default function UnitPublicHomePage() {
         </section>
 
         {/* Galeri Kegiatan Section */}
-        <section className="galeri-section py-20" style={{ background: "var(--bg-utama)" }}>
+        <section className="galeri-section py-20 bg-main">
           <div className="max-w-7xl mx-auto px-6">
             <div className="text-center mb-12 scroll-animate opacity-0 translate-y-12 transition-all duration-700">
               <span className="text-bg-tombol-utama font-black uppercase tracking-[0.3em] text-[9px] md:text-[10px] mb-2 block">Dokumentasi</span>
